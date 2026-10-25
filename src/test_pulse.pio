@@ -1,0 +1,5 @@
+.program test_pulse
+.wrap_target
+    set pins, 1
+    set pins, 0
+.wrap

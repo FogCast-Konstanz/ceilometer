@@ -1,0 +1,14 @@
+.program prn_tx
+.side_set 1
+.wrap_target
+    out pins, 1 side 1 [6]
+    nop         side 0 [7]
+.wrap
+
+.program frame_sync
+.side_set 1
+.wrap_target
+    mov x, y side 1
+count:
+    jmp x-- count side 0
+.wrap
