@@ -26,6 +26,8 @@ The Bring-up page provides:
 - Laser DS18B20 and receiver MCP9800 feedback; separate TEC and compensated
   SiPM-bias controls; explicit laser arming and DAC application.
 - GP12 test-pulse generation and modulo-65536 GP5 counter observation.
+- Mainboard and receiver I2C scans (firmware 0.4.1+), including idle line levels,
+  timeout/NACK counts and responding addresses. Scanning requires outputs off.
 - Dark captures with GP4 low / diagnostic PRN on GP13, optional commissioned
   emitting captures, 1023-bin histogram and correlation readback, CSV export.
 - Peripheral readback health for both temperature sensors, three DACs and TEC SPI.

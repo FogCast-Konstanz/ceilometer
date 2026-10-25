@@ -99,9 +99,11 @@ test('demo runs through the same Web Streams transport and device protocol', asy
   const port = new DemoPort(metadata), client = new SerialClient(port); await client.open();
   assert.match((await client.command('get_info'))[1], /DEMO/);
   assert.equal((await client.command('parameter_count'))[0], '48');
+  assert.deepEqual(await client.command('i2c_scan,1'), ['1','1','1','1','1','0','110','2','72','78']);
   await assert.rejects(client.command('tec_enable,1'), DeviceError);
   await client.command('set_params,tec_polarity,1'); await client.command('tec_enable,1');
   assert.equal((await client.command('get_temperature_control'))[0], '1');
+  await assert.rejects(client.command('i2c_scan,1'), DeviceError);
   port.condition = 'laser'; assert.equal((await client.command('get_state'))[0], 'FAULT');
   assert.equal((await client.command('get_temperature_control'))[0], '0');
   assert.equal(telemetry(await client.command('get_telemetry,laser_temp_mc')).valid, false);

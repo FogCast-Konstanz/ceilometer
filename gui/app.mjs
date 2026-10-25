@@ -30,7 +30,7 @@ function setUi() {
   $('connection').className = `badge${on ? ' good' : ''}`;
   for (const b of document.querySelectorAll('[data-action]')) {
     b.disabled = !on || busy || (!!b.dataset.build && (!builds[b.dataset.build] || state?.[0] === 'FAULT'));
-    if (['applyParameters', 'save', 'load', 'defaults', 'revert'].includes(b.dataset.action)) b.disabled ||= !idle();
+    if (['applyParameters', 'save', 'load', 'defaults', 'revert', 'scanReceiver', 'scanMain'].includes(b.dataset.action)) b.disabled ||= !idle();
   }
   $('sendCommand').disabled = !on || busy;
   $('addChannel').disabled = !telemetryNames.length;
@@ -292,7 +292,16 @@ async function readCapture(token) {
   check(token); capture = result; $('plotMode').value = 'histogram';
   $('captureDetail').textContent = `${demo ? 'SIMULATED · ' : ''}${result.frames} frames · ${result.chipHz.toLocaleString()} chips/s · downloaded ${result.at} · range timing unqualified`;
 }
+async function scanBus(bus, token) {
+  const reply=await cmd(`i2c_scan,${bus}`,token);
+  if(reply.length<8 || integer(reply[0],0,1)!==bus) throw new Error('Invalid I2C scan response.');
+  const count=integer(reply[7],0,112);fields(reply,8+count);
+  const addresses=reply.slice(8).map(v=>`0x${integer(v,8,119).toString(16).padStart(2,'0')}`);
+  $('busScan').textContent=`I²C${bus}: SDA/SCL ${reply[1]}/${reply[2]} → ${reply[3]}/${reply[4]} · `+
+    `${reply[5]} timeouts · ${reply[6]} NACKs · found ${addresses.join(', ') || 'none'}`;
+}
 const actions = {
+  scanReceiver: t=>scanBus(1,t),scanMain: t=>scanBus(0,t),
   pulse: t => cmd(`test_pulse,${integer($('pulse').value, 0, 10000000)}`, t), pulseOff: t => cmd('test_pulse,0', t),
   clearFault: t => cmd('clear_fault', t), refresh: inventory,
   tecOn: t => cmd('tec_enable,1', t), tecOff: t => cmd('tec_enable,0', t),

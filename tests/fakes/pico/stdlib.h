@@ -12,7 +12,7 @@ void busy_wait_us_32(uint32_t us);
 uint32_t time_us_32(void);
 #define GPIO_FUNC_SIO 0
 #define GPIO_IRQ_EDGE_FALL 4u
-#define PICO_ERROR_TIMEOUT -1
+#define PICO_ERROR_TIMEOUT -2
 void gpio_set_function(uint pin,int function);
 void gpio_set_irq_enabled_with_callback(uint pin,uint32_t events,bool enable,void (*callback)(uint,uint32_t));
 void stdio_init_all(void);

@@ -12,6 +12,11 @@ static bool hw_bias,bias_i2c_ok=true;
 static temperature_sample receiver;
 static uint16_t receiver_config=0x60;
 static acquisition_status acq;
+static unsigned probes,recoveries;
+bool board_i2c_recover(unsigned bus) { ++recoveries;return bus<=1; }
+int board_i2c_probe(unsigned bus,uint8_t address) {
+    ++probes;return bus==1 && (address==0x48 || address==0x4e) ? 2 : -1;
+}
 void busy_wait_us_32(uint32_t us) { fake_now+=us; }
 bool board_adc_sample(unsigned channel,unsigned average,uint16_t *raw) { (void)channel;(void)average;*raw=1000;return true; }
 bool board_dac_read(unsigned channel,uint16_t *raw) { *raw=channel==0 ? hw_dac : channel==1 ? hw_bias_dac : 0;return channel!=1 || bias_i2c_ok; }
@@ -177,6 +182,12 @@ int main(void) {
     request("bias_enable","1");CHECK(hw_bias);
     receiver_config=0;fake_now+=100000;CHECK(!bias_service(true));
     CHECK(fault && !hw_bias && sipm_bias_status().reason==BIAS_TEMPERATURE);
+    reset();probes=recoveries=0;request("i2c_recover","1");CHECK(recoveries==1);
+    request("i2c_scan","1");CHECK(probes==112);
+    request("arm","1");probes=recoveries=0;request("i2c_recover","1");CHECK(!recoveries);
+    request("i2c_scan","1");CHECK(!probes);
+    request("stop",NULL);request("tec_polarity","1");request("tec_enable","1");
+    request("i2c_scan","1");CHECK(!probes); /* scans cannot interrupt power control */
     puts("PASS: real USB command/interlock wiring, TEC sensor prerequisite, laser 10/30 C gates, range recovery, stale feedback, latched faults and SPI shutdown");
     return 0;
 }

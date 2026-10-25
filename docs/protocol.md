@@ -121,3 +121,23 @@ values. `bias_dac` without an argument disables bias (retired target is zero). A
 arm and feedback interlocks. Parameter settings never bypass the PID: `tec_mv`
 remains rejected. Telemetry timestamps/ages are uint32 microseconds (wrap every
 ~71.6 minutes); per-entry valid/stale flags should be used in addition to age.
+
+
+Firmware 0.4.1 adds `$i2c_scan,0` (GP0/1 mainboard) and `$i2c_scan,1`
+(GP2/3 receiver). Acquisition and all power outputs must be off. Scan uses only
+two-byte reads at nonreserved 7-bit addresses 0x08..0x77, with 1 ms deadlines;
+it does not write device configuration or attempt bus recovery. ACK fields:
+bus, SDA_before, SCL_before, SDA_after, SCL_after, timeout_count, nack_or_error_count,
+address_count, addresses... (decimal addresses). Expected 0x4c/0x4e on bus 0 and
+0x48/0x4e on bus 1. Presence alone does not identify or validate a device.
+
+
+`$i2c_recover,0_or_1` also requires acquisition and all power outputs off.
+It releases the bus, sends up to nine open-drain SCL pulses if SDA is held low,
+then a STOP and restores 100 kHz I2C. Clock-high waits are bounded at 500 us;
+neither pin is ever actively driven high. ACK: bus, cleared, final_SDA, final_SCL.
+`cleared=1` reports idle lines only, not peripheral presence. A hard SCL-low fault
+is reported as failure; no automatic power cycle is attempted. Recovery is
+explicit, not run during bias/TEC/laser operation. A scan allows 100 us for the
+final STOP to settle before changing address. It reads two data bytes to complete
+the AD5693R readback sequence.

@@ -24,6 +24,8 @@
 <div class="readout"><span>Counter (16-bit, wraps)</span><b id="counter">—</b></div>
 <label class="field">GP12 test pulse / Hz<input id="pulse" type="number" min="0" max="10000000" value="1000" step="1"></label>
 <div class="buttons"><button data-action="pulse">Apply pulse</button><button data-action="pulseOff">Pulse off</button></div>
+<div class="buttons"><button data-action="scanReceiver">Scan receiver I²C</button><button data-action="scanMain">Scan main I²C</button></div>
+<div id="busScan" class="detail">I²C scan requires all outputs off</div>
 <div class="buttons"><button data-action="clearFault">Clear fault</button><button data-action="refresh">Refresh inventory</button></div>
 <p class="hint">Loopback requires a verified GP12 → GP5 bench connection. Clearing a fault never restarts outputs.</p></section>
 <section class="panel"><div class="section-title"><span class="index">02</span><h2>TEC regulation</h2><span id="tecStatus" class="badge">OFF</span></div>

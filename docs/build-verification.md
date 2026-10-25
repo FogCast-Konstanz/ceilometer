@@ -65,3 +65,13 @@ flash save, independent TEC/bias enable, missing-receiver shutdown and explicit
 fault recovery, dark acquisition/download and Stop during an active capture.
 Live WebGL traces and the responsive layout were inspected in the browser.
 No real USB CDC port or board outputs were operated during GUI validation.
+
+
+First physical bring-up: firmware 0.4.0 was programmed and verified on the
+RP2350, then diagnostic firmware 0.4.1 was programmed/verified. USB CDC commands,
+laser DS18B20 and mainboard DAC/LT8722 readback were checked with outputs off.
+I2C scans and bounded bus recovery were exercised. The receiver link was absent;
+the user-specified US535 cable lacks the required SuperSpeed conductors.
+See receiver-diagnostics.md for measurements and the unverified cable-replacement
+step. All seven host suites pass, including real-driver bus-clear simulations,
+output-off scan/recovery guards and the GUI simulator's scan contract.

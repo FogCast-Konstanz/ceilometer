@@ -213,7 +213,7 @@ static void command(char *cmd, char *arg, void *context) {
     lease_us = time_us_32();
     if (!strcmp(cmd, "stop") && !arg) { emergency_stop(false); ack(cmd); return; }
     if (!strcmp(cmd, "get_info") && !arg) {
-        printf("$ACK,get_info,ceilometer,0.4.0,pico2,%lu,%lu,%u,%d,%d,%d\r\n",
+        printf("$ACK,get_info,ceilometer,0.4.1,pico2,%lu,%lu,%u,%d,%d,%d\r\n",
             (unsigned long)clock_get_hz(clk_sys), (unsigned long)chip_hz, PRN_LENGTH,
             CEIL_ENABLE_LASER, CEIL_ENABLE_BIAS, CEIL_ENABLE_TEC); return;
     }
@@ -250,6 +250,30 @@ static void command(char *cmd, char *arg, void *context) {
     }
     if(configuration_command(cmd,arg)) return;
     if (running) { error(cmd, "BUSY"); return; }
+    if(!strcmp(cmd,"i2c_recover") && numeric && n<=1) {
+        if(!configuration_idle()) { error(cmd,"OUTPUTS_ACTIVE");return; }
+        bool ok=board_i2c_recover(n);
+        printf("$ACK,%s,%lu,%d,%d,%d\r\n",cmd,(unsigned long)n,ok,
+            board_pin(n ? PIN_RX_SDA : PIN_LD_SDA),board_pin(n ? PIN_RX_SCL : PIN_LD_SCL));
+        return;
+    }
+    if(!strcmp(cmd,"i2c_scan") && numeric && n<=1) {
+        if(!configuration_idle()) { error(cmd,"OUTPUTS_ACTIVE");return; }
+        unsigned sda=n ? PIN_RX_SDA : PIN_LD_SDA,scl=n ? PIN_RX_SCL : PIN_LD_SCL;
+        bool sda_before=board_pin(sda),scl_before=board_pin(scl);
+        uint8_t addresses[112];unsigned count=0,timeouts=0,nacks=0;
+        for(unsigned address=0x08;address<=0x77;++address) {
+            int result=board_i2c_probe(n,(uint8_t)address);
+            if(result==2) addresses[count++]=(uint8_t)address;
+            else if(result==PICO_ERROR_TIMEOUT) ++timeouts;
+            else ++nacks;
+            if((address&15u)==0) watchdog_update();
+        }
+        printf("$ACK,%s,%lu,%d,%d,%d,%d,%u,%u,%u",cmd,(unsigned long)n,
+            sda_before,scl_before,board_pin(sda),board_pin(scl),timeouts,nacks,count);
+        for(unsigned i=0;i<count;++i) printf(",%u",addresses[i]);
+        printf("\r\n");return;
+    }
     if(!strcmp(cmd,"range_point") && numeric) {
         unsigned group=(unsigned)PARAM(range_average_bins),first=n*group;
         if(!ready || n>=(PRN_LENGTH+group-1)/group) { error(cmd,"NO_DATA_OR_INVALID_INDEX");return; }

@@ -61,3 +61,38 @@ bool board_adc_sample(unsigned channel,unsigned average,uint16_t *raw) {
     *raw=(uint16_t)((sum+average/2u)/average);return ok;
 }
 bool board_pin(unsigned pin) { return gpio_get(pin); }
+static bool wait_high(unsigned pin) {
+    for(unsigned i=0;i<100;++i) { if(gpio_get(pin)) return true;busy_wait_us_32(5); }
+    return false;
+}
+bool board_i2c_recover(unsigned bus) {
+    if(bus>1) return false;
+    i2c_inst_t *controller=bus ? i2c1 : i2c0;
+    unsigned sda=bus ? PIN_RX_SDA : PIN_LD_SDA,scl=bus ? PIN_RX_SCL : PIN_LD_SCL;
+    i2c_deinit(controller);
+    gpio_init(sda);gpio_init(scl);gpio_pull_up(sda);gpio_pull_up(scl);
+    gpio_put(sda,0);gpio_put(scl,0); /* Never drive either line high. */
+    gpio_set_dir(sda,GPIO_IN);gpio_set_dir(scl,GPIO_IN);
+    bool ok=wait_high(scl);
+    for(unsigned i=0;ok && i<9 && !gpio_get(sda);++i) {
+        gpio_set_dir(scl,GPIO_OUT);busy_wait_us_32(5);
+        gpio_set_dir(scl,GPIO_IN);ok=wait_high(scl);busy_wait_us_32(5);
+    }
+    if(ok) { /* STOP with SDA rising only after SCL has been released high. */
+        gpio_set_dir(scl,GPIO_OUT);gpio_set_dir(sda,GPIO_OUT);busy_wait_us_32(5);
+        gpio_set_dir(scl,GPIO_IN);ok=wait_high(scl);busy_wait_us_32(5);
+        gpio_set_dir(sda,GPIO_IN);busy_wait_us_32(5);ok=ok && gpio_get(sda);
+    }
+    gpio_set_dir(sda,GPIO_IN);gpio_set_dir(scl,GPIO_IN);
+    gpio_set_function(sda,GPIO_FUNC_I2C);gpio_set_function(scl,GPIO_FUNC_I2C);
+    i2c_init(controller,100000);return ok;
+}
+int board_i2c_probe(unsigned bus,uint8_t address) {
+    if(bus>1 || address<0x08 || address>0x77) return -1;
+    uint8_t value[2];
+    int result=i2c_read_timeout_us(bus ? i2c1 : i2c0,address,value,2,false,1000);
+    /* Receive FIFO can become ready before the final NACK/STOP reaches the bus.
+       Let it finish before disabling/readdressing the controller for the next probe. */
+    busy_wait_us_32(100);
+    return result;
+}

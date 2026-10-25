@@ -2,7 +2,7 @@ export class DeviceError extends Error {}
 export class Cancelled extends Error {}
 export function requestText(text) {
   text = text.replace(/^\$/, '');
-  if (!/^[a-z_]+(?:,[\x20-\x7e]+)?$/.test(text) || text.length + 1 > 127)
+  if (!/^[a-z][a-z0-9_]*(?:,[\x20-\x7e]+)?$/.test(text) || text.length + 1 > 127)
     throw new Error('Use one ASCII command, at most 127 characters including $.');
   return text;
 }

@@ -67,6 +67,11 @@ export class DemoPort {
       case 'get_info': return out(['ceilometer', '0.4.0-DEMO', 'pico2', 150000000, this.params.get('chip_hz'), 1023, 1, 1, 1]);
       case 'stop': this.stop(); return [];
       case 'heartbeat': return [];
+      case 'i2c_scan': {
+        if(this.armed || this.tec || this.bias || this.ready>now) throw new DeviceError('OUTPUTS_ACTIVE');
+        const bus=integer(a[0],0,1),addresses=bus ? this.condition==='receiver' ? [] : [0x48,0x4e] : [0x4c,0x4e];
+        return out([bus,1,1,1,1,0,112-addresses.length,addresses.length,...addresses]);
+      }
       case 'get_limits': return out([1, 60000, 500, 150000000, 1023, 4186112]);
       case 'get_state': return out([this.fault ? 'FAULT' : this.ready > now ? 'ACQUIRING' : this.ready ? 'READY' : 'IDLE',
         this.ready && this.ready <= now ? this.frames : 0, this.ready > now ? this.frames : 0, 1023, 0, +this.armed, +this.bias, 250]);
