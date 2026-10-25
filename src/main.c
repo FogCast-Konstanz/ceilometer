@@ -19,6 +19,7 @@
 #include "parameters.h"
 #include "parameter_storage.h"
 #include "telemetry.h"
+#include "sipm_bias.h"
 static uint8_t code[PRN_LENGTH];
 static uint64_t histogram[PRN_LENGTH];
 static int64_t profile[PRN_LENGTH];
@@ -32,7 +33,7 @@ static volatile bool driver_fault;
 static void error(const char *cmd, const char *reason) { printf("$NACK,%s,%s\r\n", cmd, reason); }
 static void ack(const char *cmd) { printf("$ACK,%s\r\n", cmd); }
 static void emergency_stop(bool latch) {
-    bin_acquisition_stop(); board_outputs_off(); lt8722_disable(); temperature_stop(&thermal);
+    bin_acquisition_stop(); sipm_bias_stop(); board_outputs_off(); lt8722_disable(); temperature_stop(&thermal);
     armed = false; running = false; emitting = false; ready = false; tec_on = false; bias_on = false;
     laser_code = 0; remaining = 0;
     if (latch) fault = true;
@@ -51,6 +52,8 @@ static bool configuration_commit(const parameter_values *candidate) {
     parameters_current=*candidate;
     /* Config can be recovered with absent peripherals. Telemetry reports/retries readback. */
     telemetry_init();
+    /* Changed calibration invalidates cached bias feedback; preserve latched faults. */
+    sipm_bias_reconfigure();
     bool thermal_fault=thermal.fault;
     temperature_init(&thermal);thermal.fault=thermal_fault;
     chip_hz=(uint32_t)PARAM(chip_hz);ready=false;
@@ -66,7 +69,7 @@ static bool legacy_parameter(const char *cmd,const char *name,const char *arg) {
 }
 static bool configuration_command(const char *cmd,char *arg) {
     uint32_t index;
-    if(!strcmp(cmd,"parameter_count") && !arg) { printf("$ACK,%s,%u,1\r\n",cmd,(unsigned)PARAM_COUNT);return true; }
+    if(!strcmp(cmd,"parameter_count") && !arg) { printf("$ACK,%s,%u,%u\r\n",cmd,(unsigned)PARAM_COUNT,STORAGE_SCHEMA_VERSION);return true; }
     if(!strcmp(cmd,"parameter_info") && protocol_uint(arg,PARAM_COUNT-1,&index)) {
         const parameter_descriptor *d=&parameter_descriptors[index];
         printf("$ACK,%s,%lu,%s,%s,%ld,%ld,%ld\r\n",cmd,(unsigned long)index,d->name,d->unit,
@@ -84,8 +87,8 @@ static bool configuration_command(const char *cmd,char *arg) {
     }
     if(!strcmp(cmd,"get_storage") && !arg) {
         const parameter_journal *j=parameter_storage_state();
-        printf("$ACK,%s,%d,%d,%lu,%d,%d,1\r\n",cmd,j->loaded,parameter_storage_dirty(&parameters_current),
-               (unsigned long)j->generation,j->page,j->corrupt);return true;
+        printf("$ACK,%s,%d,%d,%lu,%d,%d,%u\r\n",cmd,j->loaded,parameter_storage_dirty(&parameters_current),
+               (unsigned long)j->generation,j->page,j->corrupt,STORAGE_SCHEMA_VERSION);return true;
     }
     if(!strcmp(cmd,"telemetry_count") && !arg) {
         printf("$ACK,%s,%u\r\n",cmd,(unsigned)TELEMETRY_COUNT);return true;
@@ -168,6 +171,13 @@ static bool thermal_service(bool poll_sensor) {
     }
     return true;
 }
+static bool bias_service(bool available) {
+    (void)sipm_bias_service(available);
+    if(bias_on && (!sipm_bias_status().enabled || sipm_bias_status().fault)) {
+        emergency_stop(true);return false;
+    }
+    return true;
+}
 static bool page(char *arg, uint32_t max, uint32_t *offset, uint32_t *count) {
     if (!arg) return false;
     char *comma = strchr(arg, ','); if (!comma) return false;
@@ -177,11 +187,11 @@ static bool page(char *arg, uint32_t max, uint32_t *offset, uint32_t *count) {
 }
 static bool begin_capture(void) {
     /* Service temperature only in the dead time between finite bursts. */
-    if (!thermal_service(true) || !running) return false;
+    if (!thermal_service(true) || !bias_service(true) || !running) return false;
     if (emitting && (!armed || !laser_temperature_ok())) return false;
     capture_frames = remaining > CAPTURE_MAX_FRAMES ? CAPTURE_MAX_FRAMES : remaining;
     /* Limit sensor-service delay at slow chip rates (one frame minimum). */
-    if (armed || tec_on) {
+    if (armed || tec_on || bias_on) {
         unsigned cap = chip_hz / (20u * PRN_LENGTH);
         if (!cap) cap = 1;
         if (capture_frames > cap) capture_frames = cap;
@@ -203,7 +213,7 @@ static void command(char *cmd, char *arg, void *context) {
     lease_us = time_us_32();
     if (!strcmp(cmd, "stop") && !arg) { emergency_stop(false); ack(cmd); return; }
     if (!strcmp(cmd, "get_info") && !arg) {
-        printf("$ACK,get_info,ceilometer,0.3.0,pico2,%lu,%lu,%u,%d,%d,%d\r\n",
+        printf("$ACK,get_info,ceilometer,0.4.0,pico2,%lu,%lu,%u,%d,%d,%d\r\n",
             (unsigned long)clock_get_hz(clk_sys), (unsigned long)chip_hz, PRN_LENGTH,
             CEIL_ENABLE_LASER, CEIL_ENABLE_BIAS, CEIL_ENABLE_TEC); return;
     }
@@ -231,6 +241,13 @@ static void command(char *cmd, char *arg, void *context) {
     if(!strcmp(cmd,"get_test_pulse") && !arg) {
         printf("$ACK,%s,%lu\r\n",cmd,(unsigned long)test_pulse_actual_hz());return;
     }
+    if(!strcmp(cmd,"get_bias") && !arg) {
+        bias_status b=sipm_bias_status();uint32_t now=time_us_32();
+        printf("$ACK,%s,%d,%d,%u,%d,%ld,%lu,%" PRId64 ",%" PRId64 ",%" PRId64 ",%u\r\n",
+            cmd,b.enabled,b.fault,(unsigned)b.reason,b.valid,(long)b.temperature.mc,
+            (unsigned long)(now-b.temperature.sampled_us),b.breakdown_uv,b.target_uv,b.estimated_uv,b.code);
+        return;
+    }
     if(configuration_command(cmd,arg)) return;
     if (running) { error(cmd, "BUSY"); return; }
     if(!strcmp(cmd,"range_point") && numeric) {
@@ -245,6 +262,7 @@ static void command(char *cmd, char *arg, void *context) {
     if (!strcmp(cmd, "clear_fault") && !arg) {
         if (board_laser_fault()) error(cmd, "LD_FAULT_ACTIVE");
         else if (thermal.fault && !temperature_tec_allowed(sensors_laser_sample(),time_us_32())) error(cmd,"TEMPERATURE_INVALID");
+        else if(!sipm_bias_clear_fault()) error(cmd,"BIAS_FEEDBACK_OR_LIMIT");
         else { driver_fault = false; fault = false; thermal.fault=false; ack(cmd); } return;
     }
     if (!strcmp(cmd, "sensors") && !arg) {
@@ -292,15 +310,16 @@ static void command(char *cmd, char *arg, void *context) {
         else { emergency_stop(true); error(cmd, "I2C"); } return;
     }
     if (!strcmp(cmd, "bias_dac") && numeric && n <= 65535) {
-        if (n && (!CEIL_ENABLE_BIAS || fault || n > CEIL_BIAS_MAX_CODE)) {
-            error(cmd, "BIAS_BUILD_DISABLED_OR_LIMIT"); return;
-        }
-        if (board_dac(1, (uint16_t)n)) { PARAM(bias_dac_code)=(int32_t)n;ack(cmd); }
-        else { emergency_stop(true); error(cmd, "I2C"); } return;
+        if(n) error(cmd,"TEMPERATURE_COMPENSATION_OWNS_OUTPUT");
+        else { sipm_bias_stop();bias_on=false;ack(cmd); } return;
     }
     if (!strcmp(cmd, "bias_enable") && numeric && n <= 1) {
-        if (n && (!CEIL_ENABLE_BIAS || !CEIL_BIAS_MAX_CODE || fault)) error(cmd, "BIAS_BUILD_DISABLED_OR_FAULT");
-        else { bias_on = n; board_bias_enable(bias_on); ack(cmd); } return;
+        if(!n) { sipm_bias_stop();bias_on=false;ack(cmd); }
+        else if(fault || !sipm_bias_enable()) {
+            if(sipm_bias_status().fault) emergency_stop(true);
+            error(cmd,"BIAS_BUILD_TEMPERATURE_DAC_OR_LIMIT");
+        } else { bias_on=true;ack(cmd); }
+        return;
     }
     if (!strcmp(cmd,"tec_target")) { (void)legacy_parameter(cmd,"tec_target_mc",arg);return; }
     if (!strcmp(cmd,"tec_polarity")) { (void)legacy_parameter(cmd,"tec_polarity",arg);return; }
@@ -353,7 +372,7 @@ int main(void) {
     parameter_storage_init();
     set_sys_clock_khz(SYSTEM_KHZ, true);
     chip_hz=(uint32_t)PARAM(chip_hz);
-    board_init(); lt8722_init(); lt8722_disable(); sensors_init(); temperature_init(&thermal);
+    board_init(); lt8722_init(); lt8722_disable(); sensors_init(); temperature_init(&thermal); sipm_bias_init();
     prn_generate_seed(code,(uint16_t)PARAM(prn_seed)); prn_tx_init(code); sipm_counter_init();
     (void)board_dac(2,(uint16_t)PARAM(threshold_code));telemetry_init();
     bin_acquisition_init(); test_pulse_init();
@@ -370,6 +389,7 @@ int main(void) {
         }
         acquisition_status s = bin_acquisition_status();
         (void)thermal_service(!s.busy);
+        (void)bias_service(!s.busy);
         if(s.busy && emitting && running) telemetry_capture_active(false);
         telemetry_poll(s.busy);
         if (running && s.failed) emergency_stop(true);

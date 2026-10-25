@@ -37,8 +37,9 @@ additional recovery mechanism, not an independent physical laser interlock.
 | `set_threshold,code` | raw 16-bit U16 DAC code; does not enable detector bias |
 | `arm,0_or_1` | 1 allows laser setup; 0 shuts down all power outputs |
 | `laser_dac,code` | 0..calibrated compile-time ceiling; nonzero requires arm |
-| `bias_dac,code` | 0..calibrated compile-time ceiling; nonzero requires commissioned bias build |
-| `bias_enable,0_or_1` | GP18 high enables LT3571; requires commissioned bias build for 1 |
+| `bias_dac,code` | only 0 accepted (disable); nonzero rejected, compensation owns output |
+| `bias_enable,0_or_1` | start/stop temperature-compensated bias; 1 requires commissioned build, valid receiver temperature and target <=50 V |
+| `get_bias` | enabled, fault, reason, valid, receiver_mC, age_us, breakdown_est_uV, target_uV, output_est_uV, target_code; see sipm-bias.md |
 | `tec_read,register` | register (0..7), 32-bit unsigned value; no unrestricted write command |
 | `tec_enable,0_or_1` | commissioned soft start / disable; failures latch FAULT |
 | `tec_target,milliCelsius` | inside configured laser window, default 24000; reset PID state |
@@ -48,7 +49,8 @@ additional recovery mechanism, not an independent physical laser interlock.
 | `tec_mv,...` | rejected: PID_OWNS_OUTPUT |
 
 States: IDLE, ACQUIRING, READY, FAULT. During ACQUIRING only `stop`, `get_info`,
-`get_state`, `heartbeat`, `get_count`, and `get_temperature_control` are accepted. BUSY protects shared
+`get_state`, `heartbeat`, `get_count`, `get_bias`, and `get_temperature_control` are accepted.
+The cached parameter and telemetry getters listed below also remain available. BUSY protects shared
 buffers and avoids I2C/SPI/one-wire traffic during a burst. Sensor service and TEC
 health checks occur between bursts; freshness/range checks also run during bursts.
 Laser arming and emission require valid feedback inside the configured laser
@@ -63,7 +65,7 @@ Examples:
 
 ```text
 > $get_info
-< $ACK,get_info,ceilometer,0.3.0,pico2,150000000,10000000,1023,0,0,0
+< $ACK,get_info,ceilometer,0.4.0,pico2,150000000,10000000,1023,0,0,0
 > $capture,16
 < $ACK,capture
 > $get_state
@@ -114,8 +116,8 @@ limits, offsets and polarity. Temperature limits and target are adjustable;
 commands update the same inventory. Legacy live target/gain changes now require
 outputs off. See parameter-storage.md and telemetry-inventory.md for semantics.
 
-`capture`, `start`, `laser_dac` and `bias_dac` accept omitted arguments to use
-configured values. Actuation still requires the original build enables, limits,
+`capture`, `start` and `laser_dac` accept omitted arguments to use configured
+values. `bias_dac` without an argument disables bias (retired target is zero). Actuation still requires the original build enables, limits,
 arm and feedback interlocks. Parameter settings never bypass the PID: `tec_mv`
 remains rejected. Telemetry timestamps/ages are uint32 microseconds (wrap every
 ~71.6 minutes); per-entry valid/stale flags should be used in addition to age.

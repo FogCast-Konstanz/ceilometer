@@ -1,6 +1,7 @@
 #pragma once
 #include "parameters.h"
 #include <stddef.h>
+#define STORAGE_SCHEMA_VERSION 2u
 #define STORAGE_PAGE_SIZE 256u
 #define STORAGE_SECTOR_SIZE 4096u
 #define STORAGE_SIZE (2u*STORAGE_SECTOR_SIZE)

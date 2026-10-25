@@ -38,7 +38,7 @@ Runtime diagnostic pulse generation and output enable/arm actions are transient.
 | `tec_ilimp_code` | code | 448 | 448..462 | Positive current limit code; <= existing ~0.85 A ceiling |
 | `tec_frequency` | selector | 5 | 0..5 | 0..5 selects 0.5,1,1.5,2,2.5,3 MHz |
 | `laser_dac_code` | code | 0 | 0..65535 | Configured laser DAC target; never applied automatically at boot |
-| `bias_dac_code` | code | 0 | 0..65535 | Configured SiPM bias DAC target; no automatic bias enable |
+| `bias_dac_code` | retired | 0 | 0..0 | Retired raw bias target; compensation owns the DAC |
 | `threshold_code` | code | 0 | 0..65535 | Receiver discriminator DAC code |
 | `chip_hz` | Hz | 10000000 | 10000..10000000 | Exact 150 MHz/(15*integer) chip/bin rate |
 | `integration_frames` | frames | 16 | 1..1000000 | Default capture/start integration frames |
@@ -61,6 +61,17 @@ Runtime diagnostic pulse generation and output enable/arm actions are transient.
 | `laser_dac_ref_uv` | uV | 2500000 | 2400000..2600000 | U2 reference estimate/calibration, gain fixed unity |
 | `bias_dac_ref_uv` | uV | 2500000 | 2400000..2600000 | U6 reference estimate/calibration, gain fixed unity |
 | `threshold_dac_ref_uv` | uV | 2500000 | 2400000..2600000 | U16 reference estimate/calibration, gain fixed unity |
+
+| `sipm_overvoltage_mv` | mV | 10000 | 100..12000 | See sipm-bias.md |
+| `sipm_breakdown_mv` | mV_at_reference | 36500 | 35000..38000 | See sipm-bias.md |
+| `sipm_reference_mc` | mC | 25000 | -40000..85000 | See sipm-bias.md |
+| `sipm_tempco_uv_c` | uV_per_C | 70000 | 0..100000 | See sipm-bias.md |
+| `bias_limit_mv` | mV | 50000 | 10000..50000 | See sipm-bias.md |
+| `bias_temperature_age_ms` | ms | 1000 | 800..5000 | See sipm-bias.md |
+| `bias_gain_ppm` | ppm_of_nominal | 1000000 | 800000..1200000 | See sipm-bias.md |
+| `bias_offset_uv` | uV | -5000000 | -6000000..-4000000 | See sipm-bias.md |
+
+SiPM compensation details and safety boundaries: [sipm-bias.md](sipm-bias.md).
 
 Telemetry coverage plan: ADC0 laser-current sense, ADC1 tagged with the selected
 LT8722 AOUT source, ADC2 LT3571 bias-current sense, Pico 2's existing VSYS/3 ADC3 and VBUS GPIO24, MCU temperature ADC4 raw;

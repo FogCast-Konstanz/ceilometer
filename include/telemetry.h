@@ -100,7 +100,16 @@
  X(lt_vddio_uv,"uV") \
  X(lt_sfb_uv,"uV") \
  X(lt_ldr_uv,"uV") \
- X(lt_control_uv,"uV")
+ X(lt_control_uv,"uV") \
+ X(bias_feedback_mc,"mC") \
+ X(bias_breakdown_uv,"uV_estimate") \
+ X(bias_target_uv,"uV_target") \
+ X(bias_estimated_uv,"uV_estimate") \
+ X(bias_overvoltage_uv,"uV_estimate") \
+ X(bias_target_code,"code") \
+ X(bias_fault,"bool") \
+ X(bias_reason,"enum") \
+ X(bias_feedback_sequence,"count")
 #define TELEMETRY_ENUM(name,unit) T_##name,
 typedef enum { TELEMETRY_LIST(TELEMETRY_ENUM) TELEMETRY_COUNT } telemetry_id;
 #undef TELEMETRY_ENUM

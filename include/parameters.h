@@ -19,7 +19,7 @@
  X(tec_ilimp_code,"code",448,462,448) \
  X(tec_frequency,"selector",0,5,5) \
  X(laser_dac_code,"code",0,65535,0) \
- X(bias_dac_code,"code",0,65535,0) \
+ X(bias_dac_code,"retired",0,0,0) \
  X(threshold_code,"code",0,65535,0) \
  X(chip_hz,"Hz",10000,10000000,10000000) \
  X(integration_frames,"frames",1,1000000,16) \
@@ -41,7 +41,15 @@
  X(receiver_resolution,"bits",9,12,12) \
  X(laser_dac_ref_uv,"uV",2400000,2600000,2500000) \
  X(bias_dac_ref_uv,"uV",2400000,2600000,2500000) \
- X(threshold_dac_ref_uv,"uV",2400000,2600000,2500000)
+ X(threshold_dac_ref_uv,"uV",2400000,2600000,2500000) \
+ X(sipm_overvoltage_mv,"mV",100,12000,10000) \
+ X(sipm_breakdown_mv,"mV_at_reference",35000,38000,36500) \
+ X(sipm_reference_mc,"mC",-40000,85000,25000) \
+ X(sipm_tempco_uv_c,"uV_per_C",0,100000,70000) \
+ X(bias_limit_mv,"mV",10000,50000,50000) \
+ X(bias_temperature_age_ms,"ms",800,5000,1000) \
+ X(bias_gain_ppm,"ppm_of_nominal",800000,1200000,1000000) \
+ X(bias_offset_uv,"uV",-6000000,-4000000,-5000000)
 #define PARAM_ENUM(name,unit,lo,hi,def) PARAM_##name,
 typedef enum { PARAMETER_LIST(PARAM_ENUM) PARAM_COUNT } parameter_id;
 #undef PARAM_ENUM

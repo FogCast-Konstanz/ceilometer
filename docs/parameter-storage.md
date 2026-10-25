@@ -1,7 +1,7 @@
 # Adjustable settings and flash storage
 
 The inventory and implementation plan is in parameters-and-telemetry-plan.md.
-The 40 descriptors are the firmware's single source of names, units, bounds and
+The 48 descriptors are the firmware's single source of names, units, bounds and
 defaults. Every descriptor has USB metadata/get/set access and is included in
 flash serialization. Integer fixed-point units keep parsing and saved data
 unambiguous; for example PID P=100.25 mV/C is `pid_p_milli=100250`.
@@ -17,16 +17,17 @@ These guards preserve the prior fault latch. No configuration update clears a
 fault, starts a capture or enables an output. ACK means the configuration was
 accepted; consult telemetry validity/readback for application to a missing device.
 Threshold application is retried on receiver reconnect, and MCP9800 resolution is
-applied during telemetry service. Flash defaults/load/save work with peripherals
+applied during receiver/bias service. Flash defaults/load/save work with peripherals
 absent. Old telemetry is invalidated when configuration/calibration changes.
 
 `save` explicitly commits RAM values to flash; `load` reloads the latest valid
 record; `defaults` restores RAM defaults without writing flash. Save after
 defaults to persist a factory reset. A reboot loads saved settings or safe
-defaults if none are valid. A configured nonzero laser/bias target stays inert:
-after boot/load you must explicitly arm/apply the laser DAC, or apply/enable bias.
-`laser_dac` and `bias_dac` without an argument apply the configured target subject
-to all existing commissioning ceilings/interlocks. `capture` / `start` without
+defaults if none are valid. A configured nonzero laser target stays inert:
+after boot/load you must explicitly arm/apply the laser DAC. SiPM bias uses
+temperature compensation; `bias_enable,1` explicitly starts it with valid receiver
+feedback. Raw nonzero bias DAC actuation is rejected. `laser_dac` without an
+argument applies its configured target subject to commissioning/interlocks. `capture` / `start` without
 an argument use `integration_frames`. `set_threshold`, `set_rate`, `tec_target`,
 `tec_polarity`, `tec_pid` and successful DAC target commands update the same RAM
 inventory; they do not auto-save. Emergency shutdown zeros actual DAC outputs
@@ -46,7 +47,9 @@ length, explicit little-endian int32 values, padding and IEEE CRC32. CRC covers
 the header and payload/padding, so generation/size corruption cannot pick a bad
 record. Invalid schema, CRC or parameter constraints cause that record to be
 ignored. `get_storage` reports loaded, dirty, generation, page, invalid-record
-indicator and schema version. Unknown future schemas are ignored rather than
+indicator and schema version. Schema 2 migrates schema 1 (40 fields), discarding the retired raw bias target
+and defaulting the eight new compensation fields. It reports dirty until an
+explicit save writes schema 2. Unknown future schemas are ignored rather than
 interpreted as this layout. No automatic destructive reformat happens on boot.
 
 Append pages within the active 4 KiB sector. Once full, erase the *other* sector

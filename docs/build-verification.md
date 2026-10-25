@@ -40,3 +40,17 @@ The generated linker FLASH region is 4186112 bytes, leaving the final 8192 bytes
 for parameters. Python host tools pass syntax compilation. Flash interruption
 tests are simulated; no physical flash write, reboot or instrument measurement
 was performed on connected hardware.
+
+
+SiPM bias compensation validation (firmware 0.4.0, schema 2): all six native
+suites pass with warnings as errors. Tests cover every millidegree -40..85 C,
+nominal 46.5 V at 25 C, 70 mV/C slope, the inclusive 50 V boundary and shutdown
+above it, adjustable overvoltage/breakdown/ceiling, conversion warmup, bad sensor
+configuration, missing/stale feedback during DMA, clock wrap, DAC readback
+failure, raw-command bypass rejection, cached telemetry and schema-1 migration.
+Default and laser/TEC/bias-enabled Pico 2 cross-builds generate ELF and UF2.
+The separate build-enabled configuration uses dummy laser ceiling 1 and bias
+ceiling 60000 for compile coverage; neither is commissioning calibration.
+The default build retains all output enables OFF and both code ceilings zero.
+Current default ELF size: text 71296 bytes, data 0, BSS 92840 bytes. No hardware was flashed or physically measured. The
+software target ceiling does not qualify a physical 50 V ceiling; see sipm-bias.md.

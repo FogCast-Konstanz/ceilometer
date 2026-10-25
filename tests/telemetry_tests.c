@@ -1,5 +1,6 @@
 /* Actual ADC/DAC/LT8722 drivers and telemetry scanner, with I2C/SPI/GPIO buses simulated. */
 #include "telemetry.h"
+#include "sipm_bias.h"
 #include "parameters.h"
 #include "board.h"
 #include "config.h"
@@ -78,6 +79,7 @@ temperature_sample sensors_laser_sample(void) { temperature_sample s=ld;s.mc+=PA
 temperature_sample sensors_laser_uncalibrated(void) { return ld; }
 const uint8_t *sensors_scratchpad(void) { static const uint8_t p[9]={0x80,1,0x4b,0x46,0x7f,0xff,0x0c,0x10,0};return p; }
 void sensors_errors(uint32_t *p,uint32_t *c,uint32_t *v) { *p=2;*c=3;*v=4; }
+bool sensors_receiver_mc(int32_t *v) { *v=25000;return !i2c_fail; }
 bool sensors_receiver_configure(void) { return !i2c_fail; }
 bool sensors_receiver_register(unsigned r,uint16_t *v) { *v=r==0 ? 25*256 : r==1 ? 0x60 : 30*256;return !i2c_fail; }
 uint16_t sipm_counter_read(void) { return 12345; }
@@ -115,6 +117,13 @@ int main(void) {
     CHECK(!get(T_receiver_temp_mc).valid && lt8722_error_count()>0);
     spi_fail=false;i2c_fail=false;tec_fault=true;CHECK(!lt8722_healthy());tec_fault=false;
     lt8722_disable();CHECK(pin_output[PIN_TEC_SWEN] && !pin_value[PIN_TEC_SWEN]);
+    sipm_bias_init();(void)sipm_bias_service(true);now+=700000;(void)sipm_bias_service(true);
+    CHECK(get(T_bias_target_uv).valid && get(T_bias_target_uv).value==46500000);
+    CHECK(get(T_bias_feedback_mc).valid && get(T_bias_feedback_mc).value==25000);
+    CHECK(get(T_bias_estimated_uv).value<=46500000 && get(T_bias_estimated_uv).value>46499000);
+    calls=bus_calls;CHECK(get(T_bias_fault).valid && !get(T_bias_fault).value);
+    now+=500000;CHECK(!get(T_bias_target_uv).valid && !get(T_bias_feedback_mc).valid);
+    CHECK(bus_calls==calls); /* all compensation getters are cached, including stale propagation */
     puts("PASS: all telemetry sources, real SPI/DAC/ADC framing, AMUX scan/restore, derived references, cached/no-bus readback, stale/failure propagation and shared SWEN");
     return 0;
 }

@@ -12,10 +12,13 @@ DC-rejected correlation, paged raw/histogram/profile retrieval, test pulses,
 AD5693R DACs, MCP9800, externally powered single-drop DS18B20, and LT8722 SPI
 control with CRC/ACK checks, soft start, and DS18B20 PID temperature regulation.
 Laser operation requires valid feedback inside its adjustable temperature window (default 10-30 C). UART stdio is disabled.
+SiPM bias tracks receiver temperature for a nominal 10 V overvoltage, with a
+50 V commanded ceiling and invalid-feedback shutdown. See [sipm-bias.md](docs/sipm-bias.md)
+for calibration and the hardware protection needed for a physical 50 V ceiling.
 See [temperature-control.md](docs/temperature-control.md) for setup and fault behavior.
 
-There are 40 persistent, validated parameters, including adjustable temperature
-windows and target, and 99 timestamped telemetry fields. Start with the
+There are 48 persistent, validated parameters, including adjustable temperature
+windows and target, and 108 timestamped telemetry fields. Start with the
 [parameter plan](docs/parameters-and-telemetry-plan.md),
 [storage/commands](docs/parameter-storage.md) and
 [telemetry inventory](docs/telemetry-inventory.md).

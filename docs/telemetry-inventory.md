@@ -2,7 +2,7 @@
 
 Every item is available by name or index through `get_telemetry`; `telemetry_info`
 enumerates names and units. Values include validity, last successful timestamp,
-age, and sweep sequence. Failed reads invalidate the entry without refreshing
+age, and sample sequence. Failed reads invalidate the entry without refreshing
 old data. No hidden I2C/SPI transfers occur when reading cached telemetry during
 acquisition. A full sweep runs between bursts. Direct ADCs include the Pico 2
 module's existing VSYS/3 ADC3 and MCU temperature ADC4; GPIO24 reports VBUS.
@@ -142,3 +142,18 @@ translated control-monitor value, not the raw signed SPI DAC code.
 Sources: [LT8722 Rev B, analog monitoring](https://www.analog.com/media/en/technical-documentation/data-sheets/lt8722.pdf),
 [AD5693R readback](https://www.analog.com/media/en/technical-documentation/data-sheets/AD5693R_5692R_5691R_5693.pdf),
 [Pico 2 onboard monitors](https://datasheets.raspberrypi.com/pico/pico-2-datasheet.pdf).
+
+
+SiPM bias controller adds nine cached fields (108 total), available during acquisition:
+
+| Name | Unit | Meaning |
+|---|---|---|
+| `bias_feedback_mc` | mC | See [sipm-bias.md](sipm-bias.md) |
+| `bias_breakdown_uv` | uV_estimate | See [sipm-bias.md](sipm-bias.md) |
+| `bias_target_uv` | uV_target | See [sipm-bias.md](sipm-bias.md) |
+| `bias_estimated_uv` | uV_estimate | See [sipm-bias.md](sipm-bias.md) |
+| `bias_overvoltage_uv` | uV_estimate | See [sipm-bias.md](sipm-bias.md) |
+| `bias_target_code` | code | See [sipm-bias.md](sipm-bias.md) |
+| `bias_fault` | bool | See [sipm-bias.md](sipm-bias.md) |
+| `bias_reason` | enum | See [sipm-bias.md](sipm-bias.md) |
+| `bias_feedback_sequence` | count | See [sipm-bias.md](sipm-bias.md) |

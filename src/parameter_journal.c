@@ -3,7 +3,7 @@
 #include "parameter_storage.h"
 #include <string.h>
 #define STORAGE_MAGIC 0x4345494cu
-#define STORAGE_VERSION 1u
+#define STORAGE_VERSION STORAGE_SCHEMA_VERSION
 _Static_assert(20u+PARAM_COUNT*4u<=252u,"Settings no longer fit one flash page; bump schema/layout");
 static void put32(uint8_t *p,uint32_t v) {
     for(unsigned i=0;i<4;++i) p[i]=(uint8_t)(v>>(8*i));
@@ -27,10 +27,17 @@ void storage_record_encode(uint8_t r[STORAGE_PAGE_SIZE],const parameter_values *
     put32(r+252,storage_crc32(r,252));
 }
 bool storage_record_decode(const uint8_t r[STORAGE_PAGE_SIZE],parameter_values *p,uint32_t *generation) {
-    if(get32(r)!=STORAGE_MAGIC || get32(r+4)!=STORAGE_VERSION || get32(r+8)!=PARAM_COUNT ||
-       get32(r+16)!=PARAM_COUNT*4u || get32(r+252)!=storage_crc32(r,252)) return false;
-    parameter_values candidate;
-    for(unsigned i=0;i<PARAM_COUNT;++i) candidate.values[i]=(int32_t)get32(r+20+4*i);
+    uint32_t version=get32(r+4),count=get32(r+8);
+    bool legacy=version==1u && count==40u;
+    if(get32(r)!=STORAGE_MAGIC || (!legacy && (version!=STORAGE_VERSION || count!=PARAM_COUNT)) ||
+       get32(r+16)!=count*4u || get32(r+252)!=storage_crc32(r,252)) return false;
+    parameter_values candidate;parameters_defaults(&candidate);
+    for(unsigned i=0;i<count;++i) candidate.values[i]=(int32_t)get32(r+20+4*i);
+    /* Raw bias actuation was retired. Validate the old field before discarding it. */
+    if(legacy) {
+        if(candidate.values[PARAM_bias_dac_code]<0 || candidate.values[PARAM_bias_dac_code]>65535) return false;
+        candidate.values[PARAM_bias_dac_code]=0;
+    }
     if(!parameters_validate(&candidate)) return false;
     *p=candidate;*generation=get32(r+12);return true;
 }
@@ -56,7 +63,7 @@ bool storage_journal_load(parameter_journal *j,storage_io io,parameter_values *p
 }
 bool storage_journal_dirty(const parameter_journal *j,const parameter_values *p) {
     parameter_values saved;uint32_t gen;
-    return !j->loaded || !storage_record_decode(j->io.data+j->page*STORAGE_PAGE_SIZE,&saved,&gen) ||
+    return !j->loaded || get32(j->io.data+j->page*STORAGE_PAGE_SIZE+4)!=STORAGE_VERSION || !storage_record_decode(j->io.data+j->page*STORAGE_PAGE_SIZE,&saved,&gen) ||
            memcmp(saved.values,p->values,sizeof saved.values)!=0;
 }
 bool storage_journal_save(parameter_journal *j,const parameter_values *p) {

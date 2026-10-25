@@ -42,6 +42,19 @@ int main(void) {
         CHECK(!storage_record_decode(record,&loaded,&gen));
         record[byte]^=(uint8_t)(1u<<bit);
     }
+    /* Schema 1 has exactly the first 40 fields. Old raw bias must not reactivate. */
+    storage_record_encode(record,&p,42);
+    record[4]=1;record[8]=40;record[16]=160;
+    record[20+4*PARAM_bias_dac_code]=0xff;record[21+4*PARAM_bias_dac_code]=0xff;
+    memset(record+20+40*4,255,252-(20+40*4));
+    uint32_t crc=storage_crc32(record,252);
+    for(unsigned i=0;i<4;++i) record[252+i]=(uint8_t)(crc>>(8*i));
+    CHECK(storage_record_decode(record,&loaded,&gen));
+    CHECK(loaded.values[PARAM_bias_dac_code]==0 && loaded.values[PARAM_sipm_overvoltage_mv]==10000);
+    memset(flash,255,sizeof flash);memcpy(flash,record,256);parameter_journal migrated;
+    CHECK(storage_journal_load(&migrated,io(),&loaded));CHECK(storage_journal_dirty(&migrated,&loaded));
+    CHECK(storage_journal_save(&migrated,&loaded));CHECK(flash[256+4]==STORAGE_SCHEMA_VERSION);
+    CHECK(!storage_journal_dirty(&migrated,&loaded));
     candidate=p;candidate.values[PARAM_laser_min_mc]=40000;
     storage_record_encode(record,&candidate,43);
     CHECK(!storage_record_decode(record,&loaded,&gen)); /* even CRC-valid unsafe configurations are rejected */

@@ -17,10 +17,10 @@ if(CEIL_HOST_TESTS)
   add_test(NAME sensor_tests COMMAND sensor_tests)
   add_executable(interlock_tests tests/interlock_tests.c src/temperature_control.c src/pid_controller.c
     src/sequence.c src/correlation.c src/protocol.c src/parameters.c src/parameter_journal.c
-    src/telemetry.c tests/fakes/storage_backend.c)
+    src/telemetry.c src/sipm_bias.c tests/fakes/storage_backend.c)
   target_include_directories(interlock_tests PRIVATE tests/fakes include)
   target_compile_definitions(interlock_tests PRIVATE CEIL_ENABLE_TEC=1 CEIL_ENABLE_LASER=1
-    CEIL_ENABLE_BIAS=0 CEIL_LASER_MAX_CODE=1 CEIL_BIAS_MAX_CODE=0)
+    CEIL_ENABLE_BIAS=1 CEIL_LASER_MAX_CODE=1 CEIL_BIAS_MAX_CODE=60000)
   target_compile_options(interlock_tests PRIVATE -Wall -Wextra -Werror)
   add_test(NAME interlock_tests COMMAND interlock_tests)
   add_executable(parameter_tests tests/parameter_tests.c src/parameters.c src/parameter_journal.c)
@@ -28,9 +28,9 @@ if(CEIL_HOST_TESTS)
   target_compile_options(parameter_tests PRIVATE -Wall -Wextra -Werror)
   add_test(NAME parameter_tests COMMAND parameter_tests)
   add_executable(telemetry_tests tests/telemetry_tests.c src/telemetry.c src/board.c src/lt8722.c
-    src/lt8722_codec.c src/parameters.c src/temperature_control.c src/pid_controller.c)
+    src/lt8722_codec.c src/parameters.c src/temperature_control.c src/pid_controller.c src/sipm_bias.c)
   target_include_directories(telemetry_tests PRIVATE tests/fakes include)
-  target_compile_definitions(telemetry_tests PRIVATE CEIL_ENABLE_TEC=1)
+  target_compile_definitions(telemetry_tests PRIVATE CEIL_ENABLE_TEC=1 CEIL_ENABLE_BIAS=1 CEIL_BIAS_MAX_CODE=60000)
   target_compile_options(telemetry_tests PRIVATE -Wall -Wextra -Werror)
   add_test(NAME telemetry_tests COMMAND telemetry_tests)
   return()
@@ -60,7 +60,7 @@ add_executable(ceilometer src/main.c src/sequence.c src/prn_tx.c src/sipm_counte
   src/bin_acquisition.c src/correlation.c src/protocol.c src/board.c
   src/lt8722.c src/lt8722_codec.c src/sensors.c src/test_pulse.c
   src/pid_controller.c src/temperature_control.c src/parameters.c
-  src/parameter_journal.c src/parameter_storage.c src/telemetry.c)
+  src/parameter_journal.c src/parameter_storage.c src/telemetry.c src/sipm_bias.c)
 target_include_directories(ceilometer PRIVATE include)
 target_compile_options(ceilometer PRIVATE -Wall -Wextra -Werror)
 target_compile_definitions(ceilometer PRIVATE

@@ -1,4 +1,5 @@
 #include "telemetry.h"
+#include "sipm_bias.h"
 #include "parameters.h"
 #include "board.h"
 #include "config.h"
@@ -83,7 +84,11 @@ void telemetry_poll(bool busy) {
     store(T_laser_temp_sequence,ld.sequence,fresh,ld.sampled_us);
     const uint8_t *scratch=sensors_scratchpad();
     for(unsigned i=0;i<9;++i) store(T_ds_byte0+i,scratch[i],rawld.valid&&fresh,ld.sampled_us);
-    bool receiver_config_ok=sensors_receiver_configure();
+    /* The compensation service owns receiver configuration. A telemetry sweep
+       must not silently repair a sensor reset and hide it from that service. */
+    uint16_t receiver_config=0;
+    bool receiver_config_ok=sensors_receiver_register(1,&receiver_config) &&
+        (receiver_config&0x61u)==(uint16_t)((PARAM(receiver_resolution)-9)<<5);
     uint16_t rx=0;
     for(unsigned i=0;i<4;++i) {
         bool ok=sensors_receiver_register(i,&rx);
@@ -148,6 +153,18 @@ int telemetry_find(const char *name) {
 }
 bool telemetry_read(unsigned index,uint32_t now,telemetry_value *out) {
     if(index>=TELEMETRY_COUNT) return false;
+    if(index>=T_bias_feedback_mc) {
+        bias_status b=sipm_bias_status();
+        int64_t data[]={b.temperature.mc,b.breakdown_uv,b.target_uv,b.estimated_uv,
+                       b.estimated_uv-b.breakdown_uv,b.code,b.fault,b.reason,b.temperature.sequence};
+        bool fresh=b.temperature.valid && now-b.temperature.sampled_us<=(uint32_t)PARAM(bias_temperature_age_ms)*1000u;
+        bool status=index==T_bias_fault || index==T_bias_reason;
+        bool valid=status || (fresh && (index==T_bias_feedback_mc || index==T_bias_feedback_sequence ||
+                    b.valid));
+        *out=(telemetry_value){.value=data[index-T_bias_feedback_mc],.valid=valid,
+             .sampled_us=status ? now : b.temperature.sampled_us,.sequence=b.temperature.sequence};
+        return true;
+    }
     *out=values[index];
     bool ds=(index>=T_laser_temp_mc && index<=T_laser_temp_sequence) || (index>=T_ds_byte0 && index<=T_ds_byte8);
     uint32_t max_age=ds ? (uint32_t)PARAM(temperature_age_ms)*1000u :
