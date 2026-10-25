@@ -1,0 +1,774 @@
+{
+  "parameters": [
+    {
+      "name": "laser_min_mc",
+      "unit": "mC",
+      "min": -10000,
+      "max": 50000,
+      "default": 10000
+    },
+    {
+      "name": "laser_max_mc",
+      "unit": "mC",
+      "min": -10000,
+      "max": 50000,
+      "default": 30000
+    },
+    {
+      "name": "tec_target_mc",
+      "unit": "mC",
+      "min": -10000,
+      "max": 50000,
+      "default": 24000
+    },
+    {
+      "name": "tec_min_mc",
+      "unit": "mC",
+      "min": -10000,
+      "max": 50000,
+      "default": -10000
+    },
+    {
+      "name": "tec_max_mc",
+      "unit": "mC",
+      "min": -10000,
+      "max": 50000,
+      "default": 50000
+    },
+    {
+      "name": "temperature_age_ms",
+      "unit": "ms",
+      "min": 1000,
+      "max": 10000,
+      "default": 2000
+    },
+    {
+      "name": "ds_period_ms",
+      "unit": "ms",
+      "min": 800,
+      "max": 5000,
+      "default": 1000
+    },
+    {
+      "name": "pid_p_milli",
+      "unit": "milli_mV_per_C",
+      "min": 0,
+      "max": 10000000,
+      "default": 100000
+    },
+    {
+      "name": "pid_i_milli",
+      "unit": "milli_mV_per_C_s",
+      "min": 0,
+      "max": 10000000,
+      "default": 10000
+    },
+    {
+      "name": "pid_d_milli",
+      "unit": "milli_mV_s_per_C",
+      "min": 0,
+      "max": 10000000,
+      "default": 0
+    },
+    {
+      "name": "tec_polarity",
+      "unit": "sign",
+      "min": -1,
+      "max": 1,
+      "default": 0
+    },
+    {
+      "name": "tec_output_mv",
+      "unit": "mV",
+      "min": 0,
+      "max": 500,
+      "default": 500
+    },
+    {
+      "name": "pid_integral_mv",
+      "unit": "mV",
+      "min": 0,
+      "max": 500,
+      "default": 500
+    },
+    {
+      "name": "tec_ilimn_code",
+      "unit": "code",
+      "min": 48,
+      "max": 64,
+      "default": 64
+    },
+    {
+      "name": "tec_ilimp_code",
+      "unit": "code",
+      "min": 448,
+      "max": 462,
+      "default": 448
+    },
+    {
+      "name": "tec_frequency",
+      "unit": "selector",
+      "min": 0,
+      "max": 5,
+      "default": 5
+    },
+    {
+      "name": "laser_dac_code",
+      "unit": "code",
+      "min": 0,
+      "max": 65535,
+      "default": 0
+    },
+    {
+      "name": "bias_dac_code",
+      "unit": "retired",
+      "min": 0,
+      "max": 0,
+      "default": 0
+    },
+    {
+      "name": "threshold_code",
+      "unit": "code",
+      "min": 0,
+      "max": 65535,
+      "default": 0
+    },
+    {
+      "name": "chip_hz",
+      "unit": "Hz",
+      "min": 10000,
+      "max": 10000000,
+      "default": 10000000
+    },
+    {
+      "name": "integration_frames",
+      "unit": "frames",
+      "min": 1,
+      "max": 1000000,
+      "default": 16
+    },
+    {
+      "name": "prn_seed",
+      "unit": "state",
+      "min": 1,
+      "max": 1023,
+      "default": 1023
+    },
+    {
+      "name": "range_offset_bins",
+      "unit": "bins",
+      "min": -1022,
+      "max": 1022,
+      "default": 0
+    },
+    {
+      "name": "range_average_bins",
+      "unit": "bins",
+      "min": 1,
+      "max": 1023,
+      "default": 1
+    },
+    {
+      "name": "usb_lease_ms",
+      "unit": "ms",
+      "min": 500,
+      "max": 10000,
+      "default": 2000
+    },
+    {
+      "name": "telemetry_period_ms",
+      "unit": "ms",
+      "min": 20,
+      "max": 2000,
+      "default": 100
+    },
+    {
+      "name": "active_adc_period_us",
+      "unit": "us",
+      "min": 100,
+      "max": 10000,
+      "default": 1000
+    },
+    {
+      "name": "amux_settle_us",
+      "unit": "us",
+      "min": 100,
+      "max": 2000,
+      "default": 1000
+    },
+    {
+      "name": "adc_average",
+      "unit": "samples",
+      "min": 1,
+      "max": 64,
+      "default": 8
+    },
+    {
+      "name": "adc_reference_uv",
+      "unit": "uV",
+      "min": 2800000,
+      "max": 3100000,
+      "default": 3000000
+    },
+    {
+      "name": "laser_sense_uv_per_ma",
+      "unit": "uV_per_mA",
+      "min": 0,
+      "max": 10000,
+      "default": 0
+    },
+    {
+      "name": "laser_sense_offset_uv",
+      "unit": "uV",
+      "min": -100000,
+      "max": 100000,
+      "default": 0
+    },
+    {
+      "name": "bias_sense_uv_per_ua",
+      "unit": "uV_per_uA",
+      "min": 0,
+      "max": 1000000,
+      "default": 0
+    },
+    {
+      "name": "bias_sense_offset_uv",
+      "unit": "uV",
+      "min": -100000,
+      "max": 100000,
+      "default": 0
+    },
+    {
+      "name": "laser_temp_offset_mc",
+      "unit": "mC",
+      "min": -5000,
+      "max": 5000,
+      "default": 0
+    },
+    {
+      "name": "receiver_temp_offset_mc",
+      "unit": "mC",
+      "min": -5000,
+      "max": 5000,
+      "default": 0
+    },
+    {
+      "name": "receiver_resolution",
+      "unit": "bits",
+      "min": 9,
+      "max": 12,
+      "default": 12
+    },
+    {
+      "name": "laser_dac_ref_uv",
+      "unit": "uV",
+      "min": 2400000,
+      "max": 2600000,
+      "default": 2500000
+    },
+    {
+      "name": "bias_dac_ref_uv",
+      "unit": "uV",
+      "min": 2400000,
+      "max": 2600000,
+      "default": 2500000
+    },
+    {
+      "name": "threshold_dac_ref_uv",
+      "unit": "uV",
+      "min": 2400000,
+      "max": 2600000,
+      "default": 2500000
+    },
+    {
+      "name": "sipm_overvoltage_mv",
+      "unit": "mV",
+      "min": 100,
+      "max": 12000,
+      "default": 10000
+    },
+    {
+      "name": "sipm_breakdown_mv",
+      "unit": "mV_at_reference",
+      "min": 35000,
+      "max": 38000,
+      "default": 36500
+    },
+    {
+      "name": "sipm_reference_mc",
+      "unit": "mC",
+      "min": -40000,
+      "max": 85000,
+      "default": 25000
+    },
+    {
+      "name": "sipm_tempco_uv_c",
+      "unit": "uV_per_C",
+      "min": 0,
+      "max": 100000,
+      "default": 70000
+    },
+    {
+      "name": "bias_limit_mv",
+      "unit": "mV",
+      "min": 10000,
+      "max": 50000,
+      "default": 50000
+    },
+    {
+      "name": "bias_temperature_age_ms",
+      "unit": "ms",
+      "min": 800,
+      "max": 5000,
+      "default": 1000
+    },
+    {
+      "name": "bias_gain_ppm",
+      "unit": "ppm_of_nominal",
+      "min": 800000,
+      "max": 1200000,
+      "default": 1000000
+    },
+    {
+      "name": "bias_offset_uv",
+      "unit": "uV",
+      "min": -6000000,
+      "max": -4000000,
+      "default": -5000000
+    }
+  ],
+  "telemetry": [
+    {
+      "name": "laser_adc_raw",
+      "unit": "code"
+    },
+    {
+      "name": "tec_adc_raw",
+      "unit": "code"
+    },
+    {
+      "name": "bias_adc_raw",
+      "unit": "code"
+    },
+    {
+      "name": "vsys_adc_raw",
+      "unit": "code"
+    },
+    {
+      "name": "mcu_adc_raw",
+      "unit": "code"
+    },
+    {
+      "name": "laser_sense_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "bias_sense_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "vsys_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "mcu_temperature_mc",
+      "unit": "mC"
+    },
+    {
+      "name": "laser_current_ma",
+      "unit": "mA"
+    },
+    {
+      "name": "bias_current_ua",
+      "unit": "uA"
+    },
+    {
+      "name": "laser_active_raw",
+      "unit": "code"
+    },
+    {
+      "name": "laser_active_peak_raw",
+      "unit": "code"
+    },
+    {
+      "name": "laser_active_samples",
+      "unit": "samples"
+    },
+    {
+      "name": "laser_active_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "laser_active_current_ma",
+      "unit": "mA"
+    },
+    {
+      "name": "laser_temp_mc",
+      "unit": "mC"
+    },
+    {
+      "name": "laser_temp_raw_mc",
+      "unit": "mC"
+    },
+    {
+      "name": "laser_temp_sequence",
+      "unit": "count"
+    },
+    {
+      "name": "receiver_temp_mc",
+      "unit": "mC"
+    },
+    {
+      "name": "receiver_config",
+      "unit": "bits"
+    },
+    {
+      "name": "receiver_hysteresis_raw",
+      "unit": "bits"
+    },
+    {
+      "name": "receiver_limit_raw",
+      "unit": "bits"
+    },
+    {
+      "name": "ld_error",
+      "unit": "bool"
+    },
+    {
+      "name": "tec_swen",
+      "unit": "bool"
+    },
+    {
+      "name": "bias_enabled",
+      "unit": "bool"
+    },
+    {
+      "name": "vbus_present",
+      "unit": "bool"
+    },
+    {
+      "name": "smps_pwm",
+      "unit": "bool"
+    },
+    {
+      "name": "counter_raw",
+      "unit": "code"
+    },
+    {
+      "name": "spi_errors",
+      "unit": "count"
+    },
+    {
+      "name": "ds_presence_errors",
+      "unit": "count"
+    },
+    {
+      "name": "ds_crc_errors",
+      "unit": "count"
+    },
+    {
+      "name": "ds_conversion_errors",
+      "unit": "count"
+    },
+    {
+      "name": "sweep_sequence",
+      "unit": "count"
+    },
+    {
+      "name": "sweep_duration_us",
+      "unit": "us"
+    },
+    {
+      "name": "ds_byte0",
+      "unit": "byte"
+    },
+    {
+      "name": "ds_byte1",
+      "unit": "byte"
+    },
+    {
+      "name": "ds_byte2",
+      "unit": "byte"
+    },
+    {
+      "name": "ds_byte3",
+      "unit": "byte"
+    },
+    {
+      "name": "ds_byte4",
+      "unit": "byte"
+    },
+    {
+      "name": "ds_byte5",
+      "unit": "byte"
+    },
+    {
+      "name": "ds_byte6",
+      "unit": "byte"
+    },
+    {
+      "name": "ds_byte7",
+      "unit": "byte"
+    },
+    {
+      "name": "ds_byte8",
+      "unit": "byte"
+    },
+    {
+      "name": "dac0_requested",
+      "unit": "code"
+    },
+    {
+      "name": "dac1_requested",
+      "unit": "code"
+    },
+    {
+      "name": "dac2_requested",
+      "unit": "code"
+    },
+    {
+      "name": "dac0_readback",
+      "unit": "code"
+    },
+    {
+      "name": "dac1_readback",
+      "unit": "code"
+    },
+    {
+      "name": "dac2_readback",
+      "unit": "code"
+    },
+    {
+      "name": "dac0_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "dac1_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "dac2_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_register0",
+      "unit": "bits"
+    },
+    {
+      "name": "lt_register1",
+      "unit": "bits"
+    },
+    {
+      "name": "lt_register2",
+      "unit": "bits"
+    },
+    {
+      "name": "lt_register3",
+      "unit": "bits"
+    },
+    {
+      "name": "lt_register4",
+      "unit": "bits"
+    },
+    {
+      "name": "lt_register5",
+      "unit": "bits"
+    },
+    {
+      "name": "lt_register6",
+      "unit": "bits"
+    },
+    {
+      "name": "lt_register7",
+      "unit": "bits"
+    },
+    {
+      "name": "lt_mux0_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux1_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux2_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux3_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux4_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux5_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux6_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux7_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux8_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux9_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux10_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux11_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux12_raw",
+      "unit": "code"
+    },
+    {
+      "name": "lt_mux0_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux1_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux2_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux3_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux4_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux5_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux6_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux7_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux8_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux9_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux10_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux11_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_mux12_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_output_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_output_ua",
+      "unit": "uA"
+    },
+    {
+      "name": "lt_ref2500_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_ref1250_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_ref1650_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_die_temp_mc",
+      "unit": "mC"
+    },
+    {
+      "name": "lt_vin_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_vcc_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_vddio_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_sfb_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_ldr_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "lt_control_uv",
+      "unit": "uV"
+    },
+    {
+      "name": "bias_feedback_mc",
+      "unit": "mC"
+    },
+    {
+      "name": "bias_breakdown_uv",
+      "unit": "uV_estimate"
+    },
+    {
+      "name": "bias_target_uv",
+      "unit": "uV_target"
+    },
+    {
+      "name": "bias_estimated_uv",
+      "unit": "uV_estimate"
+    },
+    {
+      "name": "bias_overvoltage_uv",
+      "unit": "uV_estimate"
+    },
+    {
+      "name": "bias_target_code",
+      "unit": "code"
+    },
+    {
+      "name": "bias_fault",
+      "unit": "bool"
+    },
+    {
+      "name": "bias_reason",
+      "unit": "enum"
+    },
+    {
+      "name": "bias_feedback_sequence",
+      "unit": "count"
+    }
+  ]
+}

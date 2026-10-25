@@ -54,3 +54,14 @@ ceiling 60000 for compile coverage; neither is commissioning calibration.
 The default build retains all output enables OFF and both code ceilings zero.
 Current default ELF size: text 71296 bytes, data 0, BSS 92840 bytes. No hardware was flashed or physically measured. The
 software target ceiling does not qualify a physical 50 V ceiling; see sipm-bias.md.
+
+
+Web console verification: Node tests cover serialized/fragmented USB replies,
+priority Stop and queued-actuation cancellation, late-ACK isolation after timeout,
+ordinary NACK recovery, malformed/oversized responses, exact int64 telemetry/CSV,
+atomic setting bounds/length limits and demo metadata parity with firmware.
+The browser demo was exercised for inventory discovery, parameter edits and
+flash save, independent TEC/bias enable, missing-receiver shutdown and explicit
+fault recovery, dark acquisition/download and Stop during an active capture.
+Live WebGL traces and the responsive layout were inspected in the browser.
+No real USB CDC port or board outputs were operated during GUI validation.

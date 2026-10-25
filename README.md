@@ -27,6 +27,15 @@ The schematics override the brainstorm pin suggestions. Read
 [hardware.md](docs/hardware.md), [protocol.md](docs/protocol.md), and
 [validation.md](docs/validation.md) before bring-up.
 
+## Web control GUI
+
+Run `python gui/serve.py`, then open **http://127.0.0.1:8765** in desktop
+Chrome or Edge. Connect directly to the Pico 2 USB CDC port, or use the clearly
+marked demo mode without hardware. The interface provides board bring-up
+controls, live WebGL plots adapted from the RDS GUI, all parameter/telemetry
+inventories, fault diagnostics, dark captures and CSV/JSON exports.
+See [GUI instructions](gui/README.md). No frontend build or cloud service is needed.
+
 ## Build
 
 Install Pico SDK >=2.3 with TinyUSB, Arm GNU toolchain, CMake, and Ninja. Tested
