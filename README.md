@@ -11,8 +11,14 @@ finite 1-16-frame bursts, integration across bursts, modulo differences, 64-bit
 DC-rejected correlation, paged raw/histogram/profile retrieval, test pulses,
 AD5693R DACs, MCP9800, externally powered single-drop DS18B20, and LT8722 SPI
 control with CRC/ACK checks, soft start, and DS18B20 PID temperature regulation.
-Laser operation requires valid 10-30 C feedback. UART stdio is disabled.
+Laser operation requires valid feedback inside its adjustable temperature window (default 10-30 C). UART stdio is disabled.
 See [temperature-control.md](docs/temperature-control.md) for setup and fault behavior.
+
+There are 40 persistent, validated parameters, including adjustable temperature
+windows and target, and 99 timestamped telemetry fields. Start with the
+[parameter plan](docs/parameters-and-telemetry-plan.md),
+[storage/commands](docs/parameter-storage.md) and
+[telemetry inventory](docs/telemetry-inventory.md).
 
 The schematics override the brainstorm pin suggestions. Read
 [hardware.md](docs/hardware.md), [protocol.md](docs/protocol.md), and
@@ -20,7 +26,7 @@ The schematics override the brainstorm pin suggestions. Read
 
 ## Build
 
-Install Pico SDK >=2.2 with TinyUSB, Arm GNU toolchain, CMake, and Ninja. Tested
+Install Pico SDK >=2.3 with TinyUSB, Arm GNU toolchain, CMake, and Ninja. Tested
 locally with SDK 2.3.0 and Arm GNU 15.2.1, targeting `pico2` / `rp2350-arm-s`.
 
 ```powershell
@@ -85,7 +91,7 @@ service. It is not continuous or a calibrated wall-clock integration period.
 Runtime chip rates must divide 150 MHz with an integer 15-cycle PIO divider;
 10, 5, 2, and 1 MHz are supported examples. Firmware stays at rated 150 MHz.
 500 MHz and 20 MHz bins are not implemented. No automatic cloud classification,
-optical overlap correction, flash persistence, or dual-core
+optical overlap correction or dual-core
 streaming is claimed. See validation.md for the required next measurements.
 
 The code drives LD_SWITCH low during firmware shutdown/error handling and uses a

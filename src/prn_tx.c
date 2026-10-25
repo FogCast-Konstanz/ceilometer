@@ -68,3 +68,5 @@ bool prn_tx_prepare(uint32_t hz, bool laser) {
 }
 void prn_tx_start(void) { pio_enable_sm_mask_in_sync(pio0, 3); }
 bool prn_tx_starved(void) { return (pio0->fdebug & (1u << PIO_FDEBUG_TXSTALL_LSB)) != 0; }
+
+void prn_tx_set_code(const uint8_t code[PRN_LENGTH]) { prn_pack(code,words); }

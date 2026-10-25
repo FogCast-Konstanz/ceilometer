@@ -8,3 +8,5 @@ bool lt8722_enable(void);
 void lt8722_disable(void);
 bool lt8722_set_mv(int mv);
 bool lt8722_healthy(void);
+
+uint32_t lt8722_error_count(void);

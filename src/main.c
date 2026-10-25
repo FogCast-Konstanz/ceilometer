@@ -16,6 +16,9 @@
 #include "sensors.h"
 #include "test_pulse.h"
 #include "temperature_control.h"
+#include "parameters.h"
+#include "parameter_storage.h"
+#include "telemetry.h"
 static uint8_t code[PRN_LENGTH];
 static uint64_t histogram[PRN_LENGTH];
 static int64_t profile[PRN_LENGTH];
@@ -39,6 +42,101 @@ static void fault_irq(uint gpio, uint32_t events) {
     /* Immediate pin mux override even while the foreground is blocked on USB. */
     gpio_put(PIN_LD_GATE, 0); gpio_set_function(PIN_LD_GATE, GPIO_FUNC_SIO);
     driver_fault = true;
+}
+static bool configuration_idle(void) { return !running && !armed && !tec_on && !bias_on; }
+static bool configuration_commit(const parameter_values *candidate) {
+    if(!configuration_idle() || !parameters_validate(candidate)) return false;
+    if(candidate->values[PARAM_threshold_code]!=PARAM(threshold_code))
+        (void)board_dac(2,(uint16_t)candidate->values[PARAM_threshold_code]);
+    parameters_current=*candidate;
+    /* Config can be recovered with absent peripherals. Telemetry reports/retries readback. */
+    telemetry_init();
+    bool thermal_fault=thermal.fault;
+    temperature_init(&thermal);thermal.fault=thermal_fault;
+    chip_hz=(uint32_t)PARAM(chip_hz);ready=false;
+    prn_generate_seed(code,(uint16_t)PARAM(prn_seed));prn_tx_set_code(code);
+    return true;
+}
+static bool legacy_parameter(const char *cmd,const char *name,const char *arg) {
+    parameter_values candidate=parameters_current;
+    if(!parameter_assign(&candidate,name,arg) || !configuration_commit(&candidate)) {
+        error(cmd,configuration_idle() ? "INVALID_CONFIGURATION" : "OUTPUTS_ACTIVE");return false;
+    }
+    ack(cmd);return true;
+}
+static bool configuration_command(const char *cmd,char *arg) {
+    uint32_t index;
+    if(!strcmp(cmd,"parameter_count") && !arg) { printf("$ACK,%s,%u,1\r\n",cmd,(unsigned)PARAM_COUNT);return true; }
+    if(!strcmp(cmd,"parameter_info") && protocol_uint(arg,PARAM_COUNT-1,&index)) {
+        const parameter_descriptor *d=&parameter_descriptors[index];
+        printf("$ACK,%s,%lu,%s,%s,%ld,%ld,%ld\r\n",cmd,(unsigned long)index,d->name,d->unit,
+               (long)d->minimum,(long)d->maximum,(long)d->default_value);return true;
+    }
+    if(!strcmp(cmd,"get_param") && arg) {
+        int i=parameter_find(arg);
+        if(i<0) error(cmd,"UNKNOWN_PARAMETER");
+        else {
+            const parameter_descriptor *d=&parameter_descriptors[i];
+            printf("$ACK,%s,%s,%ld,%s,%ld,%ld,%ld\r\n",cmd,d->name,(long)parameters_current.values[i],
+                   d->unit,(long)d->minimum,(long)d->maximum,(long)d->default_value);
+        }
+        return true;
+    }
+    if(!strcmp(cmd,"get_storage") && !arg) {
+        const parameter_journal *j=parameter_storage_state();
+        printf("$ACK,%s,%d,%d,%lu,%d,%d,1\r\n",cmd,j->loaded,parameter_storage_dirty(&parameters_current),
+               (unsigned long)j->generation,j->page,j->corrupt);return true;
+    }
+    if(!strcmp(cmd,"telemetry_count") && !arg) {
+        printf("$ACK,%s,%u\r\n",cmd,(unsigned)TELEMETRY_COUNT);return true;
+    }
+    if(!strcmp(cmd,"telemetry_info") && protocol_uint(arg,TELEMETRY_COUNT-1,&index)) {
+        printf("$ACK,%s,%lu,%s,%s\r\n",cmd,(unsigned long)index,
+               telemetry_descriptors[index].name,telemetry_descriptors[index].unit);return true;
+    }
+    if(!strcmp(cmd,"get_telemetry") && arg) {
+        int i=telemetry_find(arg);
+        if(i<0 && protocol_uint(arg,TELEMETRY_COUNT-1,&index)) i=(int)index;
+        telemetry_value value;uint32_t now=time_us_32();
+        if(i<0 || !telemetry_read((unsigned)i,now,&value)) error(cmd,"UNKNOWN_TELEMETRY");
+        else printf("$ACK,%s,%s,%s,%" PRId64 ",%d,%lu,%lu,%lu\r\n",cmd,telemetry_descriptors[i].name,
+                    telemetry_descriptors[i].unit,value.value,value.valid,(unsigned long)value.sampled_us,
+                    (unsigned long)(now-value.sampled_us),(unsigned long)value.sequence);
+        return true;
+    }
+    bool set=!strcmp(cmd,"set_param") || !strcmp(cmd,"set_params");
+    if(set || !strcmp(cmd,"save") || !strcmp(cmd,"load") || !strcmp(cmd,"defaults")) {
+        if(!configuration_idle()) { error(cmd,"OUTPUTS_ACTIVE");return true; }
+        if(!strcmp(cmd,"save")) {
+            if(arg) error(cmd,"INVALID_PARAM");
+            else {
+                (void)test_pulse_set(0);watchdog_update();
+                if(parameter_storage_save(&parameters_current)) ack(cmd);else error(cmd,"FLASH_VERIFY_FAILED");
+                watchdog_update();
+            }
+            return true;
+        }
+        parameter_values candidate=parameters_current;
+        bool ok=true;
+        if(set) {
+            if(!arg || !*arg) ok=false;
+            unsigned pairs=0;
+            while(arg && *arg && ok) {
+                char *value=strchr(arg,',');
+                if(!value) { ok=false;break; }
+                *value++=0;char *next=strchr(value,',');if(next) *next++=0;
+                if(++pairs>8 || !parameter_assign(&candidate,arg,value)) ok=false;
+                if(next && !*next) ok=false;
+                arg=next;
+            }
+            if(!pairs) ok=false;
+        } else if(arg) ok=false;
+        else if(!strcmp(cmd,"defaults")) parameters_defaults(&candidate);
+        else if(!parameter_storage_load(&candidate)) { error(cmd,"NO_VALID_SAVED_PARAMETERS");return true; }
+        if(!ok || !configuration_commit(&candidate)) error(cmd,"INVALID_CONFIGURATION");else ack(cmd);
+        return true;
+    }
+    return false;
 }
 static bool laser_temperature_ok(void) {
     return temperature_laser_allowed(sensors_laser_sample(), time_us_32());
@@ -89,16 +187,23 @@ static bool begin_capture(void) {
         if (capture_frames > cap) capture_frames = cap;
     }
     consumed = false;
-    return bin_acquisition_start(capture_frames, chip_hz, emitting);
+    bool ok=bin_acquisition_start(capture_frames,chip_hz,emitting);
+    if(ok && emitting) telemetry_capture_active(true);
+    return ok;
 }
 static void command(char *cmd, char *arg, void *context) {
     (void)context;
     uint32_t n = 0, count = 0;
     bool numeric = protocol_uint(arg, UINT32_MAX, &n);
+    if(!arg) {
+        if(!strcmp(cmd,"capture") || !strcmp(cmd,"start")) { n=(uint32_t)PARAM(integration_frames);numeric=true; }
+        if(!strcmp(cmd,"laser_dac")) { n=(uint32_t)PARAM(laser_dac_code);numeric=true; }
+        if(!strcmp(cmd,"bias_dac")) { n=(uint32_t)PARAM(bias_dac_code);numeric=true; }
+    }
     lease_us = time_us_32();
     if (!strcmp(cmd, "stop") && !arg) { emergency_stop(false); ack(cmd); return; }
     if (!strcmp(cmd, "get_info") && !arg) {
-        printf("$ACK,get_info,ceilometer,0.2.0,pico2,%lu,%lu,%u,%d,%d,%d\r\n",
+        printf("$ACK,get_info,ceilometer,0.3.0,pico2,%lu,%lu,%u,%d,%d,%d\r\n",
             (unsigned long)clock_get_hz(clk_sys), (unsigned long)chip_hz, PRN_LENGTH,
             CEIL_ENABLE_LASER, CEIL_ENABLE_BIAS, CEIL_ENABLE_TEC); return;
     }
@@ -119,7 +224,24 @@ static void command(char *cmd, char *arg, void *context) {
             (long)thermal.target_mc, temperature_fresh(s,time_us_32()), (long)s.mc,
             thermal.output_mv, thermal.polarity, thermal.fault); return;
     }
+    if(!strcmp(cmd,"get_limits") && !arg) {
+        printf("$ACK,%s,%u,%u,500,150000000,1023,4186112\r\n",cmd,
+               (unsigned)CEIL_LASER_MAX_CODE,(unsigned)CEIL_BIAS_MAX_CODE);return;
+    }
+    if(!strcmp(cmd,"get_test_pulse") && !arg) {
+        printf("$ACK,%s,%lu\r\n",cmd,(unsigned long)test_pulse_actual_hz());return;
+    }
+    if(configuration_command(cmd,arg)) return;
     if (running) { error(cmd, "BUSY"); return; }
+    if(!strcmp(cmd,"range_point") && numeric) {
+        unsigned group=(unsigned)PARAM(range_average_bins),first=n*group;
+        if(!ready || n>=(PRN_LENGTH+group-1)/group) { error(cmd,"NO_DATA_OR_INVALID_INDEX");return; }
+        unsigned end=first+group;if(end>PRN_LENGTH) end=PRN_LENGTH;
+        int64_t sum=0;
+        for(unsigned i=first;i<end;++i) sum+=profile[i]/(int64_t)(end-first);
+        int64_t mm=(int64_t)(range_m(first,PARAM(range_offset_bins),chip_hz)*1000.0);
+        printf("$ACK,%s,%lu,%u,%" PRId64 ",%" PRId64 "\r\n",cmd,(unsigned long)n,first,mm,sum);return;
+    }
     if (!strcmp(cmd, "clear_fault") && !arg) {
         if (board_laser_fault()) error(cmd, "LD_FAULT_ACTIVE");
         else if (thermal.fault && !temperature_tec_allowed(sensors_laser_sample(),time_us_32())) error(cmd,"TEMPERATURE_INVALID");
@@ -150,60 +272,52 @@ static void command(char *cmd, char *arg, void *context) {
         }
         printf("\r\n"); return;
     }
-    if (!strcmp(cmd, "set_rate") && numeric) {
-        uint32_t sys = clock_get_hz(clk_sys);
-        if (n < 10000 || n > DEFAULT_CHIP_HZ || sys % n || (sys / n) % CHIP_CYCLES) {
-            error(cmd, "INVALID_RATE"); return;
-        }
-        chip_hz = n; ready = false; ack(cmd); return;
-    }
+    if (!strcmp(cmd,"set_rate")) { (void)legacy_parameter(cmd,"chip_hz",arg);return; }
     if (!strcmp(cmd, "test_pulse") && numeric) {
         if (!test_pulse_set(n)) error(cmd, "INVALID_RATE");
         else printf("$ACK,test_pulse,%lu\r\n", (unsigned long)test_pulse_actual_hz());
         return;
     }
-    if (!strcmp(cmd, "set_threshold") && numeric && n <= 65535) {
-        if (board_dac(2, (uint16_t)n)) ack(cmd); else error(cmd, "I2C"); return;
-    }
+    if (!strcmp(cmd,"set_threshold")) { (void)legacy_parameter(cmd,"threshold_code",arg);return; }
     if (!strcmp(cmd, "arm") && numeric && n <= 1) {
         if (!n) { emergency_stop(false); ack(cmd); return; }
         if (!CEIL_ENABLE_LASER || !CEIL_LASER_MAX_CODE) error(cmd, "LASER_BUILD_DISABLED");
         else if (fault || board_laser_fault()) error(cmd, "FAULT");
-        else if (!laser_temperature_ok()) error(cmd, "LASER_TEMPERATURE_10_TO_30_C");
+        else if (!laser_temperature_ok()) error(cmd, "LASER_TEMPERATURE_OUTSIDE_WINDOW");
         else { armed = true; ack(cmd); } return;
     }
     if (!strcmp(cmd, "laser_dac") && numeric && n <= 65535) {
         if (n && (!armed || fault || !laser_temperature_ok() || n > CEIL_LASER_MAX_CODE)) { error(cmd, "NOT_ARMED_OR_LIMIT"); return; }
-        if (board_dac(0, (uint16_t)n)) { laser_code = (uint16_t)n; ack(cmd); }
+        if (board_dac(0, (uint16_t)n)) { laser_code = (uint16_t)n; PARAM(laser_dac_code)=(int32_t)n; ack(cmd); }
         else { emergency_stop(true); error(cmd, "I2C"); } return;
     }
     if (!strcmp(cmd, "bias_dac") && numeric && n <= 65535) {
         if (n && (!CEIL_ENABLE_BIAS || fault || n > CEIL_BIAS_MAX_CODE)) {
             error(cmd, "BIAS_BUILD_DISABLED_OR_LIMIT"); return;
         }
-        if (board_dac(1, (uint16_t)n)) ack(cmd);
+        if (board_dac(1, (uint16_t)n)) { PARAM(bias_dac_code)=(int32_t)n;ack(cmd); }
         else { emergency_stop(true); error(cmd, "I2C"); } return;
     }
     if (!strcmp(cmd, "bias_enable") && numeric && n <= 1) {
         if (n && (!CEIL_ENABLE_BIAS || !CEIL_BIAS_MAX_CODE || fault)) error(cmd, "BIAS_BUILD_DISABLED_OR_FAULT");
         else { bias_on = n; board_bias_enable(bias_on); ack(cmd); } return;
     }
-    if (!strcmp(cmd, "tec_target") && numeric && n >= 10000 && n <= 30000) {
-        thermal.target_mc=(int32_t)n; pid_reset(&thermal.pid); ack(cmd); return;
-    }
-    if (!strcmp(cmd, "tec_polarity") && arg && (!strcmp(arg,"1") || !strcmp(arg,"-1"))) {
-        if (tec_on || armed) error(cmd,"OUTPUTS_ACTIVE");
-        else { thermal.polarity=!strcmp(arg,"1") ? 1 : -1; ack(cmd); } return;
-    }
-    if (!strcmp(cmd, "tec_pid") && arg) {
-        char *i=strchr(arg,','), *d=i ? strchr(i+1,',') : NULL;
+    if (!strcmp(cmd,"tec_target")) { (void)legacy_parameter(cmd,"tec_target_mc",arg);return; }
+    if (!strcmp(cmd,"tec_polarity")) { (void)legacy_parameter(cmd,"tec_polarity",arg);return; }
+    if (!strcmp(cmd,"tec_pid") && arg) {
+        char *i=strchr(arg,','),*d=i ? strchr(i+1,',') : NULL;
         uint32_t kp,ki,kd;
-        if (i) *i++=0;
-        if (d) *d++=0;
-        if (tec_on || armed) error(cmd,"OUTPUTS_ACTIVE");
-        else if (!i || !d || !protocol_uint(arg,10000,&kp) ||
-                 !protocol_uint(i,10000,&ki) || !protocol_uint(d,10000,&kd)) error(cmd,"INVALID_PARAM");
-        else { pid_init(&thermal.pid,(float)kp,(float)ki,(float)kd,-500,500,-500,500); ack(cmd); }
+        if(i) *i++=0;
+        if(d) *d++=0;
+        if(!i || !d || !protocol_uint(arg,10000,&kp) || !protocol_uint(i,10000,&ki) || !protocol_uint(d,10000,&kd))
+            error(cmd,"INVALID_PARAM");
+        else {
+            parameter_values candidate=parameters_current;
+            candidate.values[PARAM_pid_p_milli]=(int32_t)kp*1000;
+            candidate.values[PARAM_pid_i_milli]=(int32_t)ki*1000;
+            candidate.values[PARAM_pid_d_milli]=(int32_t)kd*1000;
+            if(configuration_commit(&candidate)) ack(cmd);else error(cmd,"OUTPUTS_ACTIVE_OR_INVALID");
+        }
         return;
     }
     if (!strcmp(cmd, "tec_enable") && numeric && n <= 1) {
@@ -221,6 +335,8 @@ static void command(char *cmd, char *arg, void *context) {
     if ((!strcmp(cmd, "capture") || !strcmp(cmd, "start")) && numeric && n && n <= 1000000) {
         emitting = !strcmp(cmd, "start");
         if (fault || (emitting && (!armed || !laser_code || board_laser_fault() || !laser_temperature_ok()))) { error(cmd, "NOT_ARMED_OR_FAULT"); return; }
+        PARAM(integration_frames)=(int32_t)n;
+        telemetry_reset_active();
         memset(histogram, 0, sizeof histogram);
         ready = false; accumulated = 0; remaining = n; running = true;
         if (!begin_capture()) { emergency_stop(true); error(cmd, "ACQUISITION"); }
@@ -230,9 +346,16 @@ static void command(char *cmd, char *arg, void *context) {
     error(cmd, "UNKNOWN_COMMAND_OR_INVALID_PARAM");
 }
 int main(void) {
+    /* Establish safe levels before scanning persistent settings or starting clocks. */
+    gpio_init(PIN_LD_GATE);gpio_put(PIN_LD_GATE,0);gpio_set_dir(PIN_LD_GATE,GPIO_OUT);
+    gpio_init(PIN_BIAS_ENABLE);gpio_put(PIN_BIAS_ENABLE,0);gpio_set_dir(PIN_BIAS_ENABLE,GPIO_OUT);
+    gpio_init(PIN_TEC_SWEN);gpio_put(PIN_TEC_SWEN,0);gpio_set_dir(PIN_TEC_SWEN,GPIO_OUT);
+    parameter_storage_init();
     set_sys_clock_khz(SYSTEM_KHZ, true);
-    board_init(); lt8722_init(); sensors_init(); temperature_init(&thermal);
-    prn_generate(code); prn_tx_init(code); sipm_counter_init();
+    chip_hz=(uint32_t)PARAM(chip_hz);
+    board_init(); lt8722_init(); lt8722_disable(); sensors_init(); temperature_init(&thermal);
+    prn_generate_seed(code,(uint16_t)PARAM(prn_seed)); prn_tx_init(code); sipm_counter_init();
+    (void)board_dac(2,(uint16_t)PARAM(threshold_code));telemetry_init();
     bin_acquisition_init(); test_pulse_init();
     gpio_set_irq_enabled_with_callback(PIN_LD_ERROR, GPIO_IRQ_EDGE_FALL, true, fault_irq);
     stdio_init_all(); watchdog_enable(1000, true);
@@ -242,11 +365,13 @@ int main(void) {
         watchdog_update(); bin_acquisition_poll();
         bool connected = stdio_usb_connected();
         if (driver_fault || ((armed || bias_on || tec_on || running) &&
-            (!connected || time_us_32() - lease_us > 2000000))) {
+            (!connected || time_us_32() - lease_us > (uint32_t)PARAM(usb_lease_ms)*1000u))) {
             emergency_stop(true); driver_fault = false;
         }
         acquisition_status s = bin_acquisition_status();
         (void)thermal_service(!s.busy);
+        if(s.busy && emitting && running) telemetry_capture_active(false);
+        telemetry_poll(s.busy);
         if (running && s.failed) emergency_stop(true);
         if (running && s.ready && !consumed) {
             consumed = true;

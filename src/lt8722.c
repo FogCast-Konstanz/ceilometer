@@ -1,6 +1,8 @@
 #include "lt8722.h"
 #include "lt8722_codec.h"
 #include "config.h"
+#include "parameters.h"
+static uint32_t spi_errors;
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
 static bool enabled;
@@ -10,7 +12,9 @@ static bool transaction(bool write, uint8_t reg, uint32_t *value) {
     gpio_put(PIN_SPI_CS, 0); busy_wait_us_32(1);
     int n = spi_write_read_blocking(spi1, tx, rx, 8);
     busy_wait_us_32(1); gpio_put(PIN_SPI_CS, 1);
-    return n == 8 && lt8722_decode(write, rx, value, &status);
+    bool ok=n==8 && lt8722_decode(write,rx,value,&status);
+    if(!ok) ++spi_errors;
+    return ok;
 }
 void lt8722_init(void) {
     gpio_init(PIN_TEC_SWEN); gpio_put(PIN_TEC_SWEN, 0); gpio_set_dir(PIN_TEC_SWEN, GPIO_OUT);
@@ -24,22 +28,24 @@ void lt8722_init(void) {
 bool lt8722_read(uint8_t reg, uint32_t *v) { *v = 0; return transaction(false, reg, v); }
 bool lt8722_write(uint8_t reg, uint32_t v) { return transaction(true, reg, &v); }
 void lt8722_disable(void) {
-    gpio_put(PIN_TEC_SWEN, 0); enabled = false;
+    gpio_put(PIN_TEC_SWEN, 0); gpio_set_dir(PIN_TEC_SWEN,GPIO_OUT); enabled = false;
     uint32_t v;
     if (lt8722_read(0, &v)) (void)lt8722_write(0, v & ~3u);
 }
 bool lt8722_healthy(void) {
     uint32_t status;
-    return lt8722_read(1, &status) && !(status & 0x7e0u);
+    return lt8722_read(1, &status) && !(status & 0x7e0u) && (!enabled || gpio_get(PIN_TEC_SWEN));
 }
 bool lt8722_enable(void) {
 #if CEIL_ENABLE_TEC
     /* +/-~0.85 A nominal limits; raw register endpoints follow Rev B.
        Temperature feedback and PID are supervised by temperature_control. */
     uint32_t cmd;
-    if (!lt8722_read(0, &cmd) || !lt8722_write(0, (cmd & ~3u) | 1u)) goto fail;
+    if (!lt8722_read(0, &cmd)) goto fail;
+    cmd=(cmd & ~0x1fu) | ((uint32_t)PARAM(tec_frequency)<<2);
+    if(!lt8722_write(0,cmd|1u)) goto fail;
     sleep_ms(2);
-    if (!lt8722_write(2, 64u) || !lt8722_write(3, 448u) ||
+    if (!lt8722_write(2, (uint32_t)PARAM(tec_ilimn_code)) || !lt8722_write(3, (uint32_t)PARAM(tec_ilimp_code)) ||
         !lt8722_write(4, 0xff000000u) || !lt8722_write(1, 0)) goto fail;
     sleep_ms(1);
     /* Signed DAC common-mode ramp from -2^24 to zero, >=5 ms. */
@@ -47,7 +53,8 @@ bool lt8722_enable(void) {
         if (!lt8722_write(4, (uint32_t)(-step * 1048576))) goto fail;
         sleep_us(400);
     }
-    gpio_put(PIN_TEC_SWEN, 1);
+    /* SWEN is bidirectional. Release to external pull-up so faults can pull it low. */
+    gpio_set_dir(PIN_TEC_SWEN, GPIO_IN);
     if (!lt8722_write(0, cmd | 3u)) goto fail;
     sleep_us(200);
     enabled = lt8722_healthy();
@@ -58,9 +65,11 @@ fail:
     return false;
 }
 bool lt8722_set_mv(int mv) {
-    if (!enabled || mv < -500 || mv > 500) return false;
+    if (!enabled || mv < -PARAM(tec_output_mv) || mv > PARAM(tec_output_mv)) return false;
     /* VTEC (LDR-SFB) = signed(code)*1.25*16*Ga/2^24; nominal Ga=0.969. */
     int32_t code = (int32_t)((int64_t)mv * 16777216 * 1000 / 19380000);
     if (!lt8722_write(4, (uint32_t)code)) { lt8722_disable(); return false; }
     return true;
 }
+
+uint32_t lt8722_error_count(void) { return spi_errors; }

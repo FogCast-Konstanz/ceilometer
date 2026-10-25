@@ -1,5 +1,10 @@
 # Local verification record
 
+The parameter/telemetry update adds validated persistent settings, a reserved
+8 KiB CRC journal, and a complete telemetry inventory. See parameter-storage.md
+and telemetry-inventory.md. Native persistence fault injection and simulated
+bus tests accompany default/commissioned Pico 2 builds; hardware is untested.
+
 The initial acquisition build record below is historical. The PID/interlock
 update also passes four native suites (core, thermal, scripted sensor driver,
 and real command/interlock wiring with fake hardware), plus default and
@@ -25,3 +30,13 @@ Date: 2026-10-25 (Europe/Berlin).
 
 Build artifacts and logs are ignored by Git. Reproduce the checks using README.md;
 this record does not certify electrical performance.
+
+
+Current parameter/telemetry validation: six native suites pass (core, thermal,
+sensor-driver, real command/interlock integration, flash journal fault injection,
+and actual ADC/DAC/LT8722 drivers against simulated buses). Both default and
+TEC/laser-enabled SDK 2.3.0 builds succeed with compiler warnings as errors.
+The generated linker FLASH region is 4186112 bytes, leaving the final 8192 bytes
+for parameters. Python host tools pass syntax compilation. Flash interruption
+tests are simulated; no physical flash write, reboot or instrument measurement
+was performed on connected hardware.

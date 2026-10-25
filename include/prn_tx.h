@@ -6,3 +6,5 @@ bool prn_tx_prepare(uint32_t chip_hz, bool laser);
 void prn_tx_start(void);
 void prn_tx_stop(void);
 bool prn_tx_starved(void);
+
+void prn_tx_set_code(const uint8_t code[PRN_LENGTH]);

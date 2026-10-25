@@ -18,3 +18,9 @@ void gpio_set_irq_enabled_with_callback(uint pin,uint32_t events,bool enable,voi
 void stdio_init_all(void);
 int getchar_timeout_us(uint32_t timeout);
 void tight_loop_contents(void);
+
+#define GPIO_FUNC_I2C 1
+#define GPIO_FUNC_SPI 2
+void gpio_pull_up(uint pin);
+void sleep_ms(uint32_t ms);
+void sleep_us(uint32_t us);

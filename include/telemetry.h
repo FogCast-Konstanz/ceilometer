@@ -1,0 +1,115 @@
+#pragma once
+#include <stdbool.h>
+#include <stdint.h>
+#define TELEMETRY_LIST(X) \
+ X(laser_adc_raw,"code") \
+ X(tec_adc_raw,"code") \
+ X(bias_adc_raw,"code") \
+ X(vsys_adc_raw,"code") \
+ X(mcu_adc_raw,"code") \
+ X(laser_sense_uv,"uV") \
+ X(bias_sense_uv,"uV") \
+ X(vsys_uv,"uV") \
+ X(mcu_temperature_mc,"mC") \
+ X(laser_current_ma,"mA") \
+ X(bias_current_ua,"uA") \
+ X(laser_active_raw,"code") \
+ X(laser_active_peak_raw,"code") \
+ X(laser_active_samples,"samples") \
+ X(laser_active_uv,"uV") \
+ X(laser_active_current_ma,"mA") \
+ X(laser_temp_mc,"mC") \
+ X(laser_temp_raw_mc,"mC") \
+ X(laser_temp_sequence,"count") \
+ X(receiver_temp_mc,"mC") \
+ X(receiver_config,"bits") \
+ X(receiver_hysteresis_raw,"bits") \
+ X(receiver_limit_raw,"bits") \
+ X(ld_error,"bool") \
+ X(tec_swen,"bool") \
+ X(bias_enabled,"bool") \
+ X(vbus_present,"bool") \
+ X(smps_pwm,"bool") \
+ X(counter_raw,"code") \
+ X(spi_errors,"count") \
+ X(ds_presence_errors,"count") \
+ X(ds_crc_errors,"count") \
+ X(ds_conversion_errors,"count") \
+ X(sweep_sequence,"count") \
+ X(sweep_duration_us,"us") \
+ X(ds_byte0,"byte") \
+ X(ds_byte1,"byte") \
+ X(ds_byte2,"byte") \
+ X(ds_byte3,"byte") \
+ X(ds_byte4,"byte") \
+ X(ds_byte5,"byte") \
+ X(ds_byte6,"byte") \
+ X(ds_byte7,"byte") \
+ X(ds_byte8,"byte") \
+ X(dac0_requested,"code") \
+ X(dac1_requested,"code") \
+ X(dac2_requested,"code") \
+ X(dac0_readback,"code") \
+ X(dac1_readback,"code") \
+ X(dac2_readback,"code") \
+ X(dac0_uv,"uV") \
+ X(dac1_uv,"uV") \
+ X(dac2_uv,"uV") \
+ X(lt_register0,"bits") \
+ X(lt_register1,"bits") \
+ X(lt_register2,"bits") \
+ X(lt_register3,"bits") \
+ X(lt_register4,"bits") \
+ X(lt_register5,"bits") \
+ X(lt_register6,"bits") \
+ X(lt_register7,"bits") \
+ X(lt_mux0_raw,"code") \
+ X(lt_mux1_raw,"code") \
+ X(lt_mux2_raw,"code") \
+ X(lt_mux3_raw,"code") \
+ X(lt_mux4_raw,"code") \
+ X(lt_mux5_raw,"code") \
+ X(lt_mux6_raw,"code") \
+ X(lt_mux7_raw,"code") \
+ X(lt_mux8_raw,"code") \
+ X(lt_mux9_raw,"code") \
+ X(lt_mux10_raw,"code") \
+ X(lt_mux11_raw,"code") \
+ X(lt_mux12_raw,"code") \
+ X(lt_mux0_uv,"uV") \
+ X(lt_mux1_uv,"uV") \
+ X(lt_mux2_uv,"uV") \
+ X(lt_mux3_uv,"uV") \
+ X(lt_mux4_uv,"uV") \
+ X(lt_mux5_uv,"uV") \
+ X(lt_mux6_uv,"uV") \
+ X(lt_mux7_uv,"uV") \
+ X(lt_mux8_uv,"uV") \
+ X(lt_mux9_uv,"uV") \
+ X(lt_mux10_uv,"uV") \
+ X(lt_mux11_uv,"uV") \
+ X(lt_mux12_uv,"uV") \
+ X(lt_output_uv,"uV") \
+ X(lt_output_ua,"uA") \
+ X(lt_ref2500_uv,"uV") \
+ X(lt_ref1250_uv,"uV") \
+ X(lt_ref1650_uv,"uV") \
+ X(lt_die_temp_mc,"mC") \
+ X(lt_vin_uv,"uV") \
+ X(lt_vcc_uv,"uV") \
+ X(lt_vddio_uv,"uV") \
+ X(lt_sfb_uv,"uV") \
+ X(lt_ldr_uv,"uV") \
+ X(lt_control_uv,"uV")
+#define TELEMETRY_ENUM(name,unit) T_##name,
+typedef enum { TELEMETRY_LIST(TELEMETRY_ENUM) TELEMETRY_COUNT } telemetry_id;
+#undef TELEMETRY_ENUM
+typedef struct { const char *name,*unit; } telemetry_descriptor;
+typedef struct { int64_t value;uint32_t sampled_us,sequence;bool valid; } telemetry_value;
+extern const telemetry_descriptor telemetry_descriptors[TELEMETRY_COUNT];
+void telemetry_init(void);
+void telemetry_poll(bool acquisition_busy);
+void telemetry_capture_active(bool force);
+void telemetry_reset_active(void);
+int telemetry_find(const char *name);
+bool telemetry_read(unsigned index,uint32_t now,telemetry_value *value);

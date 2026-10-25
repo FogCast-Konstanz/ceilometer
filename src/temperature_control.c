@@ -1,26 +1,29 @@
 #include "temperature_control.h"
 #include <math.h>
+#include "parameters.h"
 bool temperature_fresh(temperature_sample s, uint32_t now) {
-    return s.valid && (uint32_t)(now-s.sampled_us) <= TEMPERATURE_MAX_AGE_US &&
+    return s.valid && (uint32_t)(now-s.sampled_us) <= (uint32_t)PARAM(temperature_age_ms)*1000u &&
            s.mc >= -55000 && s.mc <= 125000;
 }
 bool temperature_laser_allowed(temperature_sample s, uint32_t now) {
-    return temperature_fresh(s,now) && s.mc >= 10000 && s.mc <= 30000;
+    return temperature_fresh(s,now) && s.mc >= PARAM(laser_min_mc) && s.mc <= PARAM(laser_max_mc);
 }
 bool temperature_tec_allowed(temperature_sample s, uint32_t now) {
-    return temperature_fresh(s,now) && s.mc >= -10000 && s.mc <= 50000;
+    return temperature_fresh(s,now) && s.mc >= PARAM(tec_min_mc) && s.mc <= PARAM(tec_max_mc);
 }
 void temperature_init(temperature_controller *c) {
-    *c = (temperature_controller){.target_mc=24000};
+    *c = (temperature_controller){.target_mc=PARAM(tec_target_mc),.polarity=PARAM(tec_polarity)};
     /* Same laphtec algorithm, plant-specific commissioning gains in mV/C.
        No laser-current feedforward: there is no calibrated current yet. */
-    pid_init(&c->pid,100.0f,10.0f,0.0f,-500,500,-500,500);
+    pid_init(&c->pid,PARAM(pid_p_milli)/1000.0f,PARAM(pid_i_milli)/1000.0f,PARAM(pid_d_milli)/1000.0f,
+             -(float)PARAM(tec_output_mv),(float)PARAM(tec_output_mv),
+             -(float)PARAM(pid_integral_mv),(float)PARAM(pid_integral_mv));
 }
 void temperature_stop(temperature_controller *c) {
     c->enabled=false; c->output_mv=0; pid_reset(&c->pid);
 }
 bool temperature_start(temperature_controller *c, temperature_sample s, uint32_t now) {
-    if (c->fault || (c->polarity != 1 && c->polarity != -1) || !temperature_tec_allowed(s,now)) return false;
+    if (!PARAM(tec_output_mv) || c->fault || (c->polarity != 1 && c->polarity != -1) || !temperature_tec_allowed(s,now)) return false;
     pid_reset(&c->pid); c->enabled=true; c->output_mv=0;
     c->last_sequence=s.sequence-1u;
     c->last_sample_us=s.sampled_us-1000000u;
@@ -31,7 +34,7 @@ bool temperature_update(temperature_controller *c, temperature_sample s, uint32_
     if (!temperature_tec_allowed(s,now)) goto fail;
     if (s.sequence == c->last_sequence) return true; /* Never integrate cached readings. */
     uint32_t elapsed=s.sampled_us-c->last_sample_us;
-    if (elapsed < 10000u || elapsed > TEMPERATURE_MAX_AGE_US) goto fail;
+    if (elapsed < 10000u || elapsed > (uint32_t)PARAM(temperature_age_ms)*1000u) goto fail;
     float out=pid_calculate(&c->pid,c->target_mc/1000.0f,s.mc/1000.0f,elapsed/1000000.0f,0);
     if (!isfinite(out)) goto fail;
     c->output_mv=(int)(out*c->polarity);

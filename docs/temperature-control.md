@@ -14,26 +14,27 @@ the reference's 1 ms ADC loop, this DS18B20 loop advances once per fresh complet
 conversion using actual sample intervals, normally about one second. Cached
 readings never integrate again. Feedforward is zero without calibrated current.
 
-The default target is 24 C; `tec_target,10000..30000` sets milli-Celsius. The
+The default target is 24 C; `tec_target,value` sets milli-Celsius inside the
+configured laser window. Both window endpoints and target are persistent parameters. The
 commissioning gains are P=100 mV/C, I=10 mV/(C*s), D=0 mV*s/C; they are not claimed
 to be tuned for this TEC. Use `tec_pid,p,i,d` (unsigned integer gains 0..10000)
 only while TEC and laser arming are off. Output and integral limits remain
-fixed at +/-500 mV. This deliberately does not copy the laphtec plant's 4/-4.5 V
+adjustable downward from a hard +/-500 mV ceiling through persistent parameters. This deliberately does not copy the laphtec plant's 4/-4.5 V
 limits or its gains into the different thermal plant.
 
 Polarity must be chosen explicitly before TEC enable: `tec_polarity,1` means
 positive LT8722 VLDR-VSFB for positive (target-measured) error; `-1` inverts it as
 in the reference temperature controller. Confirm which direction heats the diode
-using a safe bench test. No polarity is assumed after reset. The commissioned
+using a safe bench test. The default polarity is uncommissioned; a saved, explicitly selected polarity is restored on reset. The commissioned
 TEC build option remains necessary. `tec_enable,1` starts regulation only with
 valid feedback, configured polarity and no latched fault. It retains the driver's
 soft start and nominal +/-0.85 A limits. Repeated enable requests are idempotent.
 Manual `tec_mv` requests return `PID_OWNS_OUTPUT` and cannot bypass supervision.
 
 Laser arming, nonzero laser DAC commands and every emitting burst require a valid
-temperature **inclusive of 10 and 30 C**. Leaving this window immediately stops
+temperature **inside the configured window, inclusive (default 10 to 30 C)**. Leaving this window immediately stops
 the laser/acquisition, zeros the laser DAC and disarms. If temperature is still
-valid and within the wider TEC protection envelope (-10..50 C), TEC regulation
+valid and within the configured TEC protection envelope (default -10..50 C), TEC regulation
 continues to bring the diode back into range. Returning into range never rearms
 the laser automatically. The TEC is not required to be on for a naturally
 in-range laser; the actual temperature interlock always applies.
@@ -42,7 +43,7 @@ No valid reading, bad scratchpad CRC/configuration, failed presence/reset,
 incomplete conversion, the 85 C power-on sentinel, or stale feedback disables the
 TEC, resets PID state, stops/disarms the laser and latches a fault if either was
 active. A new conversion request does not refresh the timestamp of an old sample.
-The freshness budget is 2 seconds measured conservatively from the successful
+The freshness budget is the configured age limit (default 2 seconds) measured conservatively from the successful
 conversion's request time, not the read time. The wider TEC temperature envelope
 also fails closed. Recovery requires valid feedback, `clear_fault`, and an
 explicit new `tec_enable,1` / `arm,1`; it does not restart on reconnect alone.
@@ -67,7 +68,7 @@ response before tuning gains. Native tests exercise the portable PID, decoder,
 freshness, boundary and fail-closed state logic; no hardware is simulated by those
 tests. Separate host tests run the actual one-wire driver against scripted GPIO
 read slots and the actual command handler/shutdown wiring against mocked hardware.
-The 10/30 C thresholds are measured sensor values; compensate sensor
+Configured temperature thresholds are measured sensor values; compensate sensor
 accuracy and thermal gradients separately if physical diode limits require it.
 
 DS18B20 timing/format reference:

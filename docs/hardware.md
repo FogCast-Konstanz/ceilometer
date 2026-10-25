@@ -19,7 +19,7 @@ the netlist. This is a connectivity review, not a new PCB qualification.
 | 13 | J3 diagnostic PRN data output during dark `capture` |
 | 14-15 | J3 expansion, unused |
 | 16 | U3 active-low NER laser driver error input, pulled up by R7 |
-| 17 | IC1 SWEN **input**, firmware output; misleading net name ~TEC_FAULT |
+| 17 | IC1 bidirectional SWEN; firmware open-drain control and fault readback |
 | 18 | LT3571 SHDN input; high enables bias, R11 pulls low |
 | 19 | U18 externally powered DS18B20, 4.7k external pull-up R36 |
 | 26 / ADC0 | U4 INA293B1 laser current amplifier |
@@ -43,7 +43,8 @@ selects the internal reference, unity gain and normal mode. Full-scale is nomina
 2.5 V; determine safe output ranges and settling on the populated board.
 
 LT8722 EN tied to GND is allowed: ENABLE_REQ activates the device through SPI.
-GP17 must control SWEN rather than interpret it as a fault output. Firmware
+GP17 drives SWEN low to disable and releases it to R28 to enable; the LT8722
+can also pull the shared pin low on a fault. Firmware never drives this pin high. Firmware
 reads faults from SPIS_STATUS. SPI1 uses mode 0, MSB first, 1 MHz, eight-byte
 read/write packets, address shifted left one bit, CRC-8 polynomial 0x07 with seed
 0 (Rev B), and ACK 0xa5. Response CRC is checked as well. Soft start ramps the

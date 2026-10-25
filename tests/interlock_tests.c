@@ -9,6 +9,21 @@ static temperature_sample feedback;
 static bool hw_tec, hw_gate, spi_ok=true;
 static uint16_t hw_dac;
 static acquisition_status acq;
+void busy_wait_us_32(uint32_t us) { fake_now+=us; }
+bool board_adc_sample(unsigned channel,unsigned average,uint16_t *raw) { (void)channel;(void)average;*raw=1000;return true; }
+bool board_dac_read(unsigned channel,uint16_t *raw) { *raw=channel==0 ? hw_dac : 0;return true; }
+uint16_t board_dac_requested(unsigned channel) { return channel==0 ? hw_dac : 0; }
+bool board_pin(unsigned pin) { return pin==PIN_TEC_SWEN ? hw_tec : false; }
+bool lt8722_write(uint8_t reg,uint32_t v) { (void)reg;(void)v;return spi_ok; }
+uint32_t lt8722_error_count(void) { return 0; }
+void prn_tx_set_code(const uint8_t p[PRN_LENGTH]) { (void)p; }
+temperature_sample sensors_laser_uncalibrated(void) { return feedback; }
+const uint8_t *sensors_scratchpad(void) { static uint8_t p[9];return p; }
+void sensors_errors(uint32_t *p,uint32_t *c,uint32_t *v) { *p=*c=*v=0; }
+bool sensors_receiver_register(unsigned r,uint16_t *v) { (void)r;*v=0;return false; }
+bool sensors_receiver_configure(void) { return false; }
+void gpio_init(uint pin) { (void)pin; }
+void gpio_set_dir(uint pin,bool out) { (void)pin;(void)out; }
 void gpio_put(uint pin,bool v) { (void)pin;(void)v; }
 void gpio_set_function(uint pin,int f) { (void)pin;(void)f; }
 void gpio_set_irq_enabled_with_callback(uint p,uint32_t e,bool b,void(*cb)(uint,uint32_t)) { (void)p;(void)e;(void)b;(void)cb; }
@@ -59,7 +74,8 @@ static void reset(void) {
     emergency_stop(false);fault=false;driver_fault=false;spi_ok=true;
     fake_now=1000000;last_tec_health=0;
     feedback=(temperature_sample){.valid=true,.mc=24000,.sampled_us=fake_now,.sequence=1};
-    temperature_init(&thermal);
+    parameters_defaults(&parameters_current);parameter_storage_init();parameters_defaults(&parameters_current);
+    temperature_init(&thermal);telemetry_init();
 }
 int main(void) {
     reset();feedback.valid=false;request("tec_polarity","-1");request("tec_enable","1");
@@ -87,6 +103,18 @@ int main(void) {
     reset();feedback.mc=30001;armed=true;laser_code=1;
     request("start","1");CHECK(!hw_gate && !running); /* start independently gates temperature */
     request("laser_dac","1");CHECK(!hw_dac); /* DAC path independently gated */
+    reset();request("set_params","laser_min_mc,5000,laser_max_mc,35000,tec_target_mc,32000");
+    CHECK(PARAM(laser_min_mc)==5000 && PARAM(laser_max_mc)==35000 && thermal.target_mc==32000);
+    feedback.mc=6000;request("arm","1");CHECK(armed); /* adjustable laser window */
+    request("set_param","laser_min_mc,0");CHECK(PARAM(laser_min_mc)==5000); /* no live safety edits */
+    request("stop",NULL);request("set_params","laser_min_mc,36000,laser_max_mc,37000");
+    CHECK(PARAM(laser_min_mc)==5000 && PARAM(laser_max_mc)==35000); /* rejected atomically */
+    request("save",NULL);CHECK(parameter_storage_state()->loaded);
+    request("defaults",NULL);CHECK(PARAM(laser_min_mc)==10000 && !armed && !tec_on);
+    request("load",NULL);CHECK(PARAM(laser_min_mc)==5000 && thermal.target_mc==32000 && !armed && !tec_on);
+    request("set_params","laser_dac_code,1,bias_dac_code,1");CHECK(hw_dac==0 && !hw_tec && !armed);
+    request("save",NULL);parameter_storage_init();
+    CHECK(PARAM(laser_dac_code)==1 && hw_dac==0 && !hw_tec); /* saved target never energizes boot */
     puts("PASS: real USB command/interlock wiring, TEC sensor prerequisite, laser 10/30 C gates, range recovery, stale feedback, latched faults and SPI shutdown");
     return 0;
 }

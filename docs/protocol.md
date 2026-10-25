@@ -24,7 +24,7 @@ additional recovery mechanism, not an independent physical laser interlock.
 | `get_state` | state, accumulated_frames, remaining_frames, last_burst_elapsed_us, tx_starved, armed, bias_on, correlation_us |
 | `heartbeat` | no fields; renew activity lease |
 | `stop` | stop acquisition, clear result validity, disarm, DAC zero, bias and TEC off |
-| `clear_fault` | GP16 must be high; thermal faults also require valid -10..50 C feedback; no automatic restart |
+| `clear_fault` | GP16 must be high; thermal faults also require valid feedback inside the configured TEC window; no automatic restart |
 | `get_count` | current free-running unsigned 16-bit PWM2 count; modulo 65536 |
 | `set_rate,hz` | 10000..10000000, exact sys/(15*integer); invalidate prior profile |
 | `test_pulse,hz` | GP12 test output; ACK returns quantized actual integer Hz; 0 disables |
@@ -41,7 +41,7 @@ additional recovery mechanism, not an independent physical laser interlock.
 | `bias_enable,0_or_1` | GP18 high enables LT3571; requires commissioned bias build for 1 |
 | `tec_read,register` | register (0..7), 32-bit unsigned value; no unrestricted write command |
 | `tec_enable,0_or_1` | commissioned soft start / disable; failures latch FAULT |
-| `tec_target,milliCelsius` | 10000..30000, default 24000; reset PID state |
+| `tec_target,milliCelsius` | inside configured laser window, default 24000; reset PID state |
 | `tec_polarity,1_or_-1` | set verified heating polarity while TEC and laser arming are off |
 | `tec_pid,p,i,d` | integer gains 0..10000 in mV/C, mV/(C*s), mV*s/C; outputs off |
 | `get_temperature_control` | TEC enabled, target_mC, valid, measured_mC, output_mV, polarity, thermal_fault |
@@ -51,8 +51,9 @@ States: IDLE, ACQUIRING, READY, FAULT. During ACQUIRING only `stop`, `get_info`,
 `get_state`, `heartbeat`, `get_count`, and `get_temperature_control` are accepted. BUSY protects shared
 buffers and avoids I2C/SPI/one-wire traffic during a burst. Sensor service and TEC
 health checks occur between bursts; freshness/range checks also run during bursts.
-Laser arming and emission require valid DS18B20 feedback in 10..30 C inclusive.
-TEC PID can recover temperature inside its wider -10..50 C protection envelope.
+Laser arming and emission require valid feedback inside the configured laser
+window (default 10..30 C inclusive). TEC PID can recover temperature inside its
+configured wider protection envelope (default -10..50 C).
 Missing/stale feedback disables TEC and laser, resets PID and latches a fault.
 See [temperature-control.md](temperature-control.md) for configuration and recovery.
 Wait several seconds after boot before arming. Only one externally powered
@@ -62,7 +63,7 @@ Examples:
 
 ```text
 > $get_info
-< $ACK,get_info,ceilometer,0.2.0,pico2,150000000,10000000,1023,0,0,0
+< $ACK,get_info,ceilometer,0.3.0,pico2,150000000,10000000,1023,0,0,0
 > $capture,16
 < $ACK,capture
 > $get_state
@@ -83,3 +84,38 @@ copies peak at positive lag d. Range is `(lag-offset_bins)*299792458/(2*chip_hz)
 Calibrate offset/polarity using an electrical or optical reference before assigning
 physical range. No range correction, normalization by integration, or overlap
 correction is applied in firmware.
+
+
+## v0.3 parameter and telemetry commands
+
+| Request | ACK fields / action |
+|---|---|
+| `parameter_count` | count, schema_version |
+| `parameter_info,index` | index, name, unit, minimum, maximum, default |
+| `get_param,name` | name, value, unit, minimum, maximum, default |
+| `set_param,name,value` / `set_params,name,value,...` | atomic validated changes; all outputs/acquisition off |
+| `save` | persist current settings; identical saves avoid flash wear |
+| `load` | load latest valid record; outputs stay off |
+| `defaults` | restore RAM defaults; use save explicitly to persist |
+| `get_storage` | loaded, dirty, generation, page, invalid_record_seen, schema_version |
+| `telemetry_count` | number of named telemetry fields |
+| `telemetry_info,index` | index, name, unit |
+| `get_telemetry,index_or_name` | name, unit, value, valid, sampled_us, age_us, sequence |
+| `get_limits` | build_laser_max_code, build_bias_max_code, hard_TEC_mV_limit, sys_clock_Hz, PRN_length, parameter_flash_offset |
+| `get_test_pulse` | actual diagnostic pulse frequency Hz |
+| `range_point,index` | group index, first native bin, range_mm, integer averaged correlation |
+
+Metadata/getter/cached telemetry commands remain available during acquisition.
+Setters/save/load/defaults reject active outputs or acquisition. `set_param` and
+`set_params` accept up to eight pairs subject to the 127-character line limit.
+Negative values are accepted for signed parameter descriptors, including window
+limits, offsets and polarity. Temperature limits and target are adjustable;
+10..30 C is the default laser window. Generic writes and legacy configuration
+commands update the same inventory. Legacy live target/gain changes now require
+outputs off. See parameter-storage.md and telemetry-inventory.md for semantics.
+
+`capture`, `start`, `laser_dac` and `bias_dac` accept omitted arguments to use
+configured values. Actuation still requires the original build enables, limits,
+arm and feedback interlocks. Parameter settings never bypass the PID: `tec_mv`
+remains rejected. Telemetry timestamps/ages are uint32 microseconds (wrap every
+~71.6 minutes); per-entry valid/stale flags should be used in addition to age.
