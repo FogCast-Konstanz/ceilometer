@@ -7,6 +7,21 @@ if(CEIL_HOST_TESTS)
   target_include_directories(core_tests PRIVATE include)
   target_compile_options(core_tests PRIVATE -Wall -Wextra -Werror)
   add_test(NAME core_tests COMMAND core_tests)
+  add_executable(thermal_tests tests/thermal_tests.c src/temperature_control.c src/pid_controller.c)
+  target_include_directories(thermal_tests PRIVATE include)
+  target_compile_options(thermal_tests PRIVATE -Wall -Wextra -Werror)
+  add_test(NAME thermal_tests COMMAND thermal_tests)
+  add_executable(sensor_tests tests/sensor_tests.c src/sensors.c src/temperature_control.c src/pid_controller.c)
+  target_include_directories(sensor_tests PRIVATE tests/fakes include)
+  target_compile_options(sensor_tests PRIVATE -Wall -Wextra -Werror)
+  add_test(NAME sensor_tests COMMAND sensor_tests)
+  add_executable(interlock_tests tests/interlock_tests.c src/temperature_control.c src/pid_controller.c
+    src/sequence.c src/correlation.c src/protocol.c)
+  target_include_directories(interlock_tests PRIVATE tests/fakes include)
+  target_compile_definitions(interlock_tests PRIVATE CEIL_ENABLE_TEC=1 CEIL_ENABLE_LASER=1
+    CEIL_ENABLE_BIAS=0 CEIL_LASER_MAX_CODE=1 CEIL_BIAS_MAX_CODE=0)
+  target_compile_options(interlock_tests PRIVATE -Wall -Wextra -Werror)
+  add_test(NAME interlock_tests COMMAND interlock_tests)
   return()
 endif()
 set(PICO_BOARD pico2 CACHE STRING "Pico SDK board")
@@ -32,7 +47,8 @@ foreach(limit CEIL_LASER_MAX_CODE CEIL_BIAS_MAX_CODE)
 endforeach()
 add_executable(ceilometer src/main.c src/sequence.c src/prn_tx.c src/sipm_counter.c
   src/bin_acquisition.c src/correlation.c src/protocol.c src/board.c
-  src/lt8722.c src/lt8722_codec.c src/sensors.c src/test_pulse.c)
+  src/lt8722.c src/lt8722_codec.c src/sensors.c src/test_pulse.c
+  src/pid_controller.c src/temperature_control.c)
 target_include_directories(ceilometer PRIVATE include)
 target_compile_options(ceilometer PRIVATE -Wall -Wextra -Werror)
 target_compile_definitions(ceilometer PRIVATE

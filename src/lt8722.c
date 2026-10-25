@@ -35,7 +35,7 @@ bool lt8722_healthy(void) {
 bool lt8722_enable(void) {
 #if CEIL_ENABLE_TEC
     /* +/-~0.85 A nominal limits; raw register endpoints follow Rev B.
-       No automatic temperature PID until sensor placement/polarity is qualified. */
+       Temperature feedback and PID are supervised by temperature_control. */
     uint32_t cmd;
     if (!lt8722_read(0, &cmd) || !lt8722_write(0, (cmd & ~3u) | 1u)) goto fail;
     sleep_ms(2);

@@ -10,7 +10,9 @@ snapshots, exact 1023-chip PIO PRN at 10 Mchip/s, GP6 chip and GP7 frame strobes
 finite 1-16-frame bursts, integration across bursts, modulo differences, 64-bit
 DC-rejected correlation, paged raw/histogram/profile retrieval, test pulses,
 AD5693R DACs, MCP9800, externally powered single-drop DS18B20, and LT8722 SPI
-control with CRC/ACK checks and soft start. UART stdio is disabled.
+control with CRC/ACK checks, soft start, and DS18B20 PID temperature regulation.
+Laser operation requires valid 10-30 C feedback. UART stdio is disabled.
+See [temperature-control.md](docs/temperature-control.md) for setup and fault behavior.
 
 The schematics override the brainstorm pin suggestions. Read
 [hardware.md](docs/hardware.md), [protocol.md](docs/protocol.md), and
@@ -67,7 +69,9 @@ ctest --test-dir build-host --output-on-failure
 Tests check the full PRN state cycle, all autocorrelation lags, packing across 32
 frames, counter wrap, histogram overflow rejection, delayed return polarity,
 background rejection, range scale, parser framing/recovery/numeric bounds, and
-LT8722 packet CRC/ACK handling. They do not substitute for board measurements.
+LT8722 packet CRC/ACK handling. Thermal tests also cover PID limits, temperature
+boundaries, stale/disconnected DS18B20 feedback, and actual command/shutdown paths
+with mocked peripherals. They do not substitute for board measurements.
 
 ## Current engineering limits
 
@@ -81,7 +85,7 @@ service. It is not continuous or a calibrated wall-clock integration period.
 Runtime chip rates must divide 150 MHz with an integer 15-cycle PIO divider;
 10, 5, 2, and 1 MHz are supported examples. Firmware stays at rated 150 MHz.
 500 MHz and 20 MHz bins are not implemented. No automatic cloud classification,
-optical overlap correction, temperature PID, flash persistence, or dual-core
+optical overlap correction, flash persistence, or dual-core
 streaming is claimed. See validation.md for the required next measurements.
 
 The code drives LD_SWITCH low during firmware shutdown/error handling and uses a

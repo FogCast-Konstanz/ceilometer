@@ -1,5 +1,10 @@
 # Local verification record
 
+The initial acquisition build record below is historical. The PID/interlock
+update also passes four native suites (core, thermal, scripted sensor driver,
+and real command/interlock wiring with fake hardware), plus default and
+TEC/laser-enabled Pico 2 cross-builds. See temperature-control.md. No hardware tests were run.
+
 Date: 2026-10-25 (Europe/Berlin).
 
 - Fresh schematic netlist export: KiCad 10.0.6, all five child sheets. Export

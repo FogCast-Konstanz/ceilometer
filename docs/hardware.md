@@ -49,7 +49,8 @@ read/write packets, address shifted left one bit, CRC-8 polynomial 0x07 with see
 0 (Rev B), and ACK 0xa5. Response CRC is checked as well. Soft start ramps the
 common-mode DAC for >=5 ms before switching. The commissioning driver uses
 nominal +/-0.85 A current limits and a +/-500 mV differential command ceiling;
-these must suit the actual TEC and be verified. No closed-loop PID runs.
+these must suit the actual TEC and be verified. The DS18B20 laser-diode sensor
+now closes the PID loop; see temperature-control.md.
 
 Important existing design concerns: U15's cached symbol has duplicate/nonphysical
 pins; R8/R10 affect current calibration; C65 loads the threshold DAC beyond its
@@ -59,11 +60,12 @@ external pull-down/independent disable. Resolve or qualify these before operatio
 J4/J5 carry bias, power, I2C and LVDS over a proprietary orientation-sensitive
 cable. Use only its verified pin map; connect PC USB to the Pico itself.
 
-The supplied mini_laser_controller tree contains STM32 laser-current ramp/fault
+The originally supplied underscore mini_laser_controller tree contains STM32 laser-current ramp/fault
 logic but no LT8722 driver was found in its C/H sources. Its surrounding sibling
 project directory contains no accessible C/H implementation either. The firmware
-therefore uses an independently implemented Pico LT8722 transport based on the
-manufacturer's protocol. The crossing reference supplies the ASCII $command,
+uses an independently implemented Pico LT8722 transport based on the
+manufacturer's protocol. The separate hyphenated `laphtec/Laser-Controller`
+checkout contains the PID now ported into this project. The crossing reference supplies the ASCII $command,
 $ACK/$NACK convention; no UART or RS485 transport is carried over.
 
 Primary references:

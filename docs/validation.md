@@ -59,8 +59,9 @@ channel pacing-credit counter is explicitly cleared before each burst.
 3. Check LT8722 SPI mode0, register0 readback, CRC and ACK, GP17 control direction,
    and faults. With a dummy load verify +/-0.85 A nominal limits, zero output,
    >=5 ms startup ramp, sign, disable and telemetry. Qualify TEC thermal polarity
-   before considering temperature feedback. Check DS18B20 location and disconnect
-   behavior; firmware uses it as a laser/TEC temperature limit, not a PID input.
+   before enabling the DS18B20 PID loop. Check DS18B20 location, disconnect
+   behavior, stale/CRC failures, 10/30 C laser boundaries, and explicit fault recovery.
+   See temperature-control.md for feedback timing and commissioning gains.
 4. Isolate GP5 from the receiver output before wiring a pulse generator or
    GP12-to-GP5 jumper. Two actively driven outputs must not be connected together.
    Use 3.3 V logic and common ground. Start at 100 kHz/1 MHz, measure high/low pulse
@@ -97,5 +98,5 @@ channel pacing-credit counter is explicitly cleared before each burst.
 Deterministic hardware TX/RX start, latched receiver timing, gapless ping-pong
 DMA, 20 MHz oversampling, clock/voltage sweeps and dual-core accumulation remain
 future engineering work after the finite-burst measurements. Optical current
-calibration, independent interlocks, temperature control tuning, overlap and
+calibration, independent interlocks, PID tuning, overlap and
 atmospheric response calibration likewise require the physical system.

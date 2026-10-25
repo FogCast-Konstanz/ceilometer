@@ -3,8 +3,8 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 #include "hardware/sync.h"
-static int32_t laser_mc;
-static bool pending, valid;
+static temperature_sample laser;
+static bool pending;
 static uint32_t converted_at, last_request;
 static void ow_low(void) { gpio_put(PIN_ONEWIRE, 0); gpio_set_dir(PIN_ONEWIRE, GPIO_OUT); }
 static void ow_release(void) { gpio_set_dir(PIN_ONEWIRE, GPIO_IN); }
@@ -32,27 +32,18 @@ static uint8_t ow_read(void) {
     }
     return v;
 }
-static uint8_t crc8(const uint8_t *p, unsigned n) {
-    uint8_t crc = 0;
-    while (n--) {
-        uint8_t v = *p++;
-        for (unsigned b = 0; b < 8; ++b, v >>= 1) {
-            unsigned mix = (crc ^ v) & 1; crc >>= 1; if (mix) crc ^= 0x8c;
-        }
-    }
-    return crc;
-}
-void sensors_init(void) { gpio_init(PIN_ONEWIRE); ow_release(); }
+void sensors_init(void) { laser=(temperature_sample){0}; pending=false; converted_at=0; last_request=0; gpio_init(PIN_ONEWIRE); ow_release(); }
 void sensors_poll(void) {
     uint32_t now = time_us_32();
     if (pending && now - converted_at >= 750000) {
-        pending = false; valid = false;
-        if (ow_reset()) {
+        pending = false; laser.valid = false;
+        /* Externally powered device reports conversion completion in a read slot. */
+        bool completed = (ow_read() & 1u) != 0;
+        if (completed && ow_reset()) {
             uint8_t p[9]; ow_write(0xcc); ow_write(0xbe);
             for (unsigned i = 0; i < 9; ++i) p[i] = ow_read();
-            int16_t raw = (int16_t)((uint16_t)p[1] << 8 | p[0]);
-            if (!crc8(p, 9) && p[5] == 0xff && p[7] == 0x10 && raw >= -880 && raw <= 2000) {
-                laser_mc = (int32_t)raw * 1000 / 16; valid = true;
+            if (ds18b20_decode(p, &laser.mc)) {
+                laser.sampled_us = converted_at; ++laser.sequence; laser.valid = true;
             }
         }
     }
@@ -60,13 +51,14 @@ void sensors_poll(void) {
         last_request = now;
         if (ow_reset()) {
             ow_write(0xcc); ow_write(0x44); converted_at = time_us_32(); pending = true;
-        } else valid = false;
+        } else laser.valid = false;
     }
 }
 bool sensors_laser_mc(int32_t *t) {
-    if (!valid || time_us_32() - converted_at > 3000000) return false;
-    *t = laser_mc; return true;
+    if (!temperature_fresh(laser, time_us_32())) return false;
+    *t = laser.mc; return true;
 }
+temperature_sample sensors_laser_sample(void) { return laser; }
 bool sensors_receiver_mc(int32_t *t) {
     uint8_t reg = 0, p[2];
     if (i2c_write_timeout_us(i2c1, I2C_TEMPERATURE_ADDRESS, &reg, 1, true, 2000) != 1 ||

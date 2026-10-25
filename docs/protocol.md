@@ -9,7 +9,7 @@ baud does not control wire speed. UART transport is disabled.
 The receive limit is 127 characters, excluding terminator. Oversize, non-ASCII,
 and control-character lines are discarded through the next terminator. Lines
 without `$` are ignored. Decimal unsigned parameters reject signs, whitespace,
-trailing garbage and overflow. Only `tec_mv` permits a minus sign.
+trailing garbage and overflow. Only `tec_polarity` permits the literal `-1`.
 
 Every syntactically dispatched request renews a two-second activity lease. While
 acquiring or any power output is enabled, a closed CDC connection or expired lease
@@ -24,7 +24,7 @@ additional recovery mechanism, not an independent physical laser interlock.
 | `get_state` | state, accumulated_frames, remaining_frames, last_burst_elapsed_us, tx_starved, armed, bias_on, correlation_us |
 | `heartbeat` | no fields; renew activity lease |
 | `stop` | stop acquisition, clear result validity, disarm, DAC zero, bias and TEC off |
-| `clear_fault` | clear software fault only if GP16 is high; no automatic restart |
+| `clear_fault` | GP16 must be high; thermal faults also require valid -10..50 C feedback; no automatic restart |
 | `get_count` | current free-running unsigned 16-bit PWM2 count; modulo 65536 |
 | `set_rate,hz` | 10000..10000000, exact sys/(15*integer); invalidate prior profile |
 | `test_pulse,hz` | GP12 test output; ACK returns quantized actual integer Hz; 0 disables |
@@ -41,13 +41,20 @@ additional recovery mechanism, not an independent physical laser interlock.
 | `bias_enable,0_or_1` | GP18 high enables LT3571; requires commissioned bias build for 1 |
 | `tec_read,register` | register (0..7), 32-bit unsigned value; no unrestricted write command |
 | `tec_enable,0_or_1` | commissioned soft start / disable; failures latch FAULT |
-| `tec_mv,millivolts` | -500..500 nominal VLDR-VSFB; requires enabled TEC |
+| `tec_target,milliCelsius` | 10000..30000, default 24000; reset PID state |
+| `tec_polarity,1_or_-1` | set verified heating polarity while TEC and laser arming are off |
+| `tec_pid,p,i,d` | integer gains 0..10000 in mV/C, mV/(C*s), mV*s/C; outputs off |
+| `get_temperature_control` | TEC enabled, target_mC, valid, measured_mC, output_mV, polarity, thermal_fault |
+| `tec_mv,...` | rejected: PID_OWNS_OUTPUT |
 
 States: IDLE, ACQUIRING, READY, FAULT. During ACQUIRING only `stop`, `get_info`,
-`get_state`, `heartbeat`, and `get_count` are accepted. BUSY protects shared
+`get_state`, `heartbeat`, `get_count`, and `get_temperature_control` are accepted. BUSY protects shared
 buffers and avoids I2C/SPI/one-wire traffic during a burst. Sensor service and TEC
-health checks occur between bursts. Laser/TEC operation requires a valid DS18B20
-reading between -10 and +50 C; no PID or automatic target temperature is active.
+health checks occur between bursts; freshness/range checks also run during bursts.
+Laser arming and emission require valid DS18B20 feedback in 10..30 C inclusive.
+TEC PID can recover temperature inside its wider -10..50 C protection envelope.
+Missing/stale feedback disables TEC and laser, resets PID and latches a fault.
+See [temperature-control.md](temperature-control.md) for configuration and recovery.
 Wait several seconds after boot before arming. Only one externally powered
 DS18B20 is supported; Skip ROM is used and scratchpad CRC is checked.
 
@@ -55,7 +62,7 @@ Examples:
 
 ```text
 > $get_info
-< $ACK,get_info,ceilometer,0.1.0,pico2,150000000,10000000,1023,0,0,0
+< $ACK,get_info,ceilometer,0.2.0,pico2,150000000,10000000,1023,0,0,0
 > $capture,16
 < $ACK,capture
 > $get_state
