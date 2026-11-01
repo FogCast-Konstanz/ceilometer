@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fogcast-instrument"
+version = "0.6.4"
+description = "USB acquisition, recording and dashboard for the Fogcast ceilometer"
+requires-python = ">=3.10"
+dependencies = ["pyserial>=3.5,<4", "numpy>=1.24,<3"]
+
+[project.scripts]
+ceilometer = "fogcast.ceilometer:main"
+ceilometer-dashboard = "fogcast.dashboard:main"
+ceilometer-measure = "fogcast.measure:main"
+ceilometer-benchmark = "fogcast.benchmark:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+fogcast = ["demo-metadata.json", "web/static/*", "web/static/vendor/*"]
