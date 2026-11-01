@@ -26,7 +26,7 @@ additional recovery mechanism, not an independent physical laser interlock.
 | `stop` | stop acquisition, clear result validity, disarm, DAC zero, bias and TEC off |
 | `clear_fault` | GP16 must be high; thermal faults also require valid feedback inside the configured TEC window; no automatic restart |
 | `get_count` | current free-running unsigned 16-bit PWM2 count; modulo 65536 |
-| `set_rate,hz` | 10000..10000000, exact sys/(15*integer); invalidate prior profile |
+| `set_rate,hz` | 10000..10000000, exact sys/(10*integer); invalidate prior profile |
 | `test_pulse,hz` | GP12 test output; ACK returns quantized actual integer Hz; 0 disables |
 | `capture,frames` | 1..1000000 complete PRN frames, GP4 remains low; PRN data on GP13 |
 | `start,frames` | same integration, with laser modulation; requires commissioned build, arm, nonzero laser DAC, valid temperature |
@@ -36,7 +36,7 @@ additional recovery mechanism, not an independent physical laser interlock.
 | `sensors` | adc0_raw, adc1_raw, adc2_raw, laser_temp_valid, laser_mC, receiver_temp_valid, receiver_mC |
 | `set_threshold,code` | raw 16-bit U16 DAC code; does not enable detector bias |
 | `arm,0_or_1` | 1 allows laser setup; 0 shuts down all power outputs |
-| `laser_dac,code` | 0..calibrated compile-time ceiling; nonzero requires arm |
+| `laser_dac,code` | 0..laser_max_code parameter; nonzero requires arm |
 | `bias_dac,code` | only 0 accepted (disable); nonzero rejected, compensation owns output |
 | `bias_enable,0_or_1` | start/stop temperature-compensated bias; 1 requires commissioned build, valid receiver temperature and target <=50 V |
 | `get_bias` | enabled, fault, reason, valid, receiver_mC, age_us, breakdown_est_uV, target_uV, output_est_uV, target_code; see sipm-bias.md |
@@ -103,7 +103,7 @@ correction is applied in firmware.
 | `telemetry_count` | number of named telemetry fields |
 | `telemetry_info,index` | index, name, unit |
 | `get_telemetry,index_or_name` | name, unit, value, valid, sampled_us, age_us, sequence |
-| `get_limits` | build_laser_max_code, build_bias_max_code, hard_TEC_mV_limit, sys_clock_Hz, PRN_length, parameter_flash_offset |
+| `get_limits` | laser_max_code, build_bias_max_code, hard_TEC_mV_limit, sys_clock_Hz, PRN_length, parameter_flash_offset |
 | `get_test_pulse` | actual diagnostic pulse frequency Hz |
 | `range_point,index` | group index, first native bin, range_mm, integer averaged correlation |
 
@@ -141,3 +141,60 @@ is reported as failure; no automatic power cycle is attempted. Recovery is
 explicit, not run during bias/TEC/laser operation. A scan allows 100 us for the
 final STOP to settle before changing address. It reads two data bytes to complete
 the AD5693R readback sequence.
+
+Receiver-disconnected bias testing: while all outputs are off, send
+`bias_test,25000` (manual milli-Celsius, -40000..85000), then `bias_enable,1`.
+`get_bias_test` returns one field: 1 for manual-temperature test mode, 0 for
+normal receiver feedback. `get_bias` then reports the assumed temperature.
+The normal overvoltage model, configured and hard50V target limits, compile DAC
+ceiling, DAC readback, USB lease and common fault shutdown remain enforced.
+`stop`, `bias_enable,0`, `bias_dac,0`, reset and reconfiguration clear test mode.
+Test selection is never saved. `bias_test,off` clears it while outputs are off.
+Use only for supply diagnostics: no measured receiver temperature is used.
+
+Operating clock:500MHz/1.5V; see operating-clock.md. get_clock returns sys_hz, measured_khz, regulator_selector. Nominal10MHz symbol rate uses an integer PIO divider5.
+
+`count_window,us` (1000..100000, outside acquisition) returns locally accumulated
+uint64 edge count, elapsed_us and maximum counter sampling gap_us. No generator
+is started. Check sampling gap against counter wrap interval before interpreting.
+
+Laser ceiling: `set_param,laser_max_code,N` (0..65535, default32505) with all outputs and acquisition off. `save` persists it. Zero disables arming. `get_limits` returns the current parameter as its first field. Raising the limit never applies the laser DAC or arms emission.
+
+## v0.5 continuous measurements
+
+See [continuous acquisition](continuous-acquisition.md) for the hardware master
+clock, stream commands, binary packet layout, exposure and result ownership.
+Finite diagnostic commands above retain their 1023-chip format.
+
+
+### Firmware 0.6.0 finite-burst timing
+
+The `stream_*` interface uses single-core finite bursts. Each restart discards
+complete warmup periods; `measurement_period_ms` requests accepted exposure.
+`stream_timing` returns `result_id,finite_burst,wall_ns,dead_time_ns` for the held
+result. `dead_time_ns = wall_ns - exposure_ns`; wall ends at final DMA completion,
+excluding final foreground folding/download. `stream_result` remains 11 fields.
+`capture_timing` returns `exposure_ns,wall_ns,dead_time_ns` for a READY legacy
+1023-chip capture. Requested legacy frame counts now exclude repeated warmup.
+Warmup must fit the finite buffer: 1..15 frames for 1023 chips, 1..3 for 4095;
+otherwise start returns `STARTUP_DISCARD_EXCEEDS_BURST_CAPACITY`.
+`stream_debug` fields are backend=1,inflight,length,discard,raw_burst_frames,0,0,blocks.
+
+
+### Firmware 0.6.1 runtime diagnostics
+
+`get_runtime` returns `boot_id,uptime_us,watchdog_reboot` without changing outputs.
+The Pi samples this once per second and records USB disconnect/reboot counts in
+status and its journal. Watchdog classification is captured before initialization.
+A changed boot ID distinguishes a Pico reboot from a serial-session reconnect.
+
+Firmware >=0.6.2 appends `previous_stage` to `get_runtime`: the retained last
+foreground stage before reboot (0 if unavailable). See operating-clock.md.
+
+
+Firmware 0.6.4 USB CDC descriptors advertise manufacturer `Fogcast` and product
+`Fogcast Ceilometer`. The SDK VID/PID remain 2e8a:0009 and the hardware serial
+number remains unique. Pi automatic selection requires both descriptor strings
+and VID/PID, ignores unrelated Picos without opening them, and rejects multiple
+matching ceilometers. Firmware without this identity needs an explicit port for
+its initial upgrade. Flashing remains restricted to the configured hardware serial.

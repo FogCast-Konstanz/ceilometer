@@ -16,6 +16,8 @@ void sipm_bias_init(void);
 void sipm_bias_reconfigure(void); /* invalidate feedback, retain any fault */
 void sipm_bias_stop(void); /* SHDN first; preserves the fault latch. */
 bool sipm_bias_enable(void);
+bool sipm_bias_test_temperature(int32_t mc); /* volatile, only while disabled */
+bool sipm_bias_test_active(void);
 bool sipm_bias_clear_fault(void);
 bool sipm_bias_service(bool buses_available);
 bias_status sipm_bias_status(void);

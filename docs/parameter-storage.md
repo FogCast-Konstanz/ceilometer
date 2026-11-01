@@ -90,3 +90,35 @@ python tools/ceilometer.py COM7 telemetry
 The CLI stops outputs before closing its session. Persisted polarity remains a
 commissioning choice and the TEC/laser build options and code ceilings remain
 independent of user settings. There is no persistent enable or automatic rearm.
+
+## Flash-save fix verified on Pico 2
+
+The application linker region is limited to4186112 bytes, while the SDK retains
+physical PICO_FLASH_SIZE_BYTES=4194304. Using pico_override_flash_size for the
+reservation incorrectly reduced both: SDK flash_range_program/erase hard_assert
+rejected the journal addresses and the watchdog reset the halted firmware.
+CMake now overrides only pico_flash_region.ld; the backend statically checks
+physical capacity, and its existing bounds restrict journal operations to8KiB.
+
+On-board checks: Save ACK, clean generation1, repeated unchanged Save retains
+same generation; restart restores laser_dac_code32505, tec_polarity1 and nominal
+monitor scales181/998 with all outputs off. Alternating telemetry_period_ms100/101
+exercised programming and sector rollover through generation17/page16; original
+100ms restored. Seven host test suites pass. No power outputs enabled by testing.
+
+Schema3 appends laser_max_code (0..65535, default32505, zero disables laser arming).
+It is adjustable through set_param/set_params while all outputs/acquisition are off
+and persisted by Save. Schema2's48fields are retained, including bias calibration;
+the new ceiling defaults32505. Schema1's40fields still migrate with retired raw
+bias discarded. Saved targets never enable outputs. A stored laser_dac_code above
+the ceiling may remain as a target, but applying it is rejected. The GUI laser
+DAC maximum follows the parameter after Apply/Load/Defaults/Refresh.
+
+Schema4 appends prn_length, measurement_period_ms and startup_discard_frames
+(52 parameters total). Schema3/49-field records migrate preserving every old
+field; new defaults are 1023 chips, 1000 ms, two discarded periods.
+
+Firmware 0.6.0 uses finite bursts. startup_discard_frames must leave one accepted
+period in the DMA buffer: 1..15 at 1023 chips, 1..3 at 4095 chips. The schema and
+saved calibrations are unchanged; larger stored values reject acquisition start.
+measurement_period_ms requests accepted exposure, so elapsed time can be longer.

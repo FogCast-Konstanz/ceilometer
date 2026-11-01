@@ -4,7 +4,7 @@ export class DemoPort {
   constructor(metadata) {
     this.metadata = metadata; this.params = new Map(metadata.parameters.map(p => [p.name, p.default]));
     this.saved = null; this.armed = this.tec = this.bias = this.fault = false;
-    this.laser = 0; this.pulse = 0; this.frames = 0; this.ready = 0; this.condition = 'normal'; this.started = performance.now();
+    this.testMc = null; this.laser = 0; this.pulse = 0; this.frames = 0; this.ready = 0; this.condition = 'normal'; this.started = performance.now();
   }
   async open() {
     this.readable = new ReadableStream({ start: controller => { this.rx = controller; } });
@@ -19,15 +19,15 @@ export class DemoPort {
   }
   async close() { this.readable = this.writable = null; }
   getInfo() { return {}; }
-  stop() { this.armed = this.tec = this.bias = false; this.laser = 0; this.ready = 0; }
+  stop() { this.testMc = null; this.armed = this.tec = this.bias = false; this.laser = 0; this.ready = 0; }
   biasModel() {
     const t = (performance.now() - this.started) / 1000, p = n => this.params.get(n);
-    const temperature = 25000 + Math.round(500 * Math.sin(t / 13)) + p('receiver_temp_offset_mc');
+    const temperature = this.testMc ?? 25000 + Math.round(500 * Math.sin(t / 13)) + p('receiver_temp_offset_mc');
     const breakdown = Math.round(p('sipm_breakdown_mv') * 1000 + p('sipm_tempco_uv_c') * (temperature - p('sipm_reference_mc')) / 1000);
     const target = breakdown + p('sipm_overvoltage_mv') * 1000;
     const span = p('bias_dac_ref_uv') * 6140 / 254 * p('bias_gain_ppm') / 1000000;
     const code = Math.floor((target - p('bias_offset_uv')) * 65536 / span);
-    const reason = this.condition === 'receiver' ? 1 : target > Math.min(50000, p('bias_limit_mv')) * 1000 ? 2 : code > 60000 ? 3 : 0;
+    const reason = this.condition === 'receiver' && this.testMc === null ? 1 : target > Math.min(50000, p('bias_limit_mv')) * 1000 ? 2 : code > 60000 ? 3 : 0;
     return { temperature, breakdown, target, code, reason, estimate: Math.floor(span * code / 65536 + p('bias_offset_uv')) };
   }
   sample(name, unit) {
@@ -59,20 +59,26 @@ export class DemoPort {
   }
   handle(name, a) {
     const now = performance.now();
-    if ((this.condition === 'receiver' && this.bias) || (this.condition === 'laser' && (this.tec || this.armed))) {
+    if ((this.condition === 'receiver' && this.testMc === null && this.bias) || (this.condition === 'laser' && (this.tec || this.armed))) {
       this.stop(); this.fault = true;
     }
     const out = x => x.map(String);
     switch (name) {
-      case 'get_info': return out(['ceilometer', '0.4.0-DEMO', 'pico2', 150000000, this.params.get('chip_hz'), 1023, 1, 1, 1]);
+      case 'get_info': return out(['ceilometer', '0.4.0-DEMO', 'pico2', 500000000, this.params.get('chip_hz'), 1023, 1, 1, 1]);
       case 'stop': this.stop(); return [];
       case 'heartbeat': return [];
+      case 'count_window': {
+        if (this.ready > now) throw new DeviceError('BUSY');
+        const us = integer(a[0],1000,100000);
+        const cps = this.bias ? 220000 + 10000 * Math.sin(now / 3000) : 0;
+        return out([Math.round(cps * us / 1000000), us, 2]);
+      }
       case 'i2c_scan': {
         if(this.armed || this.tec || this.bias || this.ready>now) throw new DeviceError('OUTPUTS_ACTIVE');
         const bus=integer(a[0],0,1),addresses=bus ? this.condition==='receiver' ? [] : [0x48,0x4e] : [0x4c,0x4e];
         return out([bus,1,1,1,1,0,112-addresses.length,addresses.length,...addresses]);
       }
-      case 'get_limits': return out([1, 60000, 500, 150000000, 1023, 4186112]);
+      case 'get_limits': return out([this.params.get('laser_max_code'), 60000, 500, 500000000, 1023, 4186112]);
       case 'get_state': return out([this.fault ? 'FAULT' : this.ready > now ? 'ACQUIRING' : this.ready ? 'READY' : 'IDLE',
         this.ready && this.ready <= now ? this.frames : 0, this.ready > now ? this.frames : 0, 1023, 0, +this.armed, +this.bias, 250]);
       case 'get_temperature_control': return out([+this.tec, this.params.get('tec_target_mc'), +(this.condition !== 'laser'), 24000, this.tec ? 100 : 0, this.params.get('tec_polarity'), +(this.fault && this.condition === 'laser')]);
@@ -80,8 +86,8 @@ export class DemoPort {
         const b = this.biasModel();
         return out([+this.bias, +this.fault, b.reason, +!b.reason, b.temperature, 600000, b.breakdown, b.target, b.estimate, b.code]);
       }
-      case 'get_storage': return out([+!!this.saved, +(!this.saved || JSON.stringify([...this.params]) !== JSON.stringify(this.saved)), this.saved ? 1 : 0, this.saved ? 0 : -1, 0, 2]);
-      case 'parameter_count': return out([this.metadata.parameters.length, 2]);
+      case 'get_storage': return out([+!!this.saved, +(!this.saved || JSON.stringify([...this.params]) !== JSON.stringify(this.saved)), this.saved ? 1 : 0, this.saved ? 0 : -1, 0, 4]);
+      case 'parameter_count': return out([this.metadata.parameters.length, 4]);
       case 'parameter_info': {
         const p = this.metadata.parameters[integer(a[0], 0, this.metadata.parameters.length - 1)];
         return out([a[0], p.name, p.unit, p.min, p.max, p.default]);
@@ -99,11 +105,15 @@ export class DemoPort {
       case 'tec_enable':
         if (a[0] === '1' && (this.fault || this.condition === 'laser' || !this.params.get('tec_polarity'))) throw new DeviceError('TEC_DISABLED_TEMPERATURE_OR_POLARITY');
         this.tec = a[0] === '1'; return [];
+      case 'get_bias_test': return out([+(this.testMc !== null)]);
+      case 'bias_test':
+        if(this.armed || this.tec || this.bias) throw new DeviceError('OUTPUTS_ACTIVE');
+        this.testMc = a[0] === 'off' ? null : integer(a[0], -40000, 85000); return [];
       case 'bias_enable':
         if (a[0] === '1' && (this.fault || this.biasModel().reason)) throw new DeviceError('BIAS_FEEDBACK_OR_LIMIT');
-        this.bias = a[0] === '1'; return [];
-      case 'arm': if (a[0] === '0') this.stop(); else { if (this.fault || this.condition === 'laser') throw new DeviceError('TEMPERATURE_INVALID'); this.armed = true; } return [];
-      case 'laser_dac': if (+a[0] > 1 || (+a[0] && !this.armed)) throw new DeviceError('NOT_ARMED_OR_LIMIT'); this.laser = +a[0]; this.params.set('laser_dac_code', this.laser); return [];
+        this.bias = a[0] === '1'; if(!this.bias) this.testMc=null; return [];
+      case 'arm': if (a[0] === '0') this.stop(); else { if (this.fault || !this.params.get('laser_max_code') || this.condition === 'laser') throw new DeviceError('TEMPERATURE_INVALID'); this.armed = true; } return [];
+      case 'laser_dac': if (+a[0] > this.params.get('laser_max_code') || (+a[0] && !this.armed)) throw new DeviceError('NOT_ARMED_OR_LIMIT'); this.laser = +a[0]; this.params.set('laser_dac_code', this.laser); return [];
       case 'test_pulse': this.pulse = integer(a[0], 0, 10000000); return out([this.pulse]);
       case 'get_test_pulse': return out([this.pulse]);
       case 'get_count': return out([Math.floor(now * this.pulse / 1000) % 65536]);
@@ -131,7 +141,7 @@ export class DemoPort {
         if (v('laser_min_mc') >= v('laser_max_mc') || v('tec_min_mc') > v('laser_min_mc') || v('tec_max_mc') < v('laser_max_mc') ||
             v('tec_target_mc') < v('laser_min_mc') || v('tec_target_mc') > v('laser_max_mc') ||
             v('temperature_age_ms') < v('ds_period_ms') + 850 || v('pid_integral_mv') > v('tec_output_mv') ||
-            150000000 % v('chip_hz') || (150000000 / v('chip_hz')) % 15) throw new DeviceError('INVALID_CONFIGURATION');
+            ![1023, 4095].includes(v('prn_length')) || 500000000 % v('chip_hz') || (500000000 / v('chip_hz')) % 10) throw new DeviceError('INVALID_CONFIGURATION');
         this.params = candidate; return [];
       }
       case 'tec_read': return out([integer(a[0], 0, 7), 0]);

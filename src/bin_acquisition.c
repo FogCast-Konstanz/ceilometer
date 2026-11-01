@@ -2,6 +2,7 @@
 #include "config.h"
 #include "prn_tx.h"
 #include "hardware/dma.h"
+#include "hardware/gpio.h"
 #include "hardware/pwm.h"
 #include "hardware/irq.h"
 #include "hardware/clocks.h"
@@ -18,6 +19,7 @@ static void dma_done(void) {
     pwm_set_enabled(PWM_TIMER_SLICE, false);
     state.tx_starved = prn_tx_starved();
     prn_tx_stop();
+    state.completed_us = time_us_64();
     state.elapsed_us = time_us_32() - started_us;
     uint32_t ctrl = dma_hw->ch[rx_dma].ctrl_trig;
     state.failed = state.tx_starved || (ctrl & DMA_CH0_CTRL_TRIG_AHB_ERROR_BITS);
@@ -43,16 +45,22 @@ void bin_acquisition_stop(void) {
     dma_channel_set_irq0_enabled(rx_dma, true);
     restore_interrupts(irq);
 }
-bool bin_acquisition_start(unsigned frames, uint32_t hz, bool laser) {
+bool bin_acquisition_start(unsigned frames,uint32_t hz,bool laser) {
+    return bin_acquisition_start_sequence(frames,PRN_LENGTH,hz,laser);
+}
+bool bin_acquisition_start_sequence(unsigned frames,unsigned length,uint32_t hz,bool laser) {
     uint32_t sys = clock_get_hz(clk_sys);
-    if (state.busy || frames < 1 || frames > CAPTURE_MAX_FRAMES || !hz ||
+    if (state.busy || frames < 1 || (length!=1023 && length!=4095) || frames > (CAPTURE_MAX_SAMPLES-1u)/length || !hz ||
         sys % hz || sys / hz < CHIP_CYCLES || sys / hz > 65536) return false;
     if (!prn_tx_prepare(hz, laser)) return false;
-    state = (acquisition_status){.samples = PRN_LENGTH * frames + 1u};
+    state = (acquisition_status){.samples = length * frames + 1u};
     pwm_config pc = pwm_get_default_config();
     pwm_config_set_clkdiv_int(&pc, 1);
     pwm_config_set_wrap(&pc, (uint16_t)(sys / hz - 1u));
     pwm_init(PWM_TIMER_SLICE, &pc, false);
+    pwm_set_chan_level(PWM_TIMER_SLICE,PWM_CHAN_A,(sys/hz)/2u);
+    pwm_set_counter(PWM_TIMER_SLICE,(sys/hz)/2u);
+    gpio_set_function(PIN_CHIP_SYNC,GPIO_FUNC_PWM);
     dma_channel_config dc = dma_channel_get_default_config(rx_dma);
     /* Full-width peripheral reads: no assumption about narrow PWM bus access. */
     channel_config_set_transfer_data_size(&dc, DMA_SIZE_32);
@@ -70,8 +78,8 @@ bool bin_acquisition_start(unsigned frames, uint32_t hz, bool laser) {
     started_us = time_us_32();
     deadline_us = (uint32_t)(((uint64_t)state.samples * 1000000u + hz - 1u) / hz) + 10000;
     dma_start_channel_mask(1u << rx_dma);
-    /* These writes are ordered, NOT a shared hardware start strobe.
-       Fixed phase and run-to-run spread MUST be calibrated externally. */
+    /* PIO is armed waiting for the first master PWM rising edge.
+       Counter reads still have DMA latency; calibrate the fixed TX/RX phase. */
     prn_tx_start();
     pwm_set_enabled(PWM_TIMER_SLICE, true);
     restore_interrupts(irq);

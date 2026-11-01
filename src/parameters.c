@@ -1,4 +1,5 @@
 #include "parameters.h"
+#include "config.h"
 #include <string.h>
 #include <limits.h>
 #define PARAM_DEFAULT(name,unit,lo,hi,def) def,
@@ -42,7 +43,8 @@ bool parameters_validate(const parameter_values *p) {
        V(laser_min_mc)<V(tec_min_mc) || V(laser_max_mc)>V(tec_max_mc) ||
        V(tec_target_mc)<V(laser_min_mc) || V(tec_target_mc)>V(laser_max_mc) ||
        V(temperature_age_ms)<V(ds_period_ms)+850 || V(pid_integral_mv)>V(tec_output_mv)) return false;
-    if(150000000u%(uint32_t)V(chip_hz) || (150000000u/(uint32_t)V(chip_hz))%15u) return false;
+    if(V(prn_length)!=1023 && V(prn_length)!=4095) return false;
+    if((SYSTEM_KHZ*1000u)%(uint32_t)V(chip_hz) || ((SYSTEM_KHZ*1000u)/(uint32_t)V(chip_hz))%CHIP_CYCLES) return false;
 #undef V
     return true;
 }

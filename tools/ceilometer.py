@@ -3,30 +3,116 @@ import argparse
 import csv
 import json
 import time
-import serial
 
+
+class CommandCancelled(Exception):
+    """Cancellation between complete protocol responses; USB stays synchronized."""
+
+class DeviceError(RuntimeError):
+    """A complete matching NACK; transport remains synchronized."""
 
 class Ceilometer:
     def __init__(self, port):
-        self.serial = serial.Serial(port, 115200, timeout=1, write_timeout=1)
+        import serial
+        import threading
+        import os
+        if port=='auto':
+            from serial.tools import list_ports
+            candidates=[p.device for p in list_ports.comports() if (p.vid,p.pid)==(0x2e8a,0x0009)
+                        and p.manufacturer=='Fogcast' and p.product=='Fogcast Ceilometer' ]
+            if len(candidates)!=1:
+                raise ConnectionError(f'Expected exactly one Fogcast Ceilometer USB device, found {len(candidates)}')
+            port=candidates[0]
+        self._lock=threading.RLock()
+        self.serial = serial.Serial(port, 115200, timeout=1, write_timeout=1, **({"exclusive":True} if os.name=="posix" else {}))
         time.sleep(0.2)
         self.serial.reset_input_buffer()
 
     def command(self, command):
+        with self._lock:
+            return self._command(command)
+
+    def _command(self, command):
         if "\n" in command or "\r" in command:
             raise ValueError("one command per request")
         wire=("$"+command.lstrip("$")).encode("ascii")
         if len(wire)>127:
             raise ValueError("Request exceeds firmware's 127-character line limit")
-        self.serial.write(wire+b"\n")
-        line = self.serial.readline().decode("ascii").strip()
-        fields = line.split(",")
-        name = command.lstrip("$").split(",")[0]
-        if len(fields) < 2 or fields[1] != name:
-            raise RuntimeError(f"Incomplete/unexpected response: {line!r}")
-        if fields[0] != "$ACK":
-            raise RuntimeError(line)
-        return fields[2:]
+        try:
+            if self.serial.write(wire+b"\n")!=len(wire)+1:
+                raise RuntimeError('Incomplete request write')
+            line=self.serial.readline()
+            if not line.endswith(b"\n"):
+                raise TimeoutError('Incomplete USB response')
+            fields=line.decode('ascii').strip().split(',')
+            name=command.lstrip('$').split(',')[0]
+            if len(fields)<2 or fields[1]!=name or fields[0] not in ('$ACK','$NACK'):
+                raise RuntimeError(f'Unexpected USB response: {line!r}')
+            if fields[0]=='$NACK': raise DeviceError(','.join(fields))
+            return fields[2:]
+        except DeviceError:
+            raise
+        except Exception:
+            self.serial.close() # never reuse a timed-out or malformed session
+            raise
+
+    def stream_histogram(self,cancel_check=None):
+        with self._lock:
+            return self._stream_histogram(cancel_check)
+
+    def _stream_histogram(self,cancel_check=None):
+        """Read one held result, validate every binary page, then acknowledge it."""
+        import struct
+        import zlib
+        meta=self.command("stream_result")
+        if len(meta)!=11:
+            raise RuntimeError("Unexpected stream metadata version")
+        keys=("id","length","frames","chip_hz","period_us","first_chip","end_chip",
+              "exposure_ns","armed_monotonic_us","boot_id","configuration_crc32")
+        result=dict(zip(keys,map(int,meta)))
+        length=result["length"]
+        if length not in (1023,4095):
+            raise RuntimeError("Unsupported sequence length")
+        values=[]
+        try:
+            for offset in range(0,length,128):
+                if cancel_check: cancel_check()
+                count=min(128,length-offset)
+                reply=self.command(f"stream_binary,{result['id']},{offset},{count}")
+                size=int(reply[0])
+                if size!=28+8*count:
+                    raise RuntimeError("Invalid binary page size")
+                packet=bytearray();deadline=time.monotonic()+1
+                while len(packet)<size:
+                    if time.monotonic()>deadline: raise TimeoutError("Binary page deadline exceeded")
+                    part=self.serial.read(size-len(packet))
+                    if not part:
+                        raise TimeoutError("Incomplete binary page")
+                    packet.extend(part)
+                magic,version,identity,actual,n,total=struct.unpack_from("<6I",packet)
+                crc=struct.unpack_from("<I",packet,size-4)[0]
+                if (magic,version,identity,actual,n,total)!=(0x314c4943,1,result['id'],offset,count,length) or zlib.crc32(packet[:-4])!=crc:
+                    raise RuntimeError("Binary page identity or CRC failure")
+                values.extend(struct.unpack_from(f"<{count}Q",packet,24))
+            if cancel_check: cancel_check()
+            status=self.command("stream_status")
+            if status[1]!="0":
+                raise RuntimeError("Acquisition failed while downloading")
+            timing=self.command("stream_timing")
+            if len(timing)!=4 or int(timing[0])!=result['id'] or timing[1]!='finite_burst':
+                raise RuntimeError("Unexpected acquisition timing metadata")
+            result.update(acquisition_mode=timing[1],wall_ns=int(timing[2]),dead_time_ns=int(timing[3]))
+            if result['wall_ns']<result['exposure_ns'] or result['dead_time_ns']!=result['wall_ns']-result['exposure_ns']:
+                raise RuntimeError("Invalid acquisition exposure accounting")
+            self.command(f"stream_release,{result['id']}")
+        except CommandCancelled:
+            raise # cancellation only occurs between complete pages
+        except Exception:
+            self.serial.close() # an incomplete binary response poisons the session
+            raise
+        result["histogram"]=values
+        result["dropped_results"]=int(status[4])
+        return result
 
     def parameters(self):
         count=int(self.command("parameter_count")[0])

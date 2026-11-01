@@ -1,0 +1,12 @@
+[Unit]
+Description=Apply tested ceilometer Git release while disabled
+After=network-online.target ceilometer-dashboard.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+EnvironmentFile=/etc/ceilometer/cd.env
+ExecStart=/usr/bin/python3 /opt/ceilometer-firmware/deploy/update_from_git.py
+TimeoutStartSec=240
+UMask=0027
+Environment=PYTHONDONTWRITEBYTECODE=1

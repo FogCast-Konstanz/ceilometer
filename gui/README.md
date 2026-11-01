@@ -1,17 +1,19 @@
 # Ceilometer board console
 
-Run from the firmware repository:
+Open **gui/index.html** directly in desktop Chrome or Edge (double-click the file or drag it into the browser). Keep the entire `gui` folder together. No server is required.
+
+Alternatively, run from the firmware repository:
 
 ```powershell
 python gui/serve.py
 ```
 
-Open **http://127.0.0.1:8765** in desktop Chrome or Edge. Choose **Connect USB**
+With the optional server, open **http://127.0.0.1:8765**. Choose **Connect USB**
 and select the Pico 2's USB CDC port. Close other serial clients first. USB line
 coding is 115200 for the browser API; this is not a UART and requires no baud
 negotiation. Connect the PC to the Pico's USB connector; J4/J5 are proprietary
 receiver links. No installation, build step, account or network connection is
-needed. Local serving is required for ES modules; do not open index.html as a file.
+needed. The checked-in classic-script bundle works from both file URLs and localhost. Demo metadata is embedded, so demo mode does not fetch local JSON.
 
 **Try demo** uses the same serial client/parser with an in-browser simulated
 port. Its banner, firmware version and exported data identify simulation. Demo
@@ -97,3 +99,20 @@ metadata; the test suite checks it against the C headers.
 
 No real board, hardware interlock or physical voltage was exercised by these tests.
 Web Serial follows the [Chrome documentation](https://developer.chrome.com/docs/capabilities/serial).
+
+The summary includes live SiPM count rate in cps. It uses50ms on-board
+count_window samples approximately every500ms between acquisitions, so it avoids
+16bit-counter wraps between USB polls. Display hides stale/unavailable samples
+and pauses during acquisitions/actions. Counts include any comparator crossings.
+Receiver threshold default is DAC47432 (~1809.4mV); on-board Save and restart
+persistence/readback were verified. This is also the firmware factory default.
+
+## Updating frontend sources
+
+Edit the `.mjs` modules, then run `python gui/build_bundle.py`. Commit the generated `app.bundle.js` with source changes. `python gui/build_bundle.py --check` detects stale bundles. After changing firmware descriptors, run `python gui/update_metadata.py` first. No npm installation is needed.
+
+Continuous acquisition (firmware 0.5): use Start continuous dark/laser and
+Read continuous result. Settings prn_length, measurement_period_ms and
+startup_discard_frames are on Parameters. Readout preserves exposure and
+measurement identity in CSV. Stop and tab hiding shut down all outputs.
+Continuous controls require hardware; the demo covers finite captures only.

@@ -186,7 +186,7 @@ main {
 }
 .metrics {
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(5,minmax(0,1fr));
   gap:12px
 }
 .metrics article {
@@ -738,3 +738,7 @@ header {
   top:0;
   z-index:20
 }
+
+.control-group { display: grid; gap: 12px; }
+.control-group > h2 { margin: 4px 0 0; font-size: 18px; }
+.control-group h3 { margin: 0; font-size: 15px; font-weight: 600; }

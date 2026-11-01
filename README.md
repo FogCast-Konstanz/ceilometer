@@ -1,11 +1,11 @@
 # Pico 2 ceilometer firmware
 
 Pico SDK C firmware for the RP2350 PRN-CW lidar mainboard. This is an incremental
-peripheral-validation and finite-burst acquisition implementation. It compiles to
+peripheral-validation and single-core finite-burst PRN acquisition implementation. It compiles to
 a USB CDC controlled Pico 2 image; atmospheric accuracy and 10 MHz DMA timing
 have **not** been qualified on hardware.
 
-Implemented: continuous GP5/PWM2 rising-edge counting, PWM0-paced 32-bit DMA
+Implemented: continuous GP5/PWM2 rising-edge counting, PWM3-paced 32-bit DMA
 snapshots, exact 1023-chip PIO PRN at 10 Mchip/s, GP6 chip and GP7 frame strobes,
 finite 1-16-frame bursts, integration across bursts, modulo differences, 64-bit
 DC-rejected correlation, paged raw/histogram/profile retrieval, test pulses,
@@ -17,7 +17,7 @@ SiPM bias tracks receiver temperature for a nominal 10 V overvoltage, with a
 for calibration and the hardware protection needed for a physical 50 V ceiling.
 See [temperature-control.md](docs/temperature-control.md) for setup and fault behavior.
 
-There are 48 persistent, validated parameters, including adjustable temperature
+There are 52 persistent, validated parameters, including adjustable temperature
 windows and target, and 108 timestamped telemetry fields. Start with the
 [parameter plan](docs/parameters-and-telemetry-plan.md),
 [storage/commands](docs/parameter-storage.md) and
@@ -27,10 +27,20 @@ The schematics override the brainstorm pin suggestions. Read
 [hardware.md](docs/hardware.md), [protocol.md](docs/protocol.md), and
 [validation.md](docs/validation.md) before bring-up.
 
+## Repeated PRN measurements
+
+Firmware 0.6.0 restores the single-core finite-DMA architecture. The common
+hardware TX/RX start, per-burst warmup discard, 1023/4095-chip selection and
+roughly one second of accepted exposure feed CRC-protected result downloads.
+Sensor servicing and profile downloads introduce deliberate gaps. The Pi client
+records accepted exposure and elapsed time separately. See
+[acquisition behavior](docs/continuous-acquisition.md) for limits and qualification.
+The GUI starts repeated dark/laser acquisition; Stop disables all outputs.
+
 ## Web control GUI
 
-Run `python gui/serve.py`, then open **http://127.0.0.1:8765** in desktop
-Chrome or Edge. Connect directly to the Pico 2 USB CDC port, or use the clearly
+Open `gui/index.html` directly in desktop Chrome or Edge. Alternatively, run
+`python gui/serve.py` and open **http://127.0.0.1:8765**. Connect directly to the Pico 2 USB CDC port, or use the clearly
 marked demo mode without hardware. The interface provides board bring-up
 controls, live WebGL plots adapted from the RDS GUI, all parameter/telemetry
 inventories, fault diagnostics, dark captures and CSV/JSON exports.
@@ -53,9 +63,7 @@ Load `build/ceilometer.uf2` using BOOTSEL. No board was flashed during developme
 
 Default builds keep laser, bias, and TEC power control disabled. After electrical
 qualification, opt in separately using `-DCEIL_ENABLE_LASER=ON`,
-`-DCEIL_ENABLE_BIAS=ON`, or `-DCEIL_ENABLE_TEC=ON`. Laser and bias also require
-nonzero, **bench calibrated** `CEIL_LASER_MAX_CODE` and `CEIL_BIAS_MAX_CODE` values
-(0-65535). They are raw DAC ceilings, not current or voltage calibrations. Never
+`-DCEIL_ENABLE_BIAS=ON`, or `-DCEIL_ENABLE_TEC=ON`. Laser uses the persistent `laser_max_code` parameter (0-65535, default32505; zero disables arming). Bias still uses the build setting `CEIL_BIAS_MAX_CODE`. They are raw DAC ceilings, not current or voltage calibrations. Never
 use the ADC's nominal INA293 gain as a validated laser-current measurement.
 
 ## First connection
@@ -112,3 +120,14 @@ lease. Reset/ROM boot and faults before firmware initialization need a hardware
 pull-down and independent laser-disable mechanism: none is demonstrated by the
 schematic. A stalled PIO can hold its previous pin level until the fault handler
 stops it. Do not enable optical output before those hardware protections exist.
+
+## Raspberry Pi dashboard
+
+[Pi dashboard setup](docs/pi-dashboard.md): run `python3 tools/dashboard.py <USB-port>`
+for browser-based instrument status, continuous measurement and verified
+Enable/Disable controls. The shared controller also powers `tools/measure.py`.
+Service installation files are in `deploy/`; boot/reconnect always stay disabled.
+
+[Continuous deployment](docs/continuous-deployment.md): CI builds a checksummed
+release on the deploy branch; the Pi applies it only while confirmed disabled,
+with targeted Pico flashing, health checks and rollback.

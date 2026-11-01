@@ -1,3 +1,4 @@
+import { Script } from 'node:vm';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
@@ -95,10 +96,10 @@ test('unexpected reply, invalid byte and oversized response fail closed', async 
 });
 test('demo runs through the same Web Streams transport and device protocol', async () => {
   const metadata = JSON.parse(await readFile(new URL('../demo-metadata.json', import.meta.url)));
-  assert.equal(metadata.parameters.length, 48); assert.equal(metadata.telemetry.length, 108);
+  assert.equal(metadata.parameters.length, 52); assert.equal(metadata.telemetry.length, 108);
   const port = new DemoPort(metadata), client = new SerialClient(port); await client.open();
   assert.match((await client.command('get_info'))[1], /DEMO/);
-  assert.equal((await client.command('parameter_count'))[0], '48');
+  assert.equal((await client.command('parameter_count'))[0], '52');
   assert.deepEqual(await client.command('i2c_scan,1'), ['1','1','1','1','1','0','110','2','72','78']);
   await assert.rejects(client.command('tec_enable,1'), DeviceError);
   await client.command('set_params,tec_polarity,1'); await client.command('tec_enable,1');
@@ -112,6 +113,23 @@ test('demo runs through the same Web Streams transport and device protocol', asy
   await client.command('set_params,sipm_overvoltage_mv,9000'); await client.command('save');
   await client.command('defaults'); await client.command('load');
   assert.equal((await client.command('get_param,sipm_overvoltage_mv'))[1], '9000');
+  await client.command('set_params,laser_max_code,100');
+  assert.equal((await client.command('get_limits'))[0], '100');
+  await client.command('arm,1');
+  await assert.rejects(client.command('laser_dac,101'), DeviceError);
+  await client.command('laser_dac,100'); await client.command('stop');
+  await client.command('save'); await client.command('defaults'); await client.command('load');
+  assert.equal((await client.command('get_param,laser_max_code'))[1], '100');
   await assert.rejects(client.command('set_params,laser_min_mc,30000,laser_max_mc,10000'), DeviceError);
   await client.close();
+});
+
+test('direct-file entry uses valid classic JavaScript with embedded demo metadata', async () => {
+  const html = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+  const bundle = await readFile(new URL('../app.bundle.js', import.meta.url), 'utf8');
+  assert.match(html, /<script src="app.bundle.js"><\/script>/);
+  assert.doesNotMatch(html, /type="module"/);
+  assert.doesNotThrow(() => new Script(bundle));
+  assert.doesNotMatch(bundle, /\bfetch\s*\(/);
+  assert.match(bundle, /const demoMetadata=/);
 });

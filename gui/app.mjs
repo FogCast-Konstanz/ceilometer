@@ -9,6 +9,7 @@ let client = null, demo = null, sessionDemo = false, info = null, limits = null,
 let telemetryNames = [], selected = ['laser_temp_mc', 'receiver_temp_mc'], samples = [], logs = [], capture = null;
 let epoch = 0, busy = false, polling = false, tab = 'overview', cursor = 0, lastStorage = 0, lastLogDraw = 0;
 let staged = new Map(), parameterInputs = new Map(), telemetryCells = new Map();
+let liveCps = null, liveCpsAt = 0;
 const builds = { laser: false, tec: false, bias: false };
 const critical = ['laser_temp_mc', 'receiver_temp_mc', 'lt_output_uv', 'bias_target_uv', 'ld_error', 'tec_swen',
   'bias_enabled', 'vbus_present', 'laser_adc_raw', 'bias_adc_raw', 'dac0_readback', 'dac1_readback', 'dac2_readback', 'lt_register0'];
@@ -26,10 +27,12 @@ function setUi() {
   $('connect').disabled = !!client || busy || !navigator.serial || !window.isSecureContext;
   $('demo').disabled = !!client || busy; $('disconnect').disabled = !on;
   $('stop').disabled = !on;
-  $('connection').textContent = on ? demo ? 'Demo connection' : 'USB connected' : client ? 'Connecting…' : 'Disconnected';
+  $('connection').textContent = on ? demo ? 'Demo connection' : 'USB connected' : client ? 'Connectingâ€¦' : 'Disconnected';
   $('connection').className = `badge${on ? ' good' : ''}`;
   for (const b of document.querySelectorAll('[data-action]')) {
     b.disabled = !on || busy || (!!b.dataset.build && (!builds[b.dataset.build] || state?.[0] === 'FAULT'));
+    if (['streamDark', 'streamLaser', 'readStream'].includes(b.dataset.action)) b.disabled ||= !!demo;
+    if (['streamDark', 'streamLaser'].includes(b.dataset.action)) b.disabled ||= state?.[0] === 'ACQUIRING';
     if (['applyParameters', 'save', 'load', 'defaults', 'revert', 'scanReceiver', 'scanMain'].includes(b.dataset.action)) b.disabled ||= !idle();
   }
   $('sendCommand').disabled = !on || busy;
@@ -51,7 +54,7 @@ function lost(error) {
 }
 async function run(label, work) {
   if (!connected() || busy) return;
-  const token = ++epoch; busy = true; setUi(); notify(`${label}…`);
+  const token = ++epoch; busy = true; setUi(); notify(`${label}â€¦`);
   try { await work(token); check(token); await refreshStatus(token); notify(`${label} complete.`); }
   catch (e) { if (!(e instanceof Cancelled)) { trace('ERROR', e.message); notify(e.message, true); } }
   finally { if (token === epoch) { busy = false; render(); } }
@@ -66,6 +69,8 @@ async function refreshStatus(token) {
   thermal.forEach(v => integer(v, -2147483648, 2147483647));
   bias = fields(await cmd('get_bias', token, 1), 10);
   bias.forEach(v => integer(v));
+  const testMode = integer((await cmd('get_bias_test', token, 1))[0], 0, 1);
+  $('biasTestStatus').textContent = testMode ? 'TEST MODE â€” manual temperature; receiver feedback bypassed' : 'Receiver temperature supervision';
   $('counter').textContent = integer((await cmd('get_count', token))[0], 0, 65535).toLocaleString();
   if (performance.now() - lastStorage > 2000 || !storage) {
     storage = fields(await cmd('get_storage', token), 6); storage.forEach(v => integer(v)); lastStorage = performance.now();
@@ -84,11 +89,12 @@ async function refreshParameters(token) {
     if (d.min !== integer(meta[3]) || d.max !== integer(meta[4]) || d.default !== integer(meta[5]) ||
         d.min > d.max || d.value < d.min || d.value > d.max) throw new Error('Invalid parameter bounds.');
     next.set(name, d);
-    if (i % 8 === 0) notify(`Reading parameter inventory ${i + 1}/${count}…`);
+    if (i % 8 === 0) notify(`Reading parameter inventory ${i + 1}/${count}â€¦`);
   }
   parameters.clear(); next.forEach((v, k) => parameters.set(k, v));
   staged.clear(); renderParameters();
   $('frames').value = parameters.get('integration_frames')?.value ?? 16;
+  syncThreshold();
 }
 async function readTelemetry(name, token) {
   const sample = telemetry(await cmd(`get_telemetry,${name}`, token, -1));
@@ -107,6 +113,13 @@ async function readTelemetry(name, token) {
   if (samples.length > 20000) samples.splice(0, samples.length - 20000);
   return sample;
 }
+function syncThreshold() {
+  const code = parameters.get('threshold_code')?.value ?? 0;
+  const ref = (parameters.get('threshold_dac_ref_uv')?.value ?? 2500000) / 1000;
+  $('receiverThreshold').max = (ref * 65535 / 65536).toFixed(3);
+  $('receiverThreshold').value = (code * ref / 65536).toFixed(3);
+  $('thresholdDetail').textContent = `DAC ${code} Â· ${(code * ref / 65536).toFixed(3)} mV Â· Save in Parameters to persist`;
+}
 async function updateAccepted(names, token) {
   for (const name of names) {
     const d = parameters.get(name); if (!d) continue;
@@ -114,7 +127,7 @@ async function updateAccepted(names, token) {
     if (reply[0] !== name) throw new Error('Parameter name mismatch.');
     d.value = integer(reply[1], d.min, d.max);
   }
-  lastStorage = 0; renderParameters();
+  lastStorage = 0; renderParameters(); syncThreshold();
 }
 async function inventory(token) {
   await refreshParameters(token);
@@ -129,8 +142,9 @@ async function inventory(token) {
 }
 async function connectPort(port, simulated = null) {
   busy = true; const token = ++epoch; demo = simulated; sessionDemo = !!simulated; info = null;
+  liveCps = null; liveCpsAt = 0;
   values.clear(); history.clear(); samples = []; capture = null; storage = null; lastStorage = 0;
-  $('plotMode').value = 'live'; $('captureDetail').textContent = 'No capture downloaded · timing and range require bench qualification';
+  $('plotMode').value = 'live'; $('captureDetail').textContent = '';
   scope.frozen = false; scope.end = null; scope.bounds = null; plotKey = ''; $('pause').textContent = 'Pause plot';
   telemetryNames = []; parameters.clear(); staged.clear(); selected = ['laser_temp_mc', 'receiver_temp_mc'];
   renderParameters(); renderTelemetryStructure();
@@ -155,7 +169,7 @@ async function connectPort(port, simulated = null) {
 }
 async function stopAll(message = 'All outputs and diagnostic pulses stopped.') {
   if (!connected()) return;
-  const token = ++epoch; busy = true; setUi(); notify('Stop requested; waiting for acknowledgement…');
+  const token = ++epoch; busy = true; setUi(); notify('Stop requested; waiting for acknowledgementâ€¦');
   try { await client.stop(); check(token); await cmd('test_pulse,0', token, 100); await refreshStatus(token); notify(message); }
   catch (e) { if (!(e instanceof Cancelled)) notify(e.message, true); }
   finally { if (token === epoch) { busy = false; render(); } }
@@ -168,37 +182,36 @@ async function disconnect() {
   await old.close(); $('demoBanner').hidden = true; notify('Disconnected.'); render();
 }
 function converted(s) {
-  if (s.unit === 'mC') return { value: Number(s.value) / 1000, unit: '°C' };
+  if (s.unit === 'mC') return { value: Number(s.value) / 1000, unit: 'Â°C' };
   if (/^uV(?:_|$)/.test(s.unit)) return { value: Number(s.value) / 1e6, unit: 'V' };
   return { value: Number(s.value), unit: s.unit };
 }
 const fresh = s => connected() && s?.valid && performance.now() - s.received <= 3500;
 function metric(id, name, decimals = 2) {
   const s = values.get(name), v = s && converted(s);
-  $(id).textContent = fresh(s) ? `${v.value.toFixed(decimals)} ${v.unit}` : '—';
+  $(id).textContent = fresh(s) ? `${v.value.toFixed(decimals)} ${v.unit}` : 'â€”';
 }
 function renderStatus() {
-  $('identity').textContent = info ? `${info[2].toUpperCase()} · firmware ${info[1]} · ${Number(info[3]) / 1e6} MHz` : 'No board connected';
+  $('identity').textContent = info ? `${info[2].toUpperCase()} Â· firmware ${info[1]} Â· ${Number(info[3]) / 1e6} MHz` : 'No board connected';
   $('state').textContent = connected() ? state?.[0] ?? 'READING' : 'OFFLINE';
   $('state').className = `badge${connected() ? state?.[0] === 'FAULT' ? ' bad' : ' good' : ''}`;
-  $('builds').textContent = info ? `Build enables: laser ${builds.laser ? 'on' : 'off'} · TEC ${builds.tec ? 'on' : 'off'} · bias ${builds.bias ? 'on' : 'off'}` : 'Outputs —';
-  $('storage').textContent = storage ? `Flash ${+storage[0] ? `generation ${storage[2]}` : 'defaults'} · ${+storage[1] ? 'RAM unsaved' : 'saved'}${+storage[4] ? ' · invalid record seen' : ''}` : 'Storage —';
+  $('builds').textContent = info ? `Build enables: laser ${builds.laser ? 'on' : 'off'} Â· TEC ${builds.tec ? 'on' : 'off'} Â· bias ${builds.bias ? 'on' : 'off'}` : 'Outputs â€”';
+  $('storage').textContent = storage ? `Flash ${+storage[0] ? `generation ${storage[2]}` : 'defaults'} Â· ${+storage[1] ? 'RAM unsaved' : 'saved'}${+storage[4] ? ' Â· invalid record seen' : ''}` : 'Storage â€”';
   const enabled = (id, on, off) => { $(id).textContent = on ? 'ON' : off; $(id).className = `badge${on ? ' good' : ''}`; };
   enabled('tecStatus', connected() && +thermal?.[0], 'OFF'); enabled('biasStatus', connected() && +bias?.[0], 'OFF');
   $('armStatus').textContent = connected() && +state?.[5] ? 'ARMED' : 'DISARMED';
-  $('thermalDetail').textContent = thermal ? `Target ${(thermal[1] / 1000).toFixed(2)} °C · feedback ${+thermal[2] ? 'valid' : 'invalid'} · command ${thermal[4]} mV${+thermal[6] ? ' · FAULT' : ''}` : 'Waiting for temperature feedback';
+  $('thermalDetail').textContent = thermal ? `Target ${(thermal[1] / 1000).toFixed(2)} Â°C Â· feedback ${+thermal[2] ? 'valid' : 'invalid'} Â· command ${thermal[4]} mV${+thermal[6] ? ' Â· FAULT' : ''}` : 'Waiting for temperature feedback';
   const reasons = ['OK', 'temperature invalid', 'voltage ceiling', 'build / code ceiling', 'DAC failure'];
-  $('biasDetail').textContent = bias ? `${reasons[+bias[2]] ?? 'unknown status'} · target ${(bias[7] / 1e6).toFixed(3)} V · ${+bias[3] ? 'realizable' : 'unavailable'}${+bias[1] ? ' · FAULT' : ''}` : 'Waiting for receiver feedback';
-  $('footerMode').textContent = sessionDemo ? 'SIMULATED DATA · no hardware connected' : 'Board bring-up & diagnostics';
+  $('biasDetail').textContent = bias ? `${reasons[+bias[2]] ?? 'unknown status'} Â· target ${(bias[7] / 1e6).toFixed(3)} V Â· ${+bias[3] ? 'realizable' : 'unavailable'}${+bias[1] ? ' Â· FAULT' : ''}` : 'Waiting for receiver feedback';
 }
 function renderTelemetryStructure() {
   const body = $('telemetryRows'); body.replaceChildren(); telemetryCells.clear(); $('channel').replaceChildren();
   for (const name of telemetryNames) {
     const s = values.get(name), row = node('tr'), cells = [];
-    for (const text of [name, '—', s.unit, 'not read', '—', '—']) { const td = node('td', text); row.append(td); cells.push(td); }
+    for (const text of [name, 'â€”', s.unit, 'not read', 'â€”', 'â€”']) { const td = node('td', text); row.append(td); cells.push(td); }
     const td = node('td'), b = node('button', '+ Plot', 'mini'); b.addEventListener('click', () => addChannel(name)); td.append(b); row.append(td);
     body.append(row); telemetryCells.set(name, { row, cells });
-    const option = node('option', `${name} · ${converted(s).unit}`); option.value = name; $('channel').append(option);
+    const option = node('option', `${name} Â· ${converted(s).unit}`); option.value = name; $('channel').append(option);
   }
   renderLegend();
 }
@@ -207,15 +220,18 @@ function renderTelemetry() {
   for (const [name, { row, cells }] of telemetryCells) {
     const s = values.get(name), ok = fresh(s);
     row.hidden = !`${name} ${s?.unit}`.toLowerCase().includes(query);
-    cells[1].textContent = s?.value ?? '—'; cells[1].className = ok ? '' : 'muted';
+    cells[1].textContent = s?.value ?? 'â€”'; cells[1].className = ok ? '' : 'muted';
     cells[3].textContent = !connected() ? 'disconnected' : performance.now() - s.received > 3500 ? 'stale link' : s.valid ? 'valid at read' : 'invalid';
     cells[3].className = ok ? 'valid' : 'invalid';
-    cells[4].textContent = s ? (s.age / 1000 + performance.now() - s.received).toFixed(0) : '—';
-    cells[5].textContent = s?.sequence ?? '—'; if (ok) valid++;
+    cells[4].textContent = s ? (s.age / 1000 + performance.now() - s.received).toFixed(0) : 'â€”';
+    cells[5].textContent = s?.sequence ?? 'â€”'; if (ok) valid++;
   }
   $('validCount').textContent = `${valid} / ${telemetryNames.length} valid recent reads`;
 }
 function renderParameters() {
+  const maximum = parameters.get('laser_max_code')?.value ?? Number(limits?.[0] ?? 0);
+  $('laserCode').max = maximum; $('laserLimit').textContent = `ceiling ${maximum}`;
+  if (limits) limits[0] = String(maximum);
   const body = $('parameterRows'); body.replaceChildren(); parameterInputs.clear();
   for (const d of parameters.values()) {
     const row = node('tr'); row.dataset.name = d.name;
@@ -226,14 +242,14 @@ function renderParameters() {
       if (input.value === String(d.value)) staged.delete(d.name); else staged.set(d.name, input.value);
       input.classList.toggle('changed', staged.has(d.name)); $('stagedCount').textContent = staged.size;
     });
-    parameterInputs.set(d.name, input); cell.append(input); row.append(cell, node('td', d.unit), node('td', `${d.min} … ${d.max}`), node('td', d.default)); body.append(row);
+    parameterInputs.set(d.name, input); cell.append(input); row.append(cell, node('td', d.unit), node('td', `${d.min} â€¦ ${d.max}`), node('td', d.default)); body.append(row);
   }
   $('stagedCount').textContent = staged.size; filterParameters(); setUi();
 }
 function filterParameters() { for (const row of $('parameterRows').children) row.hidden = !row.dataset.name.includes($('parameterFilter').value.toLowerCase()); }
 function renderLegend() {
   $('legend').replaceChildren();
-  selected.forEach((name, i) => { const b = node('button', `${name} ×`); b.style.color = colors[i]; b.addEventListener('click', () => {
+  selected.forEach((name, i) => { const b = node('button', `${name} Ã—`); b.style.color = colors[i]; b.addEventListener('click', () => {
     selected = selected.filter(n => n !== name); renderLegend(); updatePlot();
   }); $('legend').append(b); });
 }
@@ -251,17 +267,18 @@ function updatePlot() {
   let series, unit;
   if (mode !== 'live') {
     series = capture ? [{ data: capture[mode].map((value, i) => ({ t: i, y: Number(value) })) }] : [];
-    unit = mode === 'histogram' ? 'counts' : 'correlation × 1023';
-  } else { series = selected.map(name => ({ data: history.get(name) ?? [] })); unit = values.has(selected[0]) ? converted(values.get(selected[0])).unit : '°C'; }
+    unit = mode === 'histogram' ? 'counts' : 'correlation Ã— N';
+  } else { series = selected.map(name => ({ data: history.get(name) ?? [] })); unit = values.has(selected[0]) ? converted(values.get(selected[0])).unit : 'Â°C'; }
   if (key !== plotKey) { scope.setSeries(series, unit, mode !== 'live'); plotKey = key; } else scope.series = series;
   $('plotTitle').textContent = mode === 'live' ? 'Live telemetry' : mode === 'histogram' ? 'Capture histogram' : 'DC-rejected correlation';
   $('plotEmpty').hidden = series.some(s => s.data.length);
   $('legend').hidden = mode !== 'live';
-  if (!scope.plot) { $('plotEmpty').hidden = false; $('plotEmpty').textContent = 'WebGL unavailable · telemetry tables and exports remain usable'; }
+  if (!scope.plot) { $('plotEmpty').hidden = false; $('plotEmpty').textContent = 'WebGL unavailable Â· telemetry tables and exports remain usable'; }
   $('window').disabled = mode !== 'live';
 }
 function render() {
   renderStatus(); setUi();
+  $('sipmCps').textContent = connected() && !busy && state?.[0] !== 'ACQUIRING' && liveCps !== null && performance.now() - liveCpsAt < 1500 ? `${Math.round(liveCps).toLocaleString()} cps` : 'â€”';
   metric('laserTemp', 'laser_temp_mc'); metric('receiverTemp', 'receiver_temp_mc'); metric('tecOutput', 'lt_output_uv', 3); metric('biasTarget', 'bias_target_uv', 3);
   if (tab === 'telemetry') renderTelemetry();
   $('health').replaceChildren();
@@ -290,24 +307,76 @@ async function readCapture(token) {
     }
   }
   check(token); capture = result; $('plotMode').value = 'histogram';
-  $('captureDetail').textContent = `${demo ? 'SIMULATED · ' : ''}${result.frames} frames · ${result.chipHz.toLocaleString()} chips/s · downloaded ${result.at} · range timing unqualified`;
+  $('captureDetail').textContent = `${demo ? 'SIMULATED Â· ' : ''}${result.frames} frames Â· ${result.chipHz.toLocaleString()} chips/s Â· downloaded ${result.at} Â· range timing unqualified`;
+}
+async function readStream(token) {
+  const meta = fields(await cmd('stream_result', token), 11);
+  const id = integer(meta[0], 1), length = integer(meta[1], 1023, 4095);
+  if (![1023, 4095].includes(length)) throw new Error('Unsupported PRN length.');
+  const result = { at: new Date().toISOString(), demo: false, id, length, frames: meta[2],
+    chipHz: integer(meta[3]), exposureNs: meta[7], bootId: meta[9], configurationCrc: meta[10],
+    offset: parameters.get('range_offset_bins')?.value ?? 0, histogram: [], profile: [] };
+  for (let i = 0; i < length; i += 16) {
+    const n = Math.min(16, length - i);
+    result.histogram.push(...capturePage('histogram', await cmd(`stream_histogram,${id},${i},${n}`, token), i, n));
+  }
+  const status = fields(await cmd('stream_status', token), 7);
+  if (status[1] !== '0') throw new Error('Acquisition failed during download.');
+  const counts = result.histogram.map(Number);
+  if (counts.some(v => !Number.isSafeInteger(v)) || counts.reduce((a, b) => a + b, 0) > Number.MAX_SAFE_INTEGER / length)
+    throw new Error('Use the Python client for counts beyond exact browser correlation range.');
+  let state = parameters.get('prn_seed')?.value ?? 1023;
+  const code = [];
+  for (let i = 0; i < length; i++) {
+    code.push(state & 1);
+    const feedback = length === 1023 ? state ^ (state >> 3) : state ^ (state >> 1) ^ (state >> 4) ^ (state >> 6);
+    state = (state >> 1) | ((feedback & 1) << (length === 1023 ? 9 : 11));
+  }
+  const total = counts.reduce((a, b) => a + b, 0);
+  for (let d = 0; d < length; d++) {
+    let dot = 0;
+    for (let k = 0; k < length; k++) dot += counts[k] * (code[(k + length - d) % length] ? 1 : -1);
+    result.profile.push(String(dot * length - total));
+  }
+  const timing = fields(await cmd('stream_timing', token), 4);
+  if (integer(timing[0], 1) !== id || timing[1] !== 'finite_burst' ||
+      BigInt(timing[2]) < BigInt(result.exposureNs) ||
+      BigInt(timing[3]) !== BigInt(timing[2]) - BigInt(result.exposureNs))
+    throw new Error('Invalid acquisition timing metadata.');
+  result.acquisitionMode = timing[1]; result.wallNs = timing[2]; result.deadTimeNs = timing[3];
+  await cmd(`stream_release,${id}`, token);
+  check(token); capture = result; $('plotMode').value = 'profile';
+  $('captureDetail').textContent = `Measurement ${id} / ${length} chips / ${(Number(meta[7]) / 1e9).toFixed(7)} s accepted / ${(Number(result.wallNs) / 1e9).toFixed(3)} s elapsed / ${(Number(result.deadTimeNs) / 1e9).toFixed(3)} s warmup and gaps`;
 }
 async function scanBus(bus, token) {
   const reply=await cmd(`i2c_scan,${bus}`,token);
   if(reply.length<8 || integer(reply[0],0,1)!==bus) throw new Error('Invalid I2C scan response.');
   const count=integer(reply[7],0,112);fields(reply,8+count);
   const addresses=reply.slice(8).map(v=>`0x${integer(v,8,119).toString(16).padStart(2,'0')}`);
-  $('busScan').textContent=`I²C${bus}: SDA/SCL ${reply[1]}/${reply[2]} → ${reply[3]}/${reply[4]} · `+
-    `${reply[5]} timeouts · ${reply[6]} NACKs · found ${addresses.join(', ') || 'none'}`;
+  $('busScan').textContent=`IÂ²C${bus}: SDA/SCL ${reply[1]}/${reply[2]} â†’ ${reply[3]}/${reply[4]} Â· `+
+    `${reply[5]} timeouts Â· ${reply[6]} NACKs Â· found ${addresses.join(', ') || 'none'}`;
 }
 const actions = {
   scanReceiver: t=>scanBus(1,t),scanMain: t=>scanBus(0,t),
+  threshold: async t => {
+    const input = $('receiverThreshold');
+    if (!input.value.trim() || !input.checkValidity()) throw new Error('Enter a threshold within the displayed range.');
+    const ref = (parameters.get('threshold_dac_ref_uv')?.value ?? 2500000) / 1000;
+    const code = integer(Math.round(Number(input.value) * 65536 / ref), 0, 65535);
+    await cmd(`set_threshold,${code}`, t); await updateAccepted(['threshold_code'], t);
+  },
   pulse: t => cmd(`test_pulse,${integer($('pulse').value, 0, 10000000)}`, t), pulseOff: t => cmd('test_pulse,0', t),
   clearFault: t => cmd('clear_fault', t), refresh: inventory,
   tecOn: t => cmd('tec_enable,1', t), tecOff: t => cmd('tec_enable,0', t),
-  biasOn: t => cmd('bias_enable,1', t), biasOff: t => cmd('bias_enable,0', t),
+  biasOn: async t => { await cmd('bias_test,off', t); await cmd('bias_enable,1', t); },
+  biasTestOn: async t => {
+    const mc = Math.round(Number($('biasTestTemperature').value) * 1000);
+    integer(mc, -40000, 85000);
+    await cmd(`bias_test,${mc}`, t); await cmd('bias_enable,1', t);
+  }, biasOff: t => cmd('bias_enable,0', t),
   arm: t => cmd('arm,1', t), disarm: t => cmd('arm,0', t),
   laserDac: async t => { await cmd(`laser_dac,${integer($('laserCode').value, 0, integer(limits[0]))}`, t); await updateAccepted(['laser_dac_code'], t); },
+  streamDark: t => cmd('stream_capture', t), streamLaser: t => cmd('stream_start', t), readStream,
   readCapture,
   applyParameters: async t => { const command = settingCommand([...staged], parameters); await cmd(command, t); await refreshParameters(t); lastStorage = 0; },
   save: async t => { await cmd('save', t); lastStorage = 0; },
@@ -378,8 +447,8 @@ $('exportTelemetry').addEventListener('click', () => download('ceilometer-teleme
   ['host_utc', 'simulated', 'signal', 'raw_value_exact', 'unit', 'valid_at_read', 'device_sampled_us', 'device_age_us', 'sequence'],
   ...samples.map(s => [s.iso, s.demo, s.name, s.value, s.unit, +s.valid, s.sampled, s.age, s.sequence])]), 'text/csv'));
 $('exportCapture').addEventListener('click', () => { if (!capture) return; download('ceilometer-capture.csv', csv([
-  ['bin', 'uncalibrated_range_m', 'counts_exact', 'correlation_scaled_1023_exact', 'frames', 'chip_hz', 'simulated', 'downloaded_utc'],
-  ...capture.histogram.map((v, i) => [i, (i - capture.offset) * 299792458 / (2 * capture.chipHz), v, capture.profile[i], capture.frames, capture.chipHz, capture.demo, capture.at])]), 'text/csv'); });
+  ['bin', 'uncalibrated_range_m', 'counts_exact', 'correlation_scaled_N_exact', 'frames', 'chip_hz', 'simulated', 'downloaded_utc', 'sequence_length', 'exposure_ns', 'measurement_id', 'boot_id', 'configuration_crc32', 'acquisition_mode', 'wall_ns', 'dead_time_ns'],
+  ...capture.histogram.map((v, i) => [i, (i - capture.offset) * 299792458 / (2 * capture.chipHz), v, capture.profile[i], capture.frames, capture.chipHz, capture.demo, capture.at, capture.length ?? 1023, capture.exposureNs ?? '', capture.id ?? '', capture.bootId ?? '', capture.configurationCrc ?? '', capture.acquisitionMode ?? '', capture.wallNs ?? '', capture.deadTimeNs ?? ''])]), 'text/csv'); });
 document.addEventListener('visibilitychange', () => { if (document.hidden && connected()) void stopAll('Tab hidden: outputs stopped. Restart explicitly when ready.'); });
 window.addEventListener('pagehide', () => { if (connected()) { client.stop().catch(() => {}); } });
 navigator.serial?.addEventListener('disconnect', e => { if (client?.port === (e.port ?? e.target)) client.fail(new Error('USB device removed.')); });
@@ -389,10 +458,18 @@ async function poll() {
   polling = true; const token = epoch, begin = performance.now();
   try {
     await refreshStatus(token);
+    if (state[0] !== 'ACQUIRING' && performance.now() - liveCpsAt > 500) {
+      const result = fields(await cmd('count_window,50000', token, -1), 3);
+      const edges = integer(result[0], 0, Number.MAX_SAFE_INTEGER);
+      const duration = integer(result[1], 1, 1000000);
+      const gap = integer(result[2], 0, 1000000);
+      liveCps = gap < 200 ? edges * 1000000 / duration : null;
+      liveCpsAt = performance.now();
+    }
     const names = new Set([...critical, ...selected]);
     for (let i = 0; i < 12 && telemetryNames.length; i++) names.add(telemetryNames[cursor++ % telemetryNames.length]);
     for (const name of names) if (telemetryNames.includes(name)) await readTelemetry(name, token);
-    $('pollStatus').textContent = `Polling · ${(performance.now() - begin).toFixed(0)} ms sweep`;
+    $('pollStatus').textContent = `Polling Â· ${(performance.now() - begin).toFixed(0)} ms sweep`;
   } catch (e) {
     if (!(e instanceof Cancelled)) {
       if (e instanceof DeviceError) notify(e.message, true); else if (client) client.fail(e);

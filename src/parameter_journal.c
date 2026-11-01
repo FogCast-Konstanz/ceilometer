@@ -29,7 +29,9 @@ void storage_record_encode(uint8_t r[STORAGE_PAGE_SIZE],const parameter_values *
 bool storage_record_decode(const uint8_t r[STORAGE_PAGE_SIZE],parameter_values *p,uint32_t *generation) {
     uint32_t version=get32(r+4),count=get32(r+8);
     bool legacy=version==1u && count==40u;
-    if(get32(r)!=STORAGE_MAGIC || (!legacy && (version!=STORAGE_VERSION || count!=PARAM_COUNT)) ||
+    bool schema2=version==2u && count==48u;
+    bool schema3=version==3u && count==49u;
+    if(get32(r)!=STORAGE_MAGIC || (!legacy && !schema2 && !schema3 && (version!=STORAGE_VERSION || count!=PARAM_COUNT)) ||
        get32(r+16)!=count*4u || get32(r+252)!=storage_crc32(r,252)) return false;
     parameter_values candidate;parameters_defaults(&candidate);
     for(unsigned i=0;i<count;++i) candidate.values[i]=(int32_t)get32(r+20+4*i);

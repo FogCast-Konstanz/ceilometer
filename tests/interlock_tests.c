@@ -36,14 +36,18 @@ void gpio_put(uint pin,bool v) { (void)pin;(void)v; }
 void gpio_set_function(uint pin,int f) { (void)pin;(void)f; }
 void gpio_set_irq_enabled_with_callback(uint p,uint32_t e,bool b,void(*cb)(uint,uint32_t)) { (void)p;(void)e;(void)b;(void)cb; }
 uint32_t time_us_32(void) { return fake_now; }
+uint64_t time_us_64(void) {return fake_now;}
 void stdio_init_all(void) {}
 bool stdio_usb_connected(void) { return true; }
 int getchar_timeout_us(uint32_t t) { (void)t;return PICO_ERROR_TIMEOUT; }
 void tight_loop_contents(void) {}
+void sleep_us(uint32_t us) {(void)us;}
 bool set_sys_clock_khz(uint32_t n,bool b) { (void)n;(void)b;return true; }
-uint32_t clock_get_hz(int c) { (void)c;return 150000000; }
+uint32_t clock_get_hz(int c) { (void)c;return 500000000; }
 void watchdog_enable(uint32_t n,bool b) { (void)n;(void)b; }
 void watchdog_update(void) {}
+int putchar_raw(int c) {return c;}
+int stdio_put_string(const char *s,int len,bool newline,bool cr_translation) {(void)s;(void)newline;(void)cr_translation;return len;}
 void board_init(void) {}
 void board_outputs_off(void) { hw_dac=hw_bias_dac=0;hw_gate=hw_bias=false; }
 bool board_dac(unsigned channel,uint16_t value) { if(!channel) hw_dac=value;
@@ -88,6 +92,20 @@ static void reset(void) {
     receiver=(temperature_sample){.valid=true,.mc=25000};receiver_config=0x60;bias_i2c_ok=true;
 }
 int main(void) {
+    reset();request("stream_start",NULL);CHECK(!streaming && !running);
+    request("stream_capture",NULL);CHECK(streaming && running && !emitting);
+    request("stop",NULL);CHECK(!streaming && !running && !integration_pending());
+    request("arm","1");request("laser_dac","1");request("stream_start",NULL);
+    CHECK(streaming && running && emitting);
+    feedback.valid=false;CHECK(!thermal_service(true));CHECK(fault && !streaming && !hw_gate && !hw_dac);
+    reset();request("set_param","laser_max_code,100");CHECK(PARAM(laser_max_code)==100);
+    request("arm","1");request("laser_dac","101");CHECK(hw_dac==0);
+    request("laser_dac","100");CHECK(hw_dac==100);
+    request("set_param","laser_max_code,200");CHECK(PARAM(laser_max_code)==100);
+    request("stop",NULL);request("save",NULL);
+    request("defaults",NULL);CHECK(PARAM(laser_max_code)==32505);
+    request("load",NULL);CHECK(PARAM(laser_max_code)==100 && !armed && !hw_dac);
+    request("set_param","laser_max_code,0");request("arm","1");CHECK(!armed);
     reset();feedback.valid=false;request("tec_polarity","-1");request("tec_enable","1");
     CHECK(!tec_on && !hw_tec);request("arm","1");CHECK(!armed);
     reset();request("tec_enable","1");CHECK(!tec_on); /* missing polarity */
@@ -128,6 +146,7 @@ int main(void) {
     reset();request("bias_enable","1");CHECK(!bias_on && !hw_bias); /* conversion warmup */
     fake_now+=700000;CHECK(bias_service(true));request("bias_enable","1");
     CHECK(bias_on && hw_bias && hw_bias_dac>55000 && !armed && !tec_on);
+    request("set_threshold","262");CHECK(PARAM(threshold_code)==262 && hw_bias && bias_on);
     uint16_t nominal=hw_bias_dac;
     request("bias_dac","65535");CHECK(hw_bias_dac==nominal && hw_bias);
     receiver.mc=50000;fake_now+=100000;CHECK(bias_service(true));CHECK(hw_bias_dac>nominal);
@@ -182,6 +201,16 @@ int main(void) {
     request("bias_enable","1");CHECK(hw_bias);
     receiver_config=0;fake_now+=100000;CHECK(!bias_service(true));
     CHECK(fault && !hw_bias && sipm_bias_status().reason==BIAS_TEMPERATURE);
+    reset();receiver.valid=false;
+    request("bias_test","25000");CHECK(sipm_bias_test_active());
+    request("bias_enable","1");CHECK(hw_bias && bias_on);
+    fake_now+=2000000;CHECK(bias_service(true));CHECK(hw_bias);
+    request("bias_test","50000");CHECK(sipm_bias_status().temperature.mc==25000);
+    request("stop",NULL);CHECK(!hw_bias && !sipm_bias_test_active());
+    request("bias_enable","1");CHECK(!hw_bias); /* no synthetic feedback leak */
+    request("bias_test","75001");request("bias_enable","1");CHECK(!hw_bias);
+    reset();receiver.valid=false;request("bias_test","25000");
+    bias_i2c_ok=false;request("bias_enable","1");CHECK(!hw_bias && fault);
     reset();probes=recoveries=0;request("i2c_recover","1");CHECK(recoveries==1);
     request("i2c_scan","1");CHECK(probes==112);
     request("arm","1");probes=recoveries=0;request("i2c_recover","1");CHECK(!recoveries);

@@ -1,6 +1,8 @@
 #pragma once
+int putchar_raw(int c);
 #include <stdint.h>
 #include <stdbool.h>
+int stdio_put_string(const char *s,int len,bool newline,bool cr_translation);
 typedef unsigned uint;
 #define GPIO_OUT true
 #define GPIO_IN false
@@ -10,6 +12,7 @@ void gpio_set_dir(uint pin, bool output);
 bool gpio_get(uint pin);
 void busy_wait_us_32(uint32_t us);
 uint32_t time_us_32(void);
+uint64_t time_us_64(void);
 #define GPIO_FUNC_SIO 0
 #define GPIO_IRQ_EDGE_FALL 4u
 #define PICO_ERROR_TIMEOUT -2

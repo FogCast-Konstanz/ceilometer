@@ -1,0 +1,15 @@
+{
+  "firmware": "0.6.3",
+  "system_hz": 500000000,
+  "requested_core_voltage_v": 1.5,
+  "samples": 180,
+  "elapsed_s": 184.23954395400006,
+  "all_connected": true,
+  "all_disabled": true,
+  "usb_disconnects": 0,
+  "pico_reboots": 0,
+  "distinct_boot_ids": 1,
+  "uptime_monotonic": true,
+  "start_utc": "2026-10-31T22:03:20.519232+00:00",
+  "end_utc": "2026-10-31T22:06:24.638788+00:00"
+}

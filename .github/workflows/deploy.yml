@@ -1,0 +1,40 @@
+name: Test, build and publish Pi deployment
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: ceilometer-deployment
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+      - name: Toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib cmake ninja-build libusb-1.0-0-dev
+          python3 -m venv "$RUNNER_TEMP/venv"
+          "$RUNNER_TEMP/venv/bin/pip" install -r tools/requirements.txt
+          echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
+      - name: Host tests
+        run: |
+          cmake -S . -B build-host -G Ninja -DCEIL_HOST_TESTS=ON
+          cmake --build build-host
+          ctest --test-dir build-host --output-on-failure
+      - name: Pico SDK and firmware
+        run: |
+          git clone --depth 1 --branch 2.3.0 https://github.com/raspberrypi/pico-sdk.git "$RUNNER_TEMP/pico-sdk"
+          git -C "$RUNNER_TEMP/pico-sdk" submodule update --init lib/tinyusb
+          cmake -S . -B build -G Ninja -DPICO_SDK_PATH="$RUNNER_TEMP/pico-sdk" -DPICO_BOARD=pico2 -DCEIL_ENABLE_LASER=ON -DCEIL_ENABLE_BIAS=ON -DCEIL_ENABLE_TEC=ON -DCEIL_BIAS_MAX_CODE=60210
+          cmake --build build --parallel 2
+      - name: Package and publish deployment branch
+        run: |
+          python deploy/package_release.py --revision "$GITHUB_SHA" --output "$RUNNER_TEMP/ceilometer.tar.gz"
+          bash deploy/publish_branch.sh "$RUNNER_TEMP/ceilometer.tar.gz"

@@ -1,0 +1,6 @@
+$ACK,stop
+BIAS_OFF threshold_mV=1806 counts=0 cps=0,0
+BIAS_OFF threshold_mV=1807 counts=53723 cps=3282197,0
+BIAS_OFF threshold_mV=1808 counts=493629 cps=30158174,5
+$ACK,stop
+$ACK,set_threshold

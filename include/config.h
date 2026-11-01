@@ -4,9 +4,11 @@
 #define CAPTURE_MAX_FRAMES 16u
 #define CAPTURE_MAX_SAMPLES (PRN_LENGTH * CAPTURE_MAX_FRAMES + 1u)
 #define TX_WORDS PRN_LENGTH /* 32 exact frames, no 1023->1024 padding */
-#define CHIP_CYCLES 15u
+#define CHIP_CYCLES 10u /* Allowed chip-period quantum in clk_sys cycles. */
 #define DEFAULT_CHIP_HZ 10000000u
-#define SYSTEM_KHZ 150000u
+#ifndef SYSTEM_KHZ
+#define SYSTEM_KHZ 500000u
+#endif
 #define PIN_LD_SDA 0u
 #define PIN_LD_SCL 1u
 #define PIN_RX_SDA 2u
@@ -29,7 +31,7 @@
 #define PIN_TEC_ADC 27u
 #define PIN_BIAS_ADC 28u /* LT3571 MON current, NOT divided bias voltage */
 #define PWM_COUNTER_SLICE 2u
-#define PWM_TIMER_SLICE 0u
+#define PWM_TIMER_SLICE 3u
 #define I2C_LD_ADDRESS 0x4cu
 #define I2C_BIAS_ADDRESS 0x4eu /* AD5693R A0 is address bit 1, bit 0 is fixed zero */
 #define I2C_THRESHOLD_ADDRESS 0x4eu

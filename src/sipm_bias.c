@@ -8,7 +8,13 @@
 static bias_status state;
 static temperature_sample feedback;
 static uint32_t last_poll,normal_since;
-static bool polled,normal,settled;
+static bool polled,normal,settled,test_mode;
+static int32_t test_mc;
+bool sipm_bias_test_active(void) { return test_mode; }
+bool sipm_bias_test_temperature(int32_t mc) {
+    if(state.enabled || mc < -40000 || mc > 85000) return false;
+    test_mc=mc;test_mode=true;return true;
+}
 /* R14+R17=1208k, R21=20k; R22=15.4k, R23=10k.
    MONIN = DAC * (614/10) * (100/254); APD = MONIN - 5V.
    Gain calibration is relative to this exact resistor-ratio model. */
@@ -39,11 +45,13 @@ bool sipm_bias_calculate(temperature_sample s,uint32_t now,bias_status *out) {
 }
 void sipm_bias_stop(void) {
     board_bias_enable(false);state.enabled=false;
+    if(test_mode) feedback.valid=false;
+    test_mode=false;
     (void)board_dac(1,0);
 }
 void sipm_bias_init(void) {
     memset(&state,0,sizeof state);feedback=(temperature_sample){0};
-    polled=false;normal=false;settled=false;last_poll=normal_since=0;
+    test_mode=false;test_mc=0;polled=false;normal=false;settled=false;last_poll=normal_since=0;
     state.reason=BIAS_TEMPERATURE;
 }
 void sipm_bias_reconfigure(void) {
@@ -77,7 +85,10 @@ static void poll_temperature(uint32_t now) {
 bool sipm_bias_service(bool available) {
     uint32_t now=time_us_32();
     uint32_t previous=feedback.sequence;
-    if(available) poll_temperature(now);
+    if(test_mode) {
+        feedback=(temperature_sample){.valid=true,.mc=test_mc,.sampled_us=now,
+            .sequence=feedback.sequence+(available ? 1u : 0u)};
+    } else if(available) poll_temperature(now);
     bias_status next;bool ok=sipm_bias_calculate(feedback,time_us_32(),&next);
     next.enabled=state.enabled;next.fault=state.fault;
     if(state.fault) { next.reason=state.reason;state=next;return false; }

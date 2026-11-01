@@ -1,0 +1,175 @@
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=150000
+BEGIN sys=150000000 vreg_selector=11
+RATE sys=150000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=150000000 wanted=2000000 actual=2027027 counted=101351 us=50000 measured=2027020.0 ratio=0.999997 maxgap_us=1
+RATE sys=150000000 wanted=4000000 actual=4166666 counted=208333 us=50000 measured=4166660.0 ratio=0.999999 maxgap_us=1
+RATE sys=150000000 wanted=8000000 actual=8333333 counted=416665 us=50000 measured=8333300.0 ratio=0.999996 maxgap_us=1
+RATE sys=150000000 wanted=16000000 actual=18750000 counted=937497 us=50000 measured=18749940.0 ratio=0.999997 maxgap_us=1
+RATE sys=150000000 wanted=32000000 actual=37500000 counted=1874994 us=50000 measured=37499880.0 ratio=0.999997 maxgap_us=1
+RATE sys=150000000 wanted=64000000 actual=75000000 counted=3749988 us=50000 measured=74999760.0 ratio=0.999997 maxgap_us=1
+RATE sys=150000000 wanted=75000000 actual=75000000 counted=3749988 us=50000 measured=74999760.0 ratio=0.999997 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10714285 total=4387 expected_approx=4387.500 max_bin=2 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=75000000 total=30713 expected_approx=30712.500 max_bin=9 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500000
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201613 us=50000 measured=4032260.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403226 us=50000 measured=8064520.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833332 us=50000 measured=16666640.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785712 us=50000 measured=35714240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500001
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201612 us=50000 measured=4032240.0 ratio=0.999996 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403225 us=50000 measured=8064500.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833333 us=50000 measured=16666660.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785712 us=50000 measured=35714240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500001
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201613 us=50000 measured=4032260.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403226 us=50000 measured=8064520.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833333 us=50000 measured=16666660.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785712 us=50000 measured=35714240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500000
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201612 us=50000 measured=4032240.0 ratio=0.999996 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403226 us=50000 measured=8064520.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833332 us=50000 measured=16666640.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785713 us=50000 measured=35714260.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500000
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201613 us=50000 measured=4032260.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403225 us=50000 measured=8064500.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833332 us=50000 measured=16666640.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785712 us=50000 measured=35714240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500000
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201613 us=50000 measured=4032260.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403226 us=50000 measured=8064520.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833333 us=50000 measured=16666660.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785713 us=50000 measured=35714260.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500001
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201613 us=50000 measured=4032260.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403225 us=50000 measured=8064500.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833332 us=50000 measured=16666640.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785712 us=50000 measured=35714240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500001
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201613 us=50000 measured=4032260.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403226 us=50000 measured=8064520.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833332 us=50000 measured=16666640.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785712 us=50000 measured=35714240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500000
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201613 us=50000 measured=4032260.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403225 us=50000 measured=8064500.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833332 us=50000 measured=16666640.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785713 us=50000 measured=35714260.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11
+BOARD D5E72DD9B609A5A9 sys=150000000 vreg_selector=11 commands=b(baseline),o(500MHz1.5V),s(status)
+FC0_sys_khz=500001
+BEGIN sys=500000000 vreg_selector=18
+RATE sys=500000000 wanted=1000000 actual=1000000 counted=50000 us=50000 measured=1000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=2000000 actual=2000000 counted=100000 us=50000 measured=2000000.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=4000000 actual=4032258 counted=201613 us=50000 measured=4032260.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=8000000 actual=8064516 counted=403226 us=50000 measured=8064520.0 ratio=1.000000 maxgap_us=1
+RATE sys=500000000 wanted=16000000 actual=16666666 counted=833332 us=50000 measured=16666640.0 ratio=0.999998 maxgap_us=1
+RATE sys=500000000 wanted=32000000 actual=35714285 counted=1785712 us=50000 measured=35714240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=64000000 actual=83333333 counted=4166662 us=50000 measured=83333240.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=128000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+RATE sys=500000000 wanted=250000000 actual=250000000 counted=12499986 us=50000 measured=249999720.0 ratio=0.999999 maxgap_us=1
+DMA bins=4095 bin_hz=10000000 pulse_hz=1000000 total=409 expected_approx=409.500 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=10000000 total=4095 expected_approx=4095.000 max_bin=1 timeout=0
+DMA bins=4095 bin_hz=10000000 pulse_hz=250000000 total=102375 expected_approx=102375.000 max_bin=25 timeout=0
+DONE restored sys=150000000 vreg_selector=11

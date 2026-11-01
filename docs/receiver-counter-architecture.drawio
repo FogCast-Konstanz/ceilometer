@@ -1,0 +1,57 @@
+<mxfile host="Electron">
+  <diagram name="Receiver counter architecture" id="receiver-counter">
+    <mxGraphModel dx="4075" dy="1668" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="850" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="title" parent="1" style="text;html=1;whiteSpace=wrap;align=left;fontSize=19;fontFamily=Helvetica;labelBackgroundColor=none;" value="&lt;b&gt;Receiver counter architecture&lt;/b&gt;" vertex="1">
+          <mxGeometry height="60" width="1700" x="30" y="20" as="geometry" />
+        </mxCell>
+        <mxCell id="input" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=18;fontFamily=Helvetica;strokeWidth=1.5;labelBackgroundColor=none;" value="&lt;b&gt;Receiver pulse&lt;/b&gt;" vertex="1">
+          <mxGeometry height="185" width="270" x="30" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="counter" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=18;fontFamily=Helvetica;strokeWidth=1.5;labelBackgroundColor=none;" value="&lt;b&gt;PWM2 counter&lt;/b&gt;&lt;br&gt;&lt;br&gt;16-bit free-running CTR&lt;br&gt;clkdiv mode: B_RISING&lt;br&gt;Wrap: 65,535 -&amp;gt; 0" vertex="1">
+          <mxGeometry height="185" width="270" x="390" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="dma" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=18;fontFamily=Helvetica;strokeWidth=1.5;labelBackgroundColor=none;" value="&lt;b&gt;RX DMA&lt;/b&gt;&lt;br&gt;&lt;br&gt;32-bit CTR reads&lt;br&gt;Fixed source address&lt;br&gt;Incrementing destination" vertex="1">
+          <mxGeometry height="185" width="270" x="750" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="ram" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=18;fontFamily=Helvetica;strokeWidth=1.5;labelBackgroundColor=none;" value="&lt;b&gt;SRAM snapshots&lt;/b&gt;&lt;br&gt;&lt;br&gt;C[0], C[1], …, C[M]&lt;br&gt;M = 1023 × frames&lt;br&gt;M + 1 samples / burst" vertex="1">
+          <mxGeometry height="185" width="270" x="1110" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="bins" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=18;fontFamily=Helvetica;strokeWidth=1.5;labelBackgroundColor=none;" value="&lt;b&gt;Bin reconstruction&lt;/b&gt;&lt;br&gt;&lt;br&gt;ΔC[k] = (C[k+1] − C[k])&lt;br&gt;modulo 65,536&lt;br&gt;Fold into 1023-bin histogram" vertex="1">
+          <mxGeometry height="185" width="300" x="1470" y="150" as="geometry" />
+        </mxCell>
+        <mxCell id="edge0" edge="1" parent="1" source="input" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=16;fontFamily=Helvetica;labelBackgroundColor=none;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontColor=default;" target="counter" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" edge="1" parent="1" source="counter" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=16;fontFamily=Helvetica;labelBackgroundColor=none;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontColor=default;" target="dma" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" edge="1" parent="1" source="dma" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=16;fontFamily=Helvetica;labelBackgroundColor=none;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontColor=default;" target="ram" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" edge="1" parent="1" source="ram" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=16;fontFamily=Helvetica;labelBackgroundColor=none;exitX=1;exitY=0.5;entryX=0;entryY=0.5;fontColor=default;" target="bins" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="timer" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=18;fontFamily=Helvetica;strokeWidth=1.5;labelBackgroundColor=none;" value="&lt;b&gt;PWM0 bin timer&lt;/b&gt;&lt;br&gt;&lt;br&gt;clk_sys = 500 MHz&lt;br&gt;Divider = 1, TOP = 49&lt;br&gt;DREQ = 10 MHz" vertex="1">
+          <mxGeometry height="185" width="270" x="750" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="timer-dma" edge="1" parent="1" source="timer" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=1;strokeWidth=2;fontSize=16;fontFamily=Helvetica;labelBackgroundColor=none;exitX=0.5;exitY=0;entryX=0.5;entryY=1;fontColor=default;" target="dma" value="one read per wrap">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="live" parent="1" style="rounded=0;arcSize=8;html=1;whiteSpace=wrap;align=center;verticalAlign=middle;spacing=12;fontSize=18;fontFamily=Helvetica;strokeWidth=1.5;labelBackgroundColor=none;" value="&lt;b&gt;live frequency counter&lt;/b&gt;" vertex="1">
+          <mxGeometry height="185" width="270" x="390" y="475" as="geometry" />
+        </mxCell>
+        <mxCell id="counter-live" edge="1" parent="1" source="counter" style="edgeStyle=orthogonalEdgeStyle;endArrow=block;endFill=1;strokeWidth=2;exitX=0.5;exitY=1;labelBackgroundColor=none;fontColor=default;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" target="live">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="340" y="470" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="timing" parent="1" style="text;html=1;whiteSpace=wrap;align=left;fontSize=19;fontFamily=Helvetica;labelBackgroundColor=none;" value="100 ns nominal bins&lt;br&gt;16-frame burst: 16,369 snapshots&lt;br&gt;Nominal sampled duration: 1.6368 ms" vertex="1">
+          <mxGeometry height="130" width="640" x="1110" y="500" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

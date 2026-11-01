@@ -1,0 +1,21 @@
+threshold_mV=1750 BIAS_OFF counts=0 duration_s=0,616 observed_cps=0,0
+threshold_mV=1750 BIAS_ON counts=0 duration_s=0,651 observed_cps=0,0
+threshold_mV=1775 BIAS_OFF counts=0 duration_s=0,618 observed_cps=0,0
+threshold_mV=1775 BIAS_ON counts=0 duration_s=0,618 observed_cps=0,0
+threshold_mV=1790 BIAS_OFF counts=0 duration_s=0,666 observed_cps=0,0
+threshold_mV=1790 BIAS_ON counts=0 duration_s=0,628 observed_cps=0,0
+threshold_mV=1795 BIAS_OFF counts=0 duration_s=0,681 observed_cps=0,0
+threshold_mV=1795 BIAS_ON counts=0 duration_s=0,619 observed_cps=0,0
+threshold_mV=1800 BIAS_OFF counts=0 duration_s=0,620 observed_cps=0,0
+threshold_mV=1800 BIAS_ON counts=211 duration_s=0,685 observed_cps=308,3
+threshold_mV=1805 BIAS_OFF counts=0 duration_s=0,624 observed_cps=0,0
+threshold_mV=1805 BIAS_ON counts=1182645 duration_s=0,626 observed_cps=1890514,8
+threshold_mV=1810 BIAS_OFF counts=0 duration_s=0,626 observed_cps=0,0
+threshold_mV=1810 BIAS_ON counts=1243 duration_s=0,620 observed_cps=2004,7
+threshold_mV=1825 BIAS_OFF counts=0 duration_s=0,622 observed_cps=0,0
+threshold_mV=1825 BIAS_ON counts=0 duration_s=0,699 observed_cps=0,0
+threshold_mV=1850 BIAS_OFF counts=0 duration_s=0,619 observed_cps=0,0
+threshold_mV=1850 BIAS_ON counts=0 duration_s=0,623 observed_cps=0,0
+DMA threshold_mV=1800 frames=160 integration_s=0.016368 counts=7 cps=427,7
+DMA threshold_mV=1805 frames=160 integration_s=0.016368 counts=94927 cps=5799547,9
+DMA threshold_mV=1810 frames=160 integration_s=0.016368 counts=33 cps=2016,1

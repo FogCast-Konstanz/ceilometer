@@ -131,7 +131,7 @@
       "unit": "code",
       "min": 0,
       "max": 65535,
-      "default": 0
+      "default": 47432
     },
     {
       "name": "chip_hz",
@@ -215,7 +215,7 @@
       "unit": "uV_per_mA",
       "min": 0,
       "max": 10000,
-      "default": 0
+      "default": 181
     },
     {
       "name": "laser_sense_offset_uv",
@@ -229,7 +229,7 @@
       "unit": "uV_per_uA",
       "min": 0,
       "max": 1000000,
-      "default": 0
+      "default": 998
     },
     {
       "name": "bias_sense_offset_uv",
@@ -335,6 +335,34 @@
       "min": -6000000,
       "max": -4000000,
       "default": -5000000
+    },
+    {
+      "name": "laser_max_code",
+      "unit": "code",
+      "min": 0,
+      "max": 65535,
+      "default": 32505
+    },
+    {
+      "name": "prn_length",
+      "unit": "chips",
+      "min": 1023,
+      "max": 4095,
+      "default": 1023
+    },
+    {
+      "name": "measurement_period_ms",
+      "unit": "ms",
+      "min": 100,
+      "max": 60000,
+      "default": 1000
+    },
+    {
+      "name": "startup_discard_frames",
+      "unit": "frames",
+      "min": 1,
+      "max": 1024,
+      "default": 2
     }
   ],
   "telemetry": [

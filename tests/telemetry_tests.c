@@ -101,7 +101,10 @@ bool sensors_receiver_register(unsigned r,uint16_t *v) { *v=r==0 ? 25*256 : r==1
 uint16_t sipm_counter_read(void) { return 12345; }
 static telemetry_value get(unsigned id) { telemetry_value v;CHECK(telemetry_read(id,now,&v));return v; }
 int main(void) {
-    parameters_defaults(&parameters_current);board_init();lt8722_init();telemetry_init();
+    parameters_defaults(&parameters_current);
+    CHECK(PARAM(laser_sense_uv_per_ma)==181 && PARAM(bias_sense_uv_per_ua)==998);
+    PARAM(laser_sense_uv_per_ma)=0; /* explicitly test missing calibration */
+    board_init();lt8722_init();telemetry_init();
     regs[0]=0x08a214;regs[7]=0;telemetry_poll(false);
     CHECK(regs[0]==0x08a214 && !get(T_lt_mux0_raw).valid); /* telemetry never enables the converter */
     CHECK(get(T_vsys_uv).valid && get(T_vsys_uv).value>4900000);

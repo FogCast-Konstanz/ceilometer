@@ -42,6 +42,33 @@ int main(void) {
         CHECK(!storage_record_decode(record,&loaded,&gen));
         record[byte]^=(uint8_t)(1u<<bit);
     }
+    candidate=p;candidate.values[PARAM_prn_length]=2047;CHECK(!parameters_validate(&candidate));
+    candidate.values[PARAM_prn_length]=4095;CHECK(parameters_validate(&candidate));
+    p.values[PARAM_laser_max_code]=38000;
+    storage_record_encode(record,&p,41);record[4]=3;record[8]=49;record[16]=196;
+    memset(record+20+49*4,255,252-(20+49*4));
+    uint32_t schema3crc=storage_crc32(record,252);
+    for(unsigned i=0;i<4;++i) record[252+i]=(uint8_t)(schema3crc>>(8*i));
+    CHECK(storage_record_decode(record,&loaded,&gen));
+    CHECK(loaded.values[PARAM_laser_max_code]==38000 && loaded.values[PARAM_prn_length]==1023 &&
+          loaded.values[PARAM_measurement_period_ms]==1000 && loaded.values[PARAM_startup_discard_frames]==2);
+    parameters_defaults(&p);
+    /* Schema 2 migration preserves all existing fields and defaults the new ceiling. */
+    p.values[PARAM_bias_gain_ppm]=989241;p.values[PARAM_bias_offset_uv]=-4925156;
+    p.values[PARAM_laser_dac_code]=32505;
+    storage_record_encode(record,&p,42);record[4]=2;record[8]=48;record[16]=192;
+    memset(record+20+48*4,255,252-(20+48*4));
+    uint32_t schema2crc=storage_crc32(record,252);
+    for(unsigned i=0;i<4;++i) record[252+i]=(uint8_t)(schema2crc>>(8*i));
+    CHECK(storage_record_decode(record,&loaded,&gen));
+    CHECK(loaded.values[PARAM_laser_max_code]==32505 && loaded.values[PARAM_laser_dac_code]==32505);
+    CHECK(loaded.values[PARAM_bias_gain_ppm]==989241 && loaded.values[PARAM_bias_offset_uv]==-4925156);
+    memset(flash,255,sizeof flash);memcpy(flash,record,256);parameter_journal schema2journal;
+    CHECK(storage_journal_load(&schema2journal,io(),&loaded));
+    CHECK(storage_journal_dirty(&schema2journal,&loaded));
+    CHECK(storage_journal_save(&schema2journal,&loaded));
+    CHECK(!storage_journal_dirty(&schema2journal,&loaded));
+    parameters_defaults(&p);
     /* Schema 1 has exactly the first 40 fields. Old raw bias must not reactivate. */
     storage_record_encode(record,&p,42);
     record[4]=1;record[8]=40;record[16]=160;
@@ -70,12 +97,12 @@ int main(void) {
         CHECK(storage_journal_load(&j,io(),&loaded));
         CHECK(!storage_journal_save(&j,&candidate));
         CHECK(storage_journal_load(&j,io(),&loaded));
-        CHECK(loaded.values[PARAM_threshold_code]==0 || loaded.values[PARAM_threshold_code]==1234);
+        CHECK(loaded.values[PARAM_threshold_code]==47432 || loaded.values[PARAM_threshold_code]==1234);
     }
     program_cut=256;memcpy(flash,backup,sizeof flash);
     CHECK(storage_journal_load(&j,io(),&loaded));CHECK(storage_journal_save(&j,&candidate));
     flash[256+12]^=1;CHECK(storage_journal_load(&j,io(),&loaded));
-    CHECK(j.generation==1 && j.corrupt && loaded.values[PARAM_threshold_code]==0); /* metadata CRC protected */
+    CHECK(j.generation==1 && j.corrupt && loaded.values[PARAM_threshold_code]==47432); /* metadata CRC protected */
     memset(flash,255,sizeof flash);CHECK(!storage_journal_load(&j,io(),&loaded));
     for(unsigned i=0;i<32;++i) { p.values[PARAM_threshold_code]=(int32_t)i;CHECK(storage_journal_save(&j,&p)); }
     CHECK(j.page==31);memcpy(backup,flash,sizeof flash);

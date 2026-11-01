@@ -1,14 +1,20 @@
 .program prn_tx
-.side_set 1
+; Armed before the master PWM starts. No software relative-start dependency.
+    wait 0 gpio 6
+    wait 1 gpio 6
 .wrap_target
-    out pins, 1 side 1 [6]
-    nop         side 0 [7]
+    out pins, 1
+    mov x, y
+chip_delay:
+    jmp x-- chip_delay
 .wrap
 
 .program frame_sync
 .side_set 1
+    wait 0 gpio 6 side 0
+    wait 1 gpio 6 side 0
 .wrap_target
-    mov x, y side 1
+    mov x, y side 1 [4]
 count:
     jmp x-- count side 0
 .wrap

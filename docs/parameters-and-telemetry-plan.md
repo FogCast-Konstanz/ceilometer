@@ -101,3 +101,8 @@ sector rollover and power loss; ADC/mux selection and restore, DAC I2C readback,
 cached telemetry during acquisition, validity/stale propagation; existing thermal
 and laser interlock tests; default and commissioned Pico 2 cross-builds with a
 linker boundary protecting the storage region. No connected hardware is assumed.
+
+Current parameter inventory adds laser_max_code (49th field): code0..65535,
+default32505. Adjustable only with all outputs off; Save persists. Replaces
+CEIL_LASER_MAX_CODE. Bias ceiling remains compile-time. Laser temperature and
+arming interlocks remain in force. Firmware schema3 migrates schemas1/2.

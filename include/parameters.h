@@ -20,7 +20,7 @@
  X(tec_frequency,"selector",0,5,5) \
  X(laser_dac_code,"code",0,65535,0) \
  X(bias_dac_code,"retired",0,0,0) \
- X(threshold_code,"code",0,65535,0) \
+ X(threshold_code,"code",0,65535,47432) \
  X(chip_hz,"Hz",10000,10000000,10000000) \
  X(integration_frames,"frames",1,1000000,16) \
  X(prn_seed,"state",1,1023,1023) \
@@ -32,9 +32,9 @@
  X(amux_settle_us,"us",100,2000,1000) \
  X(adc_average,"samples",1,64,8) \
  X(adc_reference_uv,"uV",2800000,3100000,3000000) \
- X(laser_sense_uv_per_ma,"uV_per_mA",0,10000,0) \
+ X(laser_sense_uv_per_ma,"uV_per_mA",0,10000,181) \
  X(laser_sense_offset_uv,"uV",-100000,100000,0) \
- X(bias_sense_uv_per_ua,"uV_per_uA",0,1000000,0) \
+ X(bias_sense_uv_per_ua,"uV_per_uA",0,1000000,998) \
  X(bias_sense_offset_uv,"uV",-100000,100000,0) \
  X(laser_temp_offset_mc,"mC",-5000,5000,0) \
  X(receiver_temp_offset_mc,"mC",-5000,5000,0) \
@@ -49,7 +49,11 @@
  X(bias_limit_mv,"mV",10000,50000,50000) \
  X(bias_temperature_age_ms,"ms",800,5000,1000) \
  X(bias_gain_ppm,"ppm_of_nominal",800000,1200000,1000000) \
- X(bias_offset_uv,"uV",-6000000,-4000000,-5000000)
+ X(bias_offset_uv,"uV",-6000000,-4000000,-5000000) \
+ X(laser_max_code,"code",0,65535,32505) \
+ X(prn_length,"chips",1023,4095,1023) \
+ X(measurement_period_ms,"ms",100,60000,1000) \
+ X(startup_discard_frames,"frames",1,1024,2)
 #define PARAM_ENUM(name,unit,lo,hi,def) PARAM_##name,
 typedef enum { PARAMETER_LIST(PARAM_ENUM) PARAM_COUNT } parameter_id;
 #undef PARAM_ENUM

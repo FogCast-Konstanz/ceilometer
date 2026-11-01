@@ -23,8 +23,7 @@ carry their own age. Their sample timing adds bus traffic and must be included i
 DMA jitter qualification. A short burst can end while a conversion is underway;
 these are monitored filtered-current samples, not a per-chip current waveform.
 
-Current calibration scales default to zero, so uncalibrated physical current
-readings are marked invalid while raw ADC values remain available. DAC voltage
+Current scales default to nominal schematic estimates: laser181 uV/mA and bias998 uV/uA. These require bench calibration. Setting either scale to zero marks that current reading invalid; raw ADC values remain available. DAC voltage
 fields are estimates from digital input-register readback and configured reference,
 not independently measured output voltages. No direct bias voltage divider or
 threshold-output ADC exists. U3's NER cannot reveal an internal fault category.
