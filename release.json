@@ -1,11 +1,11 @@
 {
-  "created_utc": "2026-11-01T12:52:42.892638+00:00",
+  "created_utc": "2026-11-01T14:24:48.609808+00:00",
   "files": {
-    "README.md": "72b558f06a7ce3d0f0b06ebc8e84b007e0be1f02b8562538af6f0ebe3fd7282b",
+    "README.md": "35635ffba30e34416daa340f4a3959a5208363021e082a817fecdfde02aaab15",
     "deploy/ceilometer-dashboard.service": "869a2b00c28090011fb971c8451edadd2b32300cd9b3948a240a42c3ea3ae535",
     "deploy/ceilometer-update.service": "6a820bc0e9598bd6e667f972b92d3c972401a63e0b0f6cd586af1c77280bf581",
     "deploy/ceilometer-update.timer": "7a9968783917964b92247a6160fac8b719bdb22b0d047305fa073bc664e09cf1",
-    "deploy/raspberry-pi/cd.env.example": "f23d48b6afd9aa6033e6c5881d50fc3367bcb150464541b7574bf0d352c18789",
+    "deploy/raspberry-pi/cd.env.example": "ace529a8091903c855abf906562a1a055abd937c84bf330884a186d7a2bd4d4e",
     "deploy/raspberry-pi/ceilometer-dashboard.service": "869a2b00c28090011fb971c8451edadd2b32300cd9b3948a240a42c3ea3ae535",
     "deploy/raspberry-pi/ceilometer-update.service": "6a820bc0e9598bd6e667f972b92d3c972401a63e0b0f6cd586af1c77280bf581",
     "deploy/raspberry-pi/ceilometer-update.timer": "7a9968783917964b92247a6160fac8b719bdb22b0d047305fa073bc664e09cf1",
@@ -42,8 +42,8 @@
     "tests/test_stream_client.py": "d1c66024a18e60351b6c40347fcb9906af11e924da8b6384aa841ae977f6d9af",
     "tools/ceilometer.py": "90970d9b71cc8a675288ffd00a92c9b761f2df6c050b2864ba39a484d443a29e"
   },
-  "release_id": "7232ce7401731536607cfc98",
+  "release_id": "2bbd49d29ba855432aaed512",
   "schema": 1,
-  "source_revision": "3b1cf49cd3d5499d8a67ded6bc51d9f3ae9b262f",
+  "source_revision": "9749b4e9d0556a3367c76720495b8aa1ca72069b",
   "target": "pico2"
 }
