@@ -1,4 +1,6 @@
-name: Test, build and publish Pi deployment
+# Publish only. The Pi's systemd timer pulls releases over an outbound connection.
+# This workflow requires no Pi address, SSH secret, webhook or inbound access.
+name: Test, build and publish for Pi polling
 on:
   push:
     branches: [main]
@@ -25,7 +27,13 @@ jobs:
       - name: Toolchain
         run: |
           sudo apt-get update
-          sudo apt-get install -y gcc-arm-none-eabi libnewlib-arm-none-eabi libstdc++-arm-none-eabi-newlib cmake ninja-build libusb-1.0-0-dev
+          sudo apt-get install -y cmake ninja-build libusb-1.0-0-dev
+          # Use the same Arm release as the validated local firmware build.
+          archive=arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi.tar.xz
+          curl --fail --location --retry 3 "https://developer.arm.com/-/media/Files/downloads/gnu/15.2.rel1/binrel/$archive" --output "$RUNNER_TEMP/$archive"
+          echo "597893282ac8c6ab1a4073977f2362990184599643b4c5ee34870a8215783a16  $RUNNER_TEMP/$archive" | sha256sum --check
+          tar -xf "$RUNNER_TEMP/$archive" -C "$RUNNER_TEMP"
+          echo "PICO_TOOLCHAIN_PATH=$RUNNER_TEMP/arm-gnu-toolchain-15.2.rel1-x86_64-arm-none-eabi" >> "$GITHUB_ENV"
           python3 -m venv "$RUNNER_TEMP/venv"
           "$RUNNER_TEMP/venv/bin/pip" install -r software/instrument/requirements.txt
           echo "$RUNNER_TEMP/venv/bin" >> "$GITHUB_PATH"
