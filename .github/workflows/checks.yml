@@ -1,0 +1,19 @@
+name: Software checks
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - run: |
+          python3 -m venv .venv
+          .venv/bin/pip install -r software/instrument/requirements.txt
+          echo "$PWD/.venv/bin" >> "$GITHUB_PATH"
+      - run: cmake -S firmware/pico2 -B build/host -DCEIL_HOST_TESTS=ON
+      - run: cmake --build build/host
+      - run: ctest --test-dir build/host --output-on-failure

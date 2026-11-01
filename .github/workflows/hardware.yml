@@ -1,0 +1,14 @@
+name: Design source checks
+on:
+  push:
+    paths: ['hardware/**', 'scripts/check_design_sources.py', '.github/workflows/hardware.yml']
+  pull_request:
+    paths: ['hardware/**', 'scripts/check_design_sources.py', '.github/workflows/hardware.yml']
+permissions:
+  contents: read
+jobs:
+  references:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - run: python3 scripts/check_design_sources.py

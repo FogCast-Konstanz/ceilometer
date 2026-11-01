@@ -1,0 +1,1640 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "d95e06fe-9a32-4079-a96b-dda432bb6d44")
+	(paper "A4")
+	(lib_symbols
+		(symbol "Mechanical:MountingHole"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom no)
+			(on_board yes)
+			(in_pos_files yes)
+			(duplicate_pin_numbers_are_jumpers no)
+			(property "Reference" "H"
+				(at 0 5.08 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "MountingHole"
+				(at 0 3.175 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Description" "Mounting Hole without connection"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_keywords" "mounting hole"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "ki_fp_filters" "MountingHole*"
+				(at 0 0 0)
+				(show_name no)
+				(do_not_autoplace no)
+				(hide yes)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(symbol "MountingHole_0_1"
+				(circle
+					(center 0 0)
+					(radius 1.27)
+					(stroke
+						(width 1.27)
+						(type default)
+					)
+					(fill
+						(type none)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(junction
+		(at 99.06 39.37)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "5569319d-d1ce-452a-9bc5-a1ca074a3e6a")
+	)
+	(junction
+		(at 95.885 41.91)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "d450f186-f844-4749-bf59-75380c8bf9ee")
+	)
+	(wire
+		(pts
+			(xy 90.17 46.99) (xy 120.015 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "02204226-4959-4dae-8343-148a2a6e5bf6")
+	)
+	(wire
+		(pts
+			(xy 164.465 46.99) (xy 170.815 46.99)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "06c25d84-5652-4e51-ade9-1d35918e617b")
+	)
+	(wire
+		(pts
+			(xy 90.17 116.84) (xy 120.015 116.84)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1eef42f5-a8c3-4613-8bb8-4f0c67cfbd77")
+	)
+	(wire
+		(pts
+			(xy 90.17 39.37) (xy 120.015 39.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "1f6a7866-7a51-4109-aa21-9b6947ba09ef")
+	)
+	(wire
+		(pts
+			(xy 107.95 99.06) (xy 120.015 99.06)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2b89afa9-df3b-47ec-8d04-4545bebc1b39")
+	)
+	(wire
+		(pts
+			(xy 90.17 154.94) (xy 120.015 154.94)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2da55e17-2ae3-4adb-838a-9874ebc419c1")
+	)
+	(wire
+		(pts
+			(xy 90.17 152.4) (xy 120.015 152.4)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "2f6f6063-06fb-4d2b-94e6-3b964e1c95b1")
+	)
+	(wire
+		(pts
+			(xy 90.17 44.45) (xy 120.015 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "390c29e1-6ee2-48ca-947c-837bc9e4a8c9")
+	)
+	(wire
+		(pts
+			(xy 176.53 39.37) (xy 164.465 39.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "40923e06-f173-46be-aac8-b61d4af6d749")
+	)
+	(wire
+		(pts
+			(xy 90.17 70.485) (xy 120.015 70.485)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "42335c30-60d2-4f49-abd4-520c8db0a9c2")
+	)
+	(wire
+		(pts
+			(xy 90.17 41.91) (xy 120.015 41.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "4fc343ee-8f1a-45bf-9d03-95e6f3f285c7")
+	)
+	(wire
+		(pts
+			(xy 120.015 60.325) (xy 107.95 60.325)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "58ecca1c-bd9c-48f1-a25a-358f8184707f")
+	)
+	(wire
+		(pts
+			(xy 95.885 109.22) (xy 95.885 41.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "5fdd36f7-0c84-437c-b3b0-e100691a5856")
+	)
+	(wire
+		(pts
+			(xy 120.015 109.22) (xy 95.885 109.22)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6387a3e1-b0e5-4705-9552-aa84c70fa97a")
+	)
+	(wire
+		(pts
+			(xy 107.95 137.16) (xy 120.015 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "6f3f70f7-d309-4eb4-ba41-db7d4d1d49e4")
+	)
+	(wire
+		(pts
+			(xy 102.235 29.21) (xy 90.17 29.21)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "78f71740-e5ef-477b-98bc-b015aa12f41a")
+	)
+	(wire
+		(pts
+			(xy 90.17 78.105) (xy 120.015 78.105)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "7fe235bd-0fa4-46f3-85a7-57384514ef10")
+	)
+	(wire
+		(pts
+			(xy 107.95 96.52) (xy 120.015 96.52)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "809733da-22e4-4ae3-a6a1-c9cee674400b")
+	)
+	(wire
+		(pts
+			(xy 90.17 144.78) (xy 120.015 144.78)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "871b3e61-f51b-4cd5-8128-559c97e7f14d")
+	)
+	(wire
+		(pts
+			(xy 90.17 114.3) (xy 120.015 114.3)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "8de2af3a-14d0-44c6-a3d7-05c6707ab1e8")
+	)
+	(wire
+		(pts
+			(xy 176.53 44.45) (xy 164.465 44.45)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "9158a1a6-7ee5-4011-b2a6-f216a47a7b45")
+	)
+	(wire
+		(pts
+			(xy 170.815 137.16) (xy 164.465 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "95c3cce5-6bce-4f1b-a3bc-d3134b5092d6")
+	)
+	(wire
+		(pts
+			(xy 90.17 80.645) (xy 120.015 80.645)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "a03f6152-153b-4654-8e7d-b419a99c18c7")
+	)
+	(wire
+		(pts
+			(xy 176.53 41.91) (xy 164.465 41.91)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b6268155-d44c-4797-98b6-d4271ec1ad01")
+	)
+	(wire
+		(pts
+			(xy 170.815 46.99) (xy 170.815 137.16)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b754e794-4459-4463-8ec5-556df7fb6b9c")
+	)
+	(wire
+		(pts
+			(xy 90.17 111.76) (xy 120.015 111.76)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b7a6c61a-4421-4283-a030-13ff305393c8")
+	)
+	(wire
+		(pts
+			(xy 90.17 73.025) (xy 120.015 73.025)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "ba21bd60-8b04-4911-b0a0-65990ac4c62a")
+	)
+	(wire
+		(pts
+			(xy 99.06 106.68) (xy 99.06 39.37)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bbd687c2-b7a4-43bc-bef2-17e7fd8b4b59")
+	)
+	(wire
+		(pts
+			(xy 107.95 101.6) (xy 120.015 101.6)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bdb4ab5c-6ada-45f6-8ee7-409b9cecfb94")
+	)
+	(wire
+		(pts
+			(xy 90.17 147.32) (xy 120.015 147.32)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c185de80-f011-48d4-a852-f18b3f6038fa")
+	)
+	(wire
+		(pts
+			(xy 107.95 62.865) (xy 120.015 62.865)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "c2f90132-0c2c-48e4-9e06-295d92ad3929")
+	)
+	(wire
+		(pts
+			(xy 120.015 106.68) (xy 99.06 106.68)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cbbfab97-d8ce-4458-bef4-a59cadbd2c50")
+	)
+	(wire
+		(pts
+			(xy 102.235 26.67) (xy 90.17 26.67)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "cf6d1877-b7c6-4b2a-b4aa-8ea9095156f4")
+	)
+	(wire
+		(pts
+			(xy 90.17 67.945) (xy 120.015 67.945)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e3e92eeb-38ca-49b1-b1e5-959d7cae55a9")
+	)
+	(wire
+		(pts
+			(xy 102.235 31.75) (xy 90.17 31.75)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "e44577a2-5e5f-46a1-9050-70b962af08f5")
+	)
+	(wire
+		(pts
+			(xy 90.17 75.565) (xy 120.015 75.565)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "f2461c44-2491-4055-89c3-6e81761af398")
+	)
+	(label "+3.3VD"
+		(at 107.95 62.865 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "0c977b4d-49f6-4e8d-91b6-8ceee5680279")
+	)
+	(label "+5V"
+		(at 107.95 60.325 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2daf2352-46cd-4b53-adc5-62d1c1403e0a")
+	)
+	(label "+3.3VD"
+		(at 176.53 41.91 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "406bad3b-c8e2-444f-8339-37ef479c5745")
+	)
+	(label "+5V"
+		(at 107.95 96.52 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "44f67700-6d4a-45ce-9f31-4f46121ce0ad")
+	)
+	(label "+5V"
+		(at 176.53 39.37 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4ee343ab-f5b8-4ea9-be16-0d0184b78298")
+	)
+	(label "+5V"
+		(at 107.95 137.16 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "75d4b1de-3044-408b-9cbe-a14d8abe87b8")
+	)
+	(label "+3.3VA"
+		(at 176.53 44.45 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "a527cfce-cdd5-43f0-84f2-162a193fce32")
+	)
+	(label "+3.3VA"
+		(at 107.95 99.06 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a939127e-b4d1-4ecd-b59b-b0b2196e9dd0")
+	)
+	(label "+3.3VD"
+		(at 107.95 101.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "cebeb34b-8737-45cc-81f9-5ed00cb138ed")
+	)
+	(label "+3.3VD"
+		(at 102.235 29.21 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d4e5a56f-3a86-430d-b8da-3bac49a06842")
+	)
+	(label "+3.3VA"
+		(at 102.235 31.75 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "d8713410-60f0-49c7-bc11-06b8fe00e85c")
+	)
+	(label "+5V"
+		(at 102.235 26.67 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "ebb6b29b-74b2-4ab3-aefb-0d889cfd128d")
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 40.005 178.435 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "5bde31fc-71ca-4c28-b9ad-f0718f64965f")
+		(property "Reference" "H1"
+			(at 43.18 177.1649 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 43.18 179.7049 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_2.5mm"
+			(at 40.005 178.435 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 40.005 178.435 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 40.005 178.435 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "Ceilometer-Mainboard"
+				(path "/d95e06fe-9a32-4079-a96b-dda432bb6d44"
+					(reference "H1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 59.055 178.435 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "624d1400-f691-49ac-8f2d-4e7cad776b3e")
+		(property "Reference" "H3"
+			(at 62.23 177.1649 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 62.23 179.7049 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_2.5mm"
+			(at 59.055 178.435 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 59.055 178.435 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 59.055 178.435 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "Ceilometer-Mainboard"
+				(path "/d95e06fe-9a32-4079-a96b-dda432bb6d44"
+					(reference "H3")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 40.005 184.15 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "9303c79e-7aac-4a1c-8a04-06887d4dae75")
+		(property "Reference" "H2"
+			(at 43.18 182.8799 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 43.18 185.4199 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_2.5mm"
+			(at 40.005 184.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 40.005 184.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 40.005 184.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "Ceilometer-Mainboard"
+				(path "/d95e06fe-9a32-4079-a96b-dda432bb6d44"
+					(reference "H2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Mechanical:MountingHole")
+		(at 59.055 184.15 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom no)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "a0dbd23d-72cb-478f-809d-b4d9f792a735")
+		(property "Reference" "H4"
+			(at 62.23 182.8799 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Value" "MountingHole"
+			(at 62.23 185.4199 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(property "Footprint" "MountingHole:MountingHole_2.5mm"
+			(at 59.055 184.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 59.055 184.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" "Mounting Hole without connection"
+			(at 59.055 184.15 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(instances
+			(project "Ceilometer-Mainboard"
+				(path "/d95e06fe-9a32-4079-a96b-dda432bb6d44"
+					(reference "H4")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet
+		(at 120.015 57.785)
+		(size 44.45 27.94)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "0ec86ce3-b4a4-4546-a362-746d1e09da2b")
+		(property "Sheetname" "TEC driver 1"
+			(at 120.015 57.0734 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "TEC_driver.kicad_sch"
+			(at 120.015 86.3096 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "TEC_MISO" output
+			(at 120.015 75.565 180)
+			(uuid "82f78a11-7ae6-4cf2-9c05-ad69f7086499")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "TEC_MOSI" input
+			(at 120.015 73.025 180)
+			(uuid "545c0759-3f89-49d6-9c35-5ae88dad0a6c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "TEC_CLK" input
+			(at 120.015 70.485 180)
+			(uuid "5bc19b0f-a6f8-48cf-95a0-06bfd482e53a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "~{TEC_CS}" input
+			(at 120.015 67.945 180)
+			(uuid "3cf7fc44-895a-48f3-ad95-78af92e32d82")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "~{TEC_FAULT}" output
+			(at 120.015 80.645 180)
+			(uuid "e0b3fe7a-2a44-4836-9e1c-7bca585d9fa2")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "TEC_AOUT" output
+			(at 120.015 78.105 180)
+			(uuid "11b9a4f7-04f5-49b5-a68a-a0c2e3e5be47")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "+3.3VD" input
+			(at 120.015 62.865 180)
+			(uuid "7311d821-4ab1-4125-9997-72a4a95b119c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "+5V" input
+			(at 120.015 60.325 180)
+			(uuid "ff21d152-9451-48dc-80af-9634a4d3481c")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "Ceilometer-Mainboard"
+				(path "/d95e06fe-9a32-4079-a96b-dda432bb6d44"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 120.015 93.98)
+		(size 44.45 27.94)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "1dfafff8-e6eb-41db-83e5-79de64d0dc35")
+		(property "Sheetname" "Laser Driver"
+			(at 120.015 93.2684 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "laser_driver.kicad_sch"
+			(at 120.015 122.5046 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "+3.3VA" input
+			(at 120.015 99.06 180)
+			(uuid "0fd55ce8-0019-42ea-a732-b54a636495bf")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "+3.3VD" input
+			(at 120.015 101.6 180)
+			(uuid "432cc5cd-462d-4366-81e5-b270df716921")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "+5V" input
+			(at 120.015 96.52 180)
+			(uuid "ca3ca8d5-dc3e-466d-84a1-64c919be5772")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "LD_DAC_SCL" input
+			(at 120.015 106.68 180)
+			(uuid "a7481a57-ae46-4bbe-91e5-903601682e28")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "LD_DAC_SDA" bidirectional
+			(at 120.015 109.22 180)
+			(uuid "9031d5ac-64c2-48ca-86c2-c460630a6cd0")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "LD_SWITCH" input
+			(at 120.015 111.76 180)
+			(uuid "79735fac-8743-45eb-8cef-7f94ee0a3fb5")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "~{LD_ERROR}" output
+			(at 120.015 114.3 180)
+			(uuid "23b9700b-b30d-4979-b1c6-e860816f0fea")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "V_I_LD_SENSE" output
+			(at 120.015 116.84 180)
+			(uuid "e2ed6af1-c306-4013-ac3f-e78969fc0843")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "Ceilometer-Mainboard"
+				(path "/d95e06fe-9a32-4079-a96b-dda432bb6d44"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 120.015 36.195)
+		(size 44.45 13.97)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "2fe11010-3490-4bc9-bf21-23d53a0fd025")
+		(property "Sheetname" "Power Supply"
+			(at 120.015 35.4834 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "power_supply.kicad_sch"
+			(at 120.015 50.7496 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "+3.3VA" output
+			(at 164.465 44.45 0)
+			(uuid "78a317f0-9265-4578-b763-5583b553280a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "+5V" output
+			(at 164.465 39.37 0)
+			(uuid "50470fb2-9831-4de8-8ce8-c428f364b6fe")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "+3.3VD" output
+			(at 164.465 41.91 0)
+			(uuid "bf2bbee8-d0a3-44d4-80b0-286becaa58dd")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SIPM_BIAS" output
+			(at 164.465 46.99 0)
+			(uuid "6dd4400c-aabd-4811-950c-8511a19ebc06")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "BIAS_DAC_SCL" input
+			(at 120.015 39.37 180)
+			(uuid "92253933-83ce-405a-9edc-db646f385992")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "BIAS_DAC_SDA" bidirectional
+			(at 120.015 41.91 180)
+			(uuid "76110045-f248-46e3-a154-24bc4ea6ba41")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "BIAS_IMON" output
+			(at 120.015 44.45 180)
+			(uuid "29b880d8-7606-43ca-8e73-a7d82bbca459")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "~{BIAS_SHDN}" input
+			(at 120.015 46.99 180)
+			(uuid "186e94fe-3e4f-4b67-92b2-2136e10940c4")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(instances
+			(project "Ceilometer-Mainboard"
+				(path "/d95e06fe-9a32-4079-a96b-dda432bb6d44"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 120.015 133.35)
+		(size 44.45 26.67)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "ba4c18a8-0c29-424a-a9a9-cc7f77005036")
+		(property "Sheetname" "Receiver"
+			(at 120.015 132.6384 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "receiver.kicad_sch"
+			(at 120.015 160.6046 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "+5V" input
+			(at 120.015 137.16 180)
+			(uuid "870fbd1b-286a-48a1-b30d-8e3cd5a8aec3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "EXT_SCL" input
+			(at 120.015 144.78 180)
+			(uuid "61a21a3e-4887-4bbd-8e09-d8efe00701cc")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "EXT_SDA" bidirectional
+			(at 120.015 147.32 180)
+			(uuid "4e0dd08c-7ec7-4200-97fa-e2e75b094bc9")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "PULSE+" output
+			(at 120.015 152.4 180)
+			(uuid "47b53a2f-ee85-410b-9ba2-0c0819893a96")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "PULSE-" output
+			(at 120.015 154.94 180)
+			(uuid "5ddf0e84-1a9d-4142-83a7-9114cc688df4")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left)
+			)
+		)
+		(pin "SIPM_BIAS" input
+			(at 164.465 137.16 0)
+			(uuid "7a4dbd7c-2660-4a0f-ad38-662556b5e924")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "Ceilometer-Mainboard"
+				(path "/d95e06fe-9a32-4079-a96b-dda432bb6d44"
+					(page "6")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 40.005 24.13)
+		(size 50.165 135.89)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "f6bffc31-9b55-408b-8908-67eef4595ba0")
+		(property "Sheetname" "Microcontroller"
+			(at 40.005 23.4184 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "microcontroller.kicad_sch"
+			(at 40.005 160.6046 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(pin "DAC_SCL" output
+			(at 90.17 39.37 0)
+			(uuid "046d4fef-fa42-471b-b53e-a60d509c4f9a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "DAC_SDA" bidirectional
+			(at 90.17 41.91 0)
+			(uuid "353398f7-cba0-41d5-b282-5fa3c9de3382")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "EXT_SCL" input
+			(at 90.17 144.78 0)
+			(uuid "03a755d9-247e-4623-8baa-009d7e07a4bd")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "EXT_SDA" bidirectional
+			(at 90.17 147.32 0)
+			(uuid "c7514f57-8e1d-491f-8a3e-e5e81c246892")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SPI_SCK" output
+			(at 90.17 70.485 0)
+			(uuid "0c99a973-7d5a-4fd0-bd70-3deb9f6222ea")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SPI_MISO" input
+			(at 90.17 75.565 0)
+			(uuid "35d266d5-b093-46eb-bcf3-94c5dc92326d")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SPI_MOSI" output
+			(at 90.17 73.025 0)
+			(uuid "94c65fdc-d29b-4ffe-948d-e9bf30810898")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "SPI_CSn" output
+			(at 90.17 67.945 0)
+			(uuid "c2c16e4a-9a81-4ff8-95a0-6154138ac903")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "PULSE+" input
+			(at 90.17 152.4 0)
+			(uuid "e73ffd98-a15a-4b56-9972-af43af229b62")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "PULSE-" input
+			(at 90.17 154.94 0)
+			(uuid "260efc65-3001-42a4-b423-c4bbca27e5a1")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "LD_SWITCH" output
+			(at 90.17 111.76 0)
+			(uuid "ad09a614-e75d-41d5-9dcf-9cd0c4a88065")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "BIAS_SENSE" input
+			(at 90.17 44.45 0)
+			(uuid "03d9d784-1415-4d40-a3b9-fcdfba52166b")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "LD_I_SENSE" input
+			(at 90.17 116.84 0)
+			(uuid "8223d475-3784-416a-a254-558b5948424a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "TEC_SENSE" input
+			(at 90.17 78.105 0)
+			(uuid "b16936cc-2b3d-46f4-aa64-508a2de2b2c3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "~{BIAS_SHDN}" output
+			(at 90.17 46.99 0)
+			(uuid "efa536e8-6ad8-45cb-80ff-2920047129e4")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "~{LD_ERROR}" input
+			(at 90.17 114.3 0)
+			(uuid "bf374f32-cd86-4f66-a1d2-80f0c3c6262f")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "~{TEC_FAULT}" input
+			(at 90.17 80.645 0)
+			(uuid "3f299e36-484f-4170-ba3d-2c1f88faf469")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "+3.3VA" input
+			(at 90.17 31.75 0)
+			(uuid "c75dafc8-aeed-4fc9-a543-9834c03b3bc3")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "+5V" input
+			(at 90.17 26.67 0)
+			(uuid "69cd8fde-859d-4566-9e1d-62eeecef9421")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(pin "+3.3VD" input
+			(at 90.17 29.21 0)
+			(uuid "08383ee5-8a04-44fa-81f5-eebefe25b83a")
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(instances
+			(project "Ceilometer-Mainboard"
+				(path "/d95e06fe-9a32-4079-a96b-dda432bb6d44"
+					(page "5")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

@@ -1,0 +1,8 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "Driver_Laser") (type "KiCad") (uri "${KIPRJMOD}/symbols/Driver_Laser.kicad_sym") (options "") (descr ""))
+	(lib (name "Comparror_usr") (type "KiCad") (uri "${KIPRJMOD}/symbols/Comparror_usr.kicad_sym") (options "") (descr ""))
+	(lib (name "LT3571") (type "KiCad") (uri "${KIPRJMOD}/symbols/LT3571.kicad_sym") (options "") (descr "Analog Devices LT3571 APD bias converter"))
+	(lib (name "RF_Amplifier_usr") (type "Unknown SCH_FILE_T value: 12") (uri "${KIPRJMOD}/symbols/RF_Amplifier_usr.kicad_sym") (options "") (descr ""))
+	(lib (name "SIPM_usr") (type "KiCad") (uri "${KIPRJMOD}/symbols/SIPM_usr.kicad_sym") (options "") (descr ""))
+)

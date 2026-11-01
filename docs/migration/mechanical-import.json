@@ -1,0 +1,176 @@
+[
+  {
+    "source": "Mechanik\\Ceilometer-Optikplatte.dxf",
+    "destination": "hardware/mechanical/cad/exchange/Ceilometer-Optikplatte.dxf",
+    "sha256": "7e21a93d35f33e7337b38a597368c95a7cb47433f896fe8f6cee497c717516e4",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Ceilometer-Rahmen v9.step",
+    "destination": "hardware/mechanical/cad/exchange/Ceilometer-Rahmen v9.step",
+    "sha256": "2d6ac4d9692fe6ac99619e12d99d97249b11ab5838feef280c387e514d362aa0",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Ceilometer-Rahmen Zeichnung v3.pdf",
+    "destination": "hardware/mechanical/drawings/Ceilometer-Rahmen Zeichnung v3.pdf",
+    "sha256": "045cb4f460379a8264912c7d13937f016c35b806caf009a2804c0b71965c9001",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Endhalter.3mf",
+    "destination": "hardware/mechanical/printing/Endhalter.3mf",
+    "sha256": "b3a3cf788f7b82e00776ce0aaaa8f0bd6de16b73bf28ebbb8934c96da7508843",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Endhalter.gcode.3mf",
+    "destination": "hardware/mechanical/printing/Endhalter.gcode.3mf",
+    "sha256": "4128c367471649513bf4c4a22eea768d48086ac90a67d63f8c8d2f168bfc3605",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Endhalter.stl",
+    "destination": "hardware/mechanical/cad/meshes/Endhalter.stl",
+    "sha256": "3ee33dd41c04abb804ff2bd51b70f679bd1cfbb739352e8d9a796c8ba6858bcf",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Endhalter_plate_2.gcode.3mf",
+    "destination": "hardware/mechanical/printing/Endhalter_plate_2.gcode.3mf",
+    "sha256": "0d6387c584f773c93da555d492cf0cba76326311e5b829632dcddc5f3025c24b",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Laser-Clamp.stl",
+    "destination": "hardware/mechanical/cad/meshes/Laser-Clamp.stl",
+    "sha256": "43f20573180dc25bbbcb30d1894b5da02c9a521ccc3983a6b1a2794e168710a1",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Receiver-Mount.stl",
+    "destination": "hardware/mechanical/cad/meshes/Receiver-Mount.stl",
+    "sha256": "1078dc8c15a7309904f26bc6e8cfa9d7e22177980823793786ad3b8bb5255b46",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Rohrzentrierer.stl",
+    "destination": "hardware/mechanical/cad/meshes/Rohrzentrierer.stl",
+    "sha256": "f6d7870ae2f385504c1b25a45258ce1ab2d6cb4c8c6157f312bd4dcde97ec0c7",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Spannring.stl",
+    "destination": "hardware/mechanical/cad/meshes/Spannring.stl",
+    "sha256": "4d57899dd793b3ed9c732c828a6c638818bb6b53a719c15352e3d0bc31668dc5",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Spiegelhalteblock.3mf",
+    "destination": "hardware/mechanical/printing/Spiegelhalteblock.3mf",
+    "sha256": "68f4bbe0347fbedd5259e56a5db38b21123349bc16bba310f72855dcebcbb35c",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Spiegelhalteblock.stl",
+    "destination": "hardware/mechanical/cad/meshes/Spiegelhalteblock.stl",
+    "sha256": "8cce177f914b2bd9c86abde5285400d49117379ded60123dec57c6ede45dfd46",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Strebenhalter.3mf",
+    "destination": "hardware/mechanical/printing/Strebenhalter.3mf",
+    "sha256": "0291717dc837581725afbf83b0711815371a31c84cb17682a9a9308957be1358",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Strebenhalter.gcode.3mf",
+    "destination": "hardware/mechanical/printing/Strebenhalter.gcode.3mf",
+    "sha256": "a5bc6248338a5bf9cbdbac18f8264846b72789ed7cf8bbba1418622b1d08ccf8",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Strebenhalter.stl",
+    "destination": "hardware/mechanical/cad/meshes/Strebenhalter.stl",
+    "sha256": "191ccc63ca5b38ce0c817cd75d585249a074b98c801c356a4bf3f7b3dfbff476",
+    "deduplicated": false
+  },
+  {
+    "source": "Mechanik\\Transmitter-Mount.stl",
+    "destination": "hardware/mechanical/cad/meshes/Transmitter-Mount.stl",
+    "sha256": "1eb098fcdf1b83d4f73ee7a8ec420b3ac3b6674e1c8d11508e4b4761cc8b0237",
+    "deduplicated": false
+  },
+  {
+    "source": "Teleskopdesign\\Ceilometer-Optikplatte.dxf",
+    "destination": "hardware/mechanical/cad/exchange/Ceilometer-Optikplatte.dxf",
+    "sha256": "7e21a93d35f33e7337b38a597368c95a7cb47433f896fe8f6cee497c717516e4",
+    "deduplicated": true
+  },
+  {
+    "source": "Teleskopdesign\\Ceilometer-Rahmen v9.step",
+    "destination": "hardware/mechanical/cad/exchange/Ceilometer-Rahmen v9.step",
+    "sha256": "2d6ac4d9692fe6ac99619e12d99d97249b11ab5838feef280c387e514d362aa0",
+    "deduplicated": true
+  },
+  {
+    "source": "Teleskopdesign\\Ceilometer-Rahmen Zeichnung v3.pdf",
+    "destination": "hardware/mechanical/drawings/Ceilometer-Rahmen Zeichnung v3.pdf",
+    "sha256": "045cb4f460379a8264912c7d13937f016c35b806caf009a2804c0b71965c9001",
+    "deduplicated": true
+  },
+  {
+    "source": "Teleskopdesign\\Endhalter.stl",
+    "destination": "hardware/mechanical/cad/meshes/Endhalter.stl",
+    "sha256": "3ee33dd41c04abb804ff2bd51b70f679bd1cfbb739352e8d9a796c8ba6858bcf",
+    "deduplicated": true
+  },
+  {
+    "source": "Teleskopdesign\\Mirror Cell Lever Load Study 1.html",
+    "destination": "hardware/mechanical/analysis/telescope/Mirror Cell Lever Load Study 1.html",
+    "sha256": "5fb50b56974889d7fa432afb6573a31adf0815bb98e34e1c0faeb0079c15dca5",
+    "deduplicated": false
+  },
+  {
+    "source": "Teleskopdesign\\Mirror Cell v3.avi",
+    "destination": "hardware/mechanical/analysis/telescope/Mirror Cell v3.avi",
+    "sha256": "6043579f6fadd12126b5e15318e89b50331089bf681a0361ac7d38184abee929",
+    "deduplicated": false
+  },
+  {
+    "source": "Teleskopdesign\\Mirror Cell v4.avi",
+    "destination": "hardware/mechanical/analysis/telescope/Mirror Cell v4.avi",
+    "sha256": "db4203d141161eaf246d9219b1d630c35545ad355d1376ec767a2cc0fc8227d5",
+    "deduplicated": false
+  },
+  {
+    "source": "Teleskopdesign\\mounting.bmp",
+    "destination": "hardware/mechanical/analysis/telescope/mounting.bmp",
+    "sha256": "d50c9ac7420d180e77a936a1161f1affa7494b2e769c8689a5a3c0df84973ca3",
+    "deduplicated": false
+  },
+  {
+    "source": "Teleskopdesign\\Screenshot 2025-12-16 205209.png",
+    "destination": "hardware/mechanical/analysis/telescope/Screenshot 2025-12-16 205209.png",
+    "sha256": "5525880c335edea4bf2f2f1a6af4f492726a227f7a4fa83353bc2a048c61f4cd",
+    "deduplicated": false
+  },
+  {
+    "source": "Teleskopdesign\\Screenshot 2025-12-17 182729.png",
+    "destination": "hardware/mechanical/analysis/telescope/Screenshot 2025-12-17 182729.png",
+    "sha256": "9ab477b741be740028ce3247c50d7ab7e9ca526e0f05ff5d80d981df9809036c",
+    "deduplicated": false
+  },
+  {
+    "source": "Mockup\\Mockup Zeichnung v0.pdf",
+    "destination": "hardware/mechanical/analysis/mockup/Mockup Zeichnung v0.pdf",
+    "sha256": "ac1c8d8978b32a8433e81e3952efa25ce55d3e66dfff3e427d43c8ebe493c756",
+    "deduplicated": false
+  },
+  {
+    "source": "Mockup\\Mockup-Dach.png",
+    "destination": "hardware/mechanical/analysis/mockup/Mockup-Dach.png",
+    "sha256": "e03d2e6ac98b4ed57599a3a635be670c907c17519fc05a2f50d67b98a490ae4b",
+    "deduplicated": false
+  }
+]

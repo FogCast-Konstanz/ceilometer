@@ -1,133 +1,74 @@
-# Pico 2 ceilometer firmware
+# Fogcast ceilometer
 
-Pico SDK C firmware for the RP2350 PRN-CW lidar mainboard. This is an incremental
-peripheral-validation and single-core finite-burst PRN acquisition implementation. It compiles to
-a USB CDC controlled Pico 2 image; atmospheric accuracy and 10 MHz DMA timing
-have **not** been qualified on hardware.
+Monorepo for the PRN-CW laser ceilometer: RP2350 Pico 2 firmware, direct-open
+bring-up GUI, Raspberry Pi instrument software, electronics and mechanical design.
 
-Implemented: continuous GP5/PWM2 rising-edge counting, PWM3-paced 32-bit DMA
-snapshots, exact 1023-chip PIO PRN at 10 Mchip/s, GP6 chip and GP7 frame strobes,
-finite 1-16-frame bursts, integration across bursts, modulo differences, 64-bit
-DC-rejected correlation, paged raw/histogram/profile retrieval, test pulses,
-AD5693R DACs, MCP9800, externally powered single-drop DS18B20, and LT8722 SPI
-control with CRC/ACK checks, soft start, and DS18B20 PID temperature regulation.
-Laser operation requires valid feedback inside its adjustable temperature window (default 10-30 C). UART stdio is disabled.
-SiPM bias tracks receiver temperature for a nominal 10 V overvoltage, with a
-50 V commanded ceiling and invalid-feedback shutdown. See [sipm-bias.md](docs/sipm-bias.md)
-for calibration and the hardware protection needed for a physical 50 V ceiling.
-See [temperature-control.md](docs/temperature-control.md) for setup and fault behavior.
+| Directory | Contents |
+|---|---|
+| [firmware/pico2](firmware/pico2) | C/PIO firmware and portable firmware tests |
+| [software/bringup](software/bringup) | HTML/Web Serial diagnostics GUI, works from file:// |
+| [software/instrument](software/instrument) | Python `fogcast` package, recorder, processing and Pi dashboard |
+| [hardware/electronics](hardware/electronics) | KiCad mainboard, project-local libraries, LTspice simulations |
+| [hardware/mechanical](hardware/mechanical) | CAD exchange/mesh files, drawings, print projects and studies |
+| [interfaces](interfaces) | USB protocol and recorded measurement format |
+| [analysis](analysis) | Bench evidence, calibration and plotting scripts |
+| [docs](docs) | Architecture, bring-up, operation and laser safety |
+| [deploy](deploy) | Pi services and checksummed release/update tooling |
 
-There are 52 persistent, validated parameters, including adjustable temperature
-windows and target, and 108 timestamped telemetry fields. Start with the
-[parameter plan](docs/parameters-and-telemetry-plan.md),
-[storage/commands](docs/parameter-storage.md) and
-[telemetry inventory](docs/telemetry-inventory.md).
+## Get started
 
-The schematics override the brainstorm pin suggestions. Read
-[hardware.md](docs/hardware.md), [protocol.md](docs/protocol.md), and
-[validation.md](docs/validation.md) before bring-up.
+Use Git LFS for the binary CAD, office and video sources (`git lfs pull` after
+cloning). The monorepo preserves firmware history and the `pre-monorepo-0.6.4` tag.
+The original firmware checkout and OneDrive design folder were left intact.
 
-## Repeated PRN measurements
+Open `software/bringup/index.html` in desktop Chrome/Edge for USB bring-up.
+After editing the GUI, run `python software/bringup/build_bundle.py`.
+Regenerate parameter/telemetry metadata with `python software/bringup/update_metadata.py`.
 
-Firmware 0.6.0 restores the single-core finite-DMA architecture. The common
-hardware TX/RX start, per-burst warmup discard, 1023/4095-chip selection and
-roughly one second of accepted exposure feed CRC-protected result downloads.
-Sensor servicing and profile downloads introduce deliberate gaps. The Pi client
-records accepted exposure and elapsed time separately. See
-[acquisition behavior](docs/continuous-acquisition.md) for limits and qualification.
-The GUI starts repeated dark/laser acquisition; Stop disables all outputs.
+Install instrument software in a Python environment:
 
-## Web control GUI
-
-Open `gui/index.html` directly in desktop Chrome or Edge. Alternatively, run
-`python gui/serve.py` and open **http://127.0.0.1:8765**. Connect directly to the Pico 2 USB CDC port, or use the clearly
-marked demo mode without hardware. The interface provides board bring-up
-controls, live WebGL plots adapted from the RDS GUI, all parameter/telemetry
-inventories, fault diagnostics, dark captures and CSV/JSON exports.
-See [GUI instructions](gui/README.md). No frontend build or cloud service is needed.
-
-## Build
-
-Install Pico SDK >=2.3 with TinyUSB, Arm GNU toolchain, CMake, and Ninja. Tested
-locally with SDK 2.3.0 and Arm GNU 15.2.1, targeting `pico2` / `rp2350-arm-s`.
-
-```powershell
-$env:PICO_SDK_PATH = 'C:/Users/MarianKeller/.pico-sdk/sdk/2.3.0'
-cmake -S . -B build -G Ninja -DPICO_BOARD=pico2 -DPICO_TOOLCHAIN_PATH=C:/Users/MarianKeller/.pico-sdk/toolchain/15_2_Rel1
-cmake --build build
+```sh
+python -m pip install -e software/instrument
+ceilometer-dashboard --demo --http-port 8081
+# USB instrument (starts disabled):
+ceilometer-dashboard auto --listen 127.0.0.1 --http-port 8080
 ```
 
-If CMake cannot locate picotool, pass
-`-Dpicotool_DIR=C:/Users/MarianKeller/.pico-sdk/picotool/2.3.0/picotool`.
-Load `build/ceilometer.uf2` using BOOTSEL. No board was flashed during development.
+`auto` selects only USB manufacturer Fogcast/product Fogcast Ceilometer; other
+Picos are ignored and multiple matching ceilometers are rejected. Use a network
+access token for LAN binding. See [Pi operation](docs/operation/pi-dashboard.md).
 
-Default builds keep laser, bias, and TEC power control disabled. After electrical
-qualification, opt in separately using `-DCEIL_ENABLE_LASER=ON`,
-`-DCEIL_ENABLE_BIAS=ON`, or `-DCEIL_ENABLE_TEC=ON`. Laser uses the persistent `laser_max_code` parameter (0-65535, default32505; zero disables arming). Bias still uses the build setting `CEIL_BIAS_MAX_CODE`. They are raw DAC ceilings, not current or voltage calibrations. Never
-use the ADC's nominal INA293 gain as a validated laser-current measurement.
+## Build and test
 
-## First connection
+```sh
+cmake -S firmware/pico2 -B build/host -DCEIL_HOST_TESTS=ON
+cmake --build build/host
+ctest --test-dir build/host --output-on-failure
 
-Use the Pico 2 board's actual USB connector. The mainboard's proprietary J4/J5
-USB-C shaped receiver link is not a PC USB port.
-
-```powershell
-python -m pip install -r tools/requirements.txt
-python tools/ceilometer.py COM7 command get_info
-python tools/ceilometer.py COM7 capture --frames 16 --output profile.csv
+cmake -S firmware/pico2 -B build/firmware -DPICO_BOARD=pico2 -DPICO_SDK_PATH=/path/to/pico-sdk
+cmake --build build/firmware
 ```
 
-`capture` keeps GP4 low, emits diagnostic PRN data on GP13, and exercises the digital receiver path. To measure the
-counter without an attached receiver, use a correctly isolated GP12-to-GP5 bench
-loopback and `python tools/benchmark.py COM7`. The client closes each CLI session
-with `stop`. For a commissioned emitting session, use the `Ceilometer` class in
-one persistent process, wait for valid temperature, arm, set the calibrated laser
-DAC, start, and poll state at least every second; always stop in `finally`.
+Pico SDK 2.3.0 and an Arm toolchain are required for the Pico build. Power-driver
+build flags default OFF. The commissioned production configuration uses
+`-DCEIL_ENABLE_LASER=ON -DCEIL_ENABLE_BIAS=ON -DCEIL_ENABLE_TEC=ON -DCEIL_BIAS_MAX_CODE=60210`.
+Firmware remains 0.6.4, 500 MHz/requested 1.5 V, with the finite-burst architecture,
+per-burst warmup exclusion, watchdog and temperature/USB interlocks. Changing the
+repository layout does not qualify acquisition timing or optical performance.
 
-## Portable tests
+## Releases
 
-```powershell
-cmake -S . -B build-host -G Ninja -DCEIL_HOST_TESTS=ON
-cmake --build build-host
-ctest --test-dir build-host --output-on-failure
+```sh
+python deploy/releases/package_release.py --output build/ceilometer-release.tar.gz
 ```
 
-Tests check the full PRN state cycle, all autocorrelation lags, packing across 32
-frames, counter wrap, histogram overflow rejection, delayed return polarity,
-background rejection, range scale, parser framing/recovery/numeric bounds, and
-LT8722 packet CRC/ACK handling. Thermal tests also cover PID limits, temperature
-boundaries, stale/disconnected DS18B20 feedback, and actual command/shutdown paths
-with mocked peripherals. They do not substitute for board measurements.
+The package includes the instrument application, deployment tools, interface
+documentation and built UF2. CAD, live measurements, local configuration and
+firmware source/build directories are excluded. Firmware/instrument/deployment
+changes can publish a deployment; hardware-only edits cannot trigger flashing.
+The Pi applies updates only when disabled and confirmed safe. The running Pi
+installation was not modified by this repository migration.
 
-## Current engineering limits
-
-PIO SMs share a synchronized start. PIO and PWM use **separate ordered software
-writes**, with interrupts masked, so their relative phase is unqualified. DMA
-reads the live PWM counter after arbitration; it does not latch at the bin edge.
-Profiles and range are provisional until phase and latency jitter are measured.
-Integration restarts every <=16 frames, with dead time for processing and sensor
-service. It is not continuous or a calibrated wall-clock integration period.
-
-Runtime chip rates must divide 150 MHz with an integer 15-cycle PIO divider;
-10, 5, 2, and 1 MHz are supported examples. Firmware stays at rated 150 MHz.
-500 MHz and 20 MHz bins are not implemented. No automatic cloud classification,
-optical overlap correction or dual-core
-streaming is claimed. See validation.md for the required next measurements.
-
-The code drives LD_SWITCH low during firmware shutdown/error handling and uses a
-watchdog, driver-error IRQ, temperature checks, and a two-second USB command
-lease. Reset/ROM boot and faults before firmware initialization need a hardware
-pull-down and independent laser-disable mechanism: none is demonstrated by the
-schematic. A stalled PIO can hold its previous pin level until the fault handler
-stops it. Do not enable optical output before those hardware protections exist.
-
-## Raspberry Pi dashboard
-
-[Pi dashboard setup](docs/pi-dashboard.md): run `python3 tools/dashboard.py <USB-port>`
-for browser-based instrument status, continuous measurement and verified
-Enable/Disable controls. The shared controller also powers `tools/measure.py`.
-Service installation files are in `deploy/`; boot/reconnect always stay disabled.
-
-[Continuous deployment](docs/continuous-deployment.md): CI builds a checksummed
-release on the deploy branch; the Pi applies it only while confirmed disabled,
-with targeted Pico flashing, health checks and rollback.
+See [migration record](docs/migration/README.md), [USB protocol](interfaces/usb-protocol.md),
+[acquisition architecture](docs/architecture/continuous-acquisition.md), and
+[clock diagnostics](docs/bringup/operating-clock.md).

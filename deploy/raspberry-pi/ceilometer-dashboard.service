@@ -1,0 +1,28 @@
+[Unit]
+Description=Ceilometer acquisition and web dashboard
+After=local-fs.target
+
+[Service]
+Type=simple
+User=ceilometer
+Group=ceilometer
+SupplementaryGroups=dialout
+WorkingDirectory=/opt/ceilometer-firmware
+EnvironmentFile=/etc/ceilometer/dashboard.env
+Environment=PYTHONPATH=/opt/ceilometer-firmware/software/instrument/src
+ExecStart=/usr/bin/python3 -m fogcast.dashboard --listen 0.0.0.0 --http-port 8080 --output /var/lib/ceilometer/measurements ${CEILOMETER_SERIAL}
+StateDirectory=ceilometer
+StateDirectoryMode=0750
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=10
+KillSignal=SIGTERM
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+UMask=0027
+Environment=PYTHONDONTWRITEBYTECODE=1
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,4 @@
+(version 1)
+(rule Minimum_annular_width_2
+	(constraint annular_width (min 0.1mm))
+)

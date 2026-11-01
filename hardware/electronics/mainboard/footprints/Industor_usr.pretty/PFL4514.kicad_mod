@@ -1,0 +1,122 @@
+(footprint "PFL4514"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Coilcraft PFL4514 Series shielded power inductor, 4.90 x 3.40 mm max, 1.40 mm max height. Datasheet recommended land pattern: 1.14 x 3.68 mm pads on 4.20 mm pitch.")
+	(tags "Coilcraft PFL4514 power inductor shielded")
+	(property "Reference" "L"
+		(at 0 -2.65 0)
+		(layer "F.SilkS")
+		(uuid "e48127a6-2210-43de-89e1-d804c524234d")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "PFL4514"
+		(at 0 2.65 0)
+		(layer "F.Fab")
+		(uuid "04722729-5f68-439e-8162-ba7e0dc7211c")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" "https://www.mouser.de/datasheet/3/995/1/pfl4514.pdf"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "10c633fc-1917-4d76-bd49-554a7a871304")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "20d39c01-648b-4050-b406-183af7e21693")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -1.4 -1.7)
+		(end 1.4 -1.7)
+		(stroke
+			(width 0.15)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "88b13cea-ca0b-4a02-b9c0-ee8184102d8b")
+	)
+	(fp_line
+		(start -1.4 1.7)
+		(end 1.4 1.7)
+		(stroke
+			(width 0.15)
+			(type default)
+		)
+		(layer "F.SilkS")
+		(uuid "36e0bb9b-f10d-4be5-ae41-01e256b554a0")
+	)
+	(fp_rect
+		(start -2.92 -2.09)
+		(end 2.92 2.09)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "34c9e0b3-85bd-463e-898a-3cd47db98582")
+	)
+	(fp_rect
+		(start -2.45 -1.7)
+		(end 2.45 1.7)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "4c990198-3867-4a06-8fc6-fd98977ee93c")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "43589063-196a-4bbc-95f1-af048334dfff")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(pad "1" smd roundrect
+		(at -2.1 0)
+		(size 1.14 3.68)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.12)
+		(uuid "0ce917ca-4a54-4311-81ac-67c33b43a13c")
+	)
+	(pad "2" smd roundrect
+		(at 2.1 0)
+		(size 1.14 3.68)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.12)
+		(uuid "c82959e8-ce65-4722-833e-206f406f24b8")
+	)
+	(embedded_fonts no)
+)

@@ -1,0 +1,127 @@
+(footprint "Broadcom_AFBR-S4P11P012R"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Broadcom AFBR-S4P11P012R NIR dual-channel SiPM, 1.9 x 1.5 mm. Pad centers taken from manufacturer mechanical drawing. Pad sizes are a conservative derived land pattern because the datasheet does not publish a recommended PCB land pattern.")
+	(tags "SiPM photodiode Broadcom AFBR-S4P11P012R NIR")
+	(property "Reference" "REF**"
+		(at 0 -1.6 0)
+		(layer "F.SilkS")
+		(uuid "200890c2-ae00-4bcc-900f-0c8837840dda")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Value" "AFBR-S4P11P012R"
+		(at 0 1.6 0)
+		(layer "F.Fab")
+		(uuid "8f56889c-a206-49be-a953-fd76c6efa39a")
+		(effects
+			(font
+				(size 0.8 0.8)
+				(thickness 0.12)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "4ae7e529-79da-46f4-ae0a-4e5165bc9d7d")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "660f62b6-2c8b-426e-8b22-e1ded5b65356")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_circle
+		(center -1.15 -0.8)
+		(end -1.1 -0.8)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill yes)
+		(layer "F.SilkS")
+		(uuid "01f290db-c5d9-49f3-aedf-1d5d142f1735")
+	)
+	(fp_rect
+		(start -1.2 -1)
+		(end 1.2 1)
+		(stroke
+			(width 0.05)
+			(type default)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "cfb40ff6-c826-4822-84a6-f6ef3eb856c6")
+	)
+	(fp_rect
+		(start -0.95 -0.75)
+		(end 0.95 0.75)
+		(stroke
+			(width 0.1)
+			(type default)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "36d44a15-3ce1-4b97-9c13-a8769a69a5fa")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(layer "F.Fab")
+		(uuid "aa1ffce9-bfdb-4bda-a2bb-0a882e92a955")
+		(effects
+			(font
+				(size 0.55 0.55)
+				(thickness 0.08)
+			)
+		)
+	)
+	(pad "1" smd roundrect
+		(at -0.7 -0.45)
+		(size 0.6 0.3)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.2)
+		(uuid "f1ab8730-fdfe-409a-a5c0-774ffb4aa442")
+	)
+	(pad "2" smd roundrect
+		(at -0.7 0.45)
+		(size 0.6 0.3)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.2)
+		(uuid "e9d75ca6-a17b-4dbe-9311-6bcf78d39d31")
+	)
+	(pad "3" smd roundrect
+		(at 0.7 0.45)
+		(size 0.6 0.3)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.2)
+		(uuid "988ca731-848f-42e2-87a5-bd5a19941657")
+	)
+	(pad "4" smd roundrect
+		(at 0.7 -0.45)
+		(size 0.6 0.3)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(roundrect_rratio 0.2)
+		(uuid "49ca8ff2-d793-4315-a544-2333d5fccdd5")
+	)
+	(embedded_fonts no)
+)

@@ -1,0 +1,41 @@
+kikit separate --source "annotation;ref: B1" Drehrichtungssensor.kicad_pcb Drehrichtungssensor-A.kicad_pcb
+
+kikit separate --source "annotation;ref: B2" Drehrichtungssensor.kicad_pcb Drehrichtungssensor-B.kicad_pcb
+
+kikit separate --source "annotation;ref: B3" Drehrichtungssensor.kicad_pcb Drehrichtungssensor-C.kicad_pcb
+
+kikit panelize ^
+    --layout "grid; rows: 2; cols: 1; space: 2mm" ^
+    --tabs "annotation; width: 2mm; vcount: 2; hcount:0" ^
+    --cuts "mousebites; drill: 0.4mm; spacing: 0.7mm; offset: 0mm; prolong: 0.5mm" ^
+    --framing "frame; width: 5mm; space: 2mm; mintotalheight: 50mm; mintotalwidth: 50mm" ^
+    --tooling "4hole; hoffset: 2.5mm; voffset: 2.5mm; size: 1.5mm" ^
+    --fiducials "3fid; hoffset: 5mm; voffset: 5mm; coppersize: 1mm; opening: 2mm;" ^
+    --post "millradius: 1mm" ^
+    Drehrichtungssensor-A.kicad_pcb  Drehrichtungssensor-A-Panel.kicad_pcb
+
+kikit panelize ^
+    --layout "grid; rows: 2; cols: 2; space: 2mm" ^
+    --tabs "annotation; width: 2mm; vcount: 2; hcount:0" ^
+    --cuts "mousebites; drill: 0.4mm; spacing: 0.7mm; offset: 0mm; prolong: 0.5mm" ^
+    --framing "frame; width: 5mm; space: 2mm; mintotalheight: 45mm; mintotalwidth: 50mm" ^
+    --tooling "4hole; hoffset: 2.5mm; voffset: 2.5mm; size: 1.5mm" ^
+    --fiducials "3fid; hoffset: 5mm; voffset: 5mm; coppersize: 1mm; opening: 2mm;" ^
+    --post "millradius: 1mm" ^
+    Drehrichtungssensor-B.kicad_pcb  Drehrichtungssensor-B-Panel.kicad_pcb
+
+kikit panelize ^
+    --layout "grid; rows: 2; cols: 2; space: 2mm" ^
+    --tabs "annotation; width: 2mm; vcount: 2; hcount:0" ^
+    --cuts "mousebites; drill: 0.4mm; spacing: 0.7mm; offset: 0mm; prolong: 0.5mm" ^
+    --framing "frame; width: 5mm; space: 2mm; mintotalheight: 45mm; mintotalwidth: 50mm" ^
+    --tooling "4hole; hoffset: 2.5mm; voffset: 2.5mm; size: 1.5mm" ^
+    --fiducials "3fid; hoffset: 5mm; voffset: 5mm; coppersize: 1mm; opening: 2mm;" ^
+    --post "millradius: 1mm" ^
+    Drehrichtungssensor-C.kicad_pcb  Drehrichtungssensor-C-Panel.kicad_pcb
+
+kikit fab pcbway --nBoards 2 --no-drc --assembly --schematic Drehrichtungssensor.kicad_sch Drehrichtungssensor-A-Panel.kicad_pcb prod_panel_a
+
+kikit fab pcbway --nBoards 4 --no-drc --assembly --schematic Drehrichtungssensor.kicad_sch Drehrichtungssensor-B-Panel.kicad_pcb prod_panel_b
+
+kikit fab pcbway --nBoards 4 --no-drc --assembly --schematic Drehrichtungssensor.kicad_sch Drehrichtungssensor-C-Panel.kicad_pcb prod_panel_c

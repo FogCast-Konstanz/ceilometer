@@ -1,0 +1,646 @@
+H1 MountingHole MountingHole:MountingHole_2.5mm
+H2 MountingHole MountingHole:MountingHole_2.5mm
+H3 MountingHole MountingHole:MountingHole_2.5mm
+H4 MountingHole MountingHole:MountingHole_2.5mm
+C1 47u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : GND
+C2 47u Capacitor_SMD:C_0805_2012Metric
+  2 : GND
+  1 : Net-(D1-K)
+C3 47u Capacitor_SMD:C_0805_2012Metric
+  2 : GND
+  1 : Net-(D1-K)
+C4 1u Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(D1-K)
+C5 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VA
+  2 : GND
+C6 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VD
+  2 : GND
+C7 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(U2-VREF)
+C8 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(U2-VOUT)
+C9 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VA
+  2 : GND
+C10 8.2n Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(U4-IN+)
+C11 8.2n Capacitor_SMD:C_0402_1005Metric
+  2 : Net-(U4-IN+)
+  1 : Net-(U4-IN-)
+C12 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(U4-IN-)
+D1 ESD321DYAR Diode_SMD:D_SOD-523
+  2 A_2: Net-(D1-A)
+  1 K_1: Net-(D1-K)
+LD1 Laser Diode 940 nm Connector_Molex:Molex_Pico-EZmate_78171-0002_1x02-1MP_P1.20mm_Vertical
+  1 K_1: Net-(D1-A)
+  2 A_2: Net-(D1-K)
+R1 120 Resistor_SMD:R_0402_1005Metric
+  1 : Net-(D1-K)
+  2 : Net-(U1-ADJ)
+R2 200 Resistor_SMD:R_0402_1005Metric
+  2 : GND
+  1 : Net-(U1-ADJ)
+R3 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VA
+  2 : Net-(U2-~{RESET})
+R4 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VA
+  2 : /Laser Driver/LD_DAC_SDA
+R5 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VA
+  2 : /Laser Driver/LD_DAC_SCL
+R6 1 Resistor_SMD:R_0402_1005Metric
+  2 : +3.3VD
+  1 : Net-(U3-VDD)
+R7 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VD
+  2 : /Laser Driver/~{LD_ERROR}
+R8 10k Resistor_SMD:R_0402_1005Metric
+  2 : Net-(U3-AGND1)
+  1 : Net-(U4-IN+)
+R9 40m Resistor_SMD:R_0603_1608Metric
+  2 : GND
+  1 : Net-(U3-AGND1)
+R10 10k Resistor_SMD:R_0402_1005Metric
+  2 : GND
+  1 : Net-(U4-IN-)
+U1 AZ1084 Package_TO_SOT_SMD:TO-263-2
+  3 VI_3: +5V
+  2 VO_2: Net-(D1-K)
+  1 ADJ_1: Net-(U1-ADJ)
+U2 AD5693R Package_SO:MSOP-10_3x3mm_P0.5mm
+  1 VDD_1: +3.3VA
+  2 VLOGIC_2: +3.3VA
+  7 SCL_7: /Laser Driver/LD_DAC_SCL
+  8 SDA_8: /Laser Driver/LD_DAC_SDA
+  4 ~{LDAC}_4: GND
+  5 GND_5: GND
+  6 A0_6: GND
+  10 VOUT_10: Net-(U2-VOUT)
+  9 VREF_9: Net-(U2-VREF)
+  3 ~{RESET}_3: Net-(U2-~{RESET})
+U3 iC-HG30 Driver_Laser:QFN-28-1EP_5x5mm_P0.5mm_EP3.1x3.15mm_ThermalVias
+  14 EN6/LVDS56-_14: /Laser Driver/LD_SWITCH
+  15 EN5/LVDS56+_15: /Laser Driver/LD_SWITCH
+  16 EN4/LVDS34-_16: /Laser Driver/LD_SWITCH
+  17 EN3/LVDS34+_17: /Laser Driver/LD_SWITCH
+  20 EN2/LVDS12-_20: /Laser Driver/LD_SWITCH
+  21 EN1/LVDS12+_21: /Laser Driver/LD_SWITCH
+  22 ~{NER}_22: /Laser Driver/~{LD_ERROR}
+  19 ELVDS_19: GND
+  29 GND_29: GND
+  4 GND_4: GND
+  11 LDK5_11: Net-(D1-A)
+  13 LDK4_13: Net-(D1-A)
+  23 LDK3_23: Net-(D1-A)
+  25 LDK2_25: Net-(D1-A)
+  27 LDK1_27: Net-(D1-A)
+  9 LDK6_9: Net-(D1-A)
+  1 CI1_1: Net-(U2-VOUT)
+  2 CI2_2: Net-(U2-VOUT)
+  3 CI3_3: Net-(U2-VOUT)
+  5 CI4_5: Net-(U2-VOUT)
+  6 CI5_6: Net-(U2-VOUT)
+  7 CI6_7: Net-(U2-VOUT)
+  10 AGND5_10: Net-(U3-AGND1)
+  12 AGND4_12: Net-(U3-AGND1)
+  24 AGND3_24: Net-(U3-AGND1)
+  26 AGND2_26: Net-(U3-AGND1)
+  28 AGND1_28: Net-(U3-AGND1)
+  8 AGND6_8: Net-(U3-AGND1)
+  18 VDD_18: Net-(U3-VDD)
+U4 INA293B1 Package_TO_SOT_SMD:SOT-23-5
+  3 Vs_3: +3.3VA
+  1 OUT_1: /Laser Driver/V_I_LD_SENSE
+  2 GND_2: GND
+  4 IN+_4: Net-(U4-IN+)
+  5 IN-_5: Net-(U4-IN-)
+C13 47u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : GND
+C14 47u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : GND
+C15 47u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : GND
+C16 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +5V
+  2 : GND
+C17 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(U5-VREF)
+C18 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(U5-MONIN)
+C19 220n Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(U5-VOUT)
+C20 220n Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(C20-Pad1)
+C21 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VA
+  2 : GND
+C22 8.2n Capacitor_SMD:C_0402_1005Metric
+  2 : /Microcontroller/BIAS_SENSE
+  1 : GND
+C23 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(U5-CTRL)
+C24 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(U6-VREF)
+C25 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +5V
+  2 : GND
+C26 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VD
+  2 : GND
+C27 47u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : Net-(C27-Pad2)
+C28 47u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : Net-(C27-Pad2)
+C29 47u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : Net-(C27-Pad2)
+C30 47u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : Net-(C27-Pad2)
+C31 47u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : GND
+C32 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +5V
+  2 : GND
+C33 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VA
+  2 : GND
+F1 7A Fuse:Fuseholder_Littelfuse_Nano2_154x
+  2 : +5V
+  1 : Net-(J1-Pin_1)
+J1 5V IN TerminalBlock_RND:TerminalBlock_RND_205-00001_1x02_P5.00mm_Horizontal
+  2 Pin_2_2: GND
+  1 Pin_1_1: Net-(J1-Pin_1)
+L1 22u Inductor_SMD:L_Abracon_ASPI-4030S
+  1 : +5V
+  2 : Net-(L1-Pad2)
+R11 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : /Microcontroller/~{BIAS_SHDN}
+  2 : GND
+R12 60.4 Resistor_SMD:R_0402_1005Metric
+  2 : Net-(U5-MONIN)
+  1 : Net-(U5-VOUT)
+R13 1 Resistor_SMD:R_0402_1005Metric
+  2 : /Power Supply/SIPM_BIAS
+  1 : Net-(C20-Pad1)
+R14 604k Resistor_SMD:R_0402_1005Metric
+  2 : Net-(R14-Pad2)
+  1 : Net-(U5-MONIN)
+R15 4.99k Resistor_SMD:R_0402_1005Metric
+  1 : /Microcontroller/BIAS_SENSE
+  2 : GND
+R16 33.2k Resistor_SMD:R_0402_1005Metric
+  2 : GND
+  1 : Net-(U5-RT)
+R17 604k Resistor_SMD:R_0402_1005Metric
+  1 : Net-(R14-Pad2)
+  2 : Net-(U5-FB)
+R18 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VA
+  2 : Net-(U6-~{RESET})
+R19 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VA
+  2 : /Laser Driver/LD_DAC_SDA
+R20 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VA
+  2 : /Laser Driver/LD_DAC_SCL
+R21 20k Resistor_SMD:R_0402_1005Metric
+  2 : GND
+  1 : Net-(U5-FB)
+R22 15.4k Resistor_SMD:R_0402_1005Metric
+  2 : Net-(U5-CTRL)
+  1 : Net-(U6-VOUT)
+R23 10k Resistor_SMD:R_0402_1005Metric
+  2 : GND
+  1 : Net-(U5-CTRL)
+R24 1 Resistor_SMD:R_0402_1005Metric
+  1 : GND
+  2 : Net-(C27-Pad2)
+R25 1 Resistor_SMD:R_0402_1005Metric
+  1 : GND
+  2 : Net-(C27-Pad2)
+R26 1 Resistor_SMD:R_0402_1005Metric
+  1 : GND
+  2 : Net-(C27-Pad2)
+R27 1 Resistor_SMD:R_0402_1005Metric
+  1 : GND
+  2 : Net-(C27-Pad2)
+U5 LT3571 LT3571:QFN-16-1EP_3x3mm_P0.5mm_EP1.45x1.45mm_ThermalVias
+  11 VIN_11: +5V
+  16 MON_16: /Microcontroller/BIAS_SENSE
+  12 SHDN_12: /Microcontroller/~{BIAS_SHDN}
+  2 APD_2: /Power Supply/SIPM_BIAS
+  10 GND_10: GND
+  17 GND_17: GND
+  7 GND_7: GND
+  8 SYNC_8: GND
+  5 SW_5: Net-(L1-Pad2)
+  6 SW_6: Net-(L1-Pad2)
+  14 CTRL_14: Net-(U5-CTRL)
+  15 FB_15: Net-(U5-FB)
+  3 MONIN_3: Net-(U5-MONIN)
+  9 RT_9: Net-(U5-RT)
+  4 VOUT_4: Net-(U5-VOUT)
+  13 VREF_13: Net-(U5-VREF)
+  1 NC_1: unconnected-(U5-NC-Pad1)
+U6 AD5693R Package_SO:MSOP-10_3x3mm_P0.5mm
+  1 VDD_1: +3.3VA
+  2 VLOGIC_2: +3.3VA
+  6 A0_6: +3.3VA
+  7 SCL_7: /Laser Driver/LD_DAC_SCL
+  8 SDA_8: /Laser Driver/LD_DAC_SDA
+  4 ~{LDAC}_4: GND
+  5 GND_5: GND
+  10 VOUT_10: Net-(U6-VOUT)
+  9 VREF_9: Net-(U6-VREF)
+  3 ~{RESET}_3: Net-(U6-~{RESET})
+U7 NCV8161AMX330 Package_SON_usr:Texas_XDFN-4_1x1mm_P0.65mm
+  1 OUT_1: +3.3VD
+  3 EN_3: +5V
+  4 IN_4: +5V
+  2 GND_2: GND
+  5 EPAD_5: GND
+U8 TVS0500DRV Package_SON:WSON-6-1EP_2x2mm_P0.65mm_EP1x1.6mm
+  4 IN_4: +5V
+  5 IN_5: +5V
+  6 IN_6: +5V
+  1 GND_1: GND
+  2 GND_2: GND
+  3 GND_3: GND
+  7 GND_7: GND
+U9 NCV8161AMX330 Package_SON_usr:Texas_XDFN-4_1x1mm_P0.65mm
+  1 OUT_1: +3.3VA
+  3 EN_3: +5V
+  4 IN_4: +5V
+  2 GND_2: GND
+  5 EPAD_5: GND
+C34 1u Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(IC1-LDR_1)
+C35 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +5V
+  2 : GND
+C36 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +5V
+  2 : GND
+C37 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VD
+  2 : GND
+C38 220n Capacitor_SMD:C_0402_1005Metric
+  1 : Net-(IC1-BST)
+  2 : Net-(IC1-SW_1)
+C39 1u Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(IC1-SFB)
+C40 1u Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(IC1-VCC)
+C67 10u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : GND
+C68 10u Capacitor_SMD:C_0805_2012Metric
+  1 : +5V
+  2 : GND
+IC1 LT8722AV#PBF Analog_Devices_usr:LT8722AVPBF
+  14 VDDIO_14: +3.3VD
+  11 VIN_2_11: +5V
+  4 VIN_1_4: +5V
+  15 ~{CS}_15: /Microcontroller/SPI_CSn
+  18 MISO_18: /Microcontroller/SPI_MISO
+  17 MOSI_17: /Microcontroller/SPI_MOSI
+  16 SCK_16: /Microcontroller/SPI_SCK
+  20 AOUT_20: /Microcontroller/TEC_SENSE
+  13 SWEN_13: /Microcontroller/~{TEC_FAULT}
+  1 SYNC_1: GND
+  10 GND_10: GND
+  19 EN_19: GND
+  21 GND_21: GND
+  22 GND_22: GND
+  5 GND_5: GND
+  3 BST_3: Net-(IC1-BST)
+  8 LDR_1_8: Net-(IC1-LDR_1)
+  9 LDR_2_9: Net-(IC1-LDR_1)
+  12 SFB_12: Net-(IC1-SFB)
+  6 SW_1_6: Net-(IC1-SW_1)
+  7 SW_2_7: Net-(IC1-SW_1)
+  2 VCC_2: Net-(IC1-VCC)
+J2 TEC_OUT Connector_Molex:Molex_Pico-EZmate_78171-0002_1x02-1MP_P1.20mm_Vertical
+  2 Pin_2_2: Net-(IC1-LDR_1)
+  1 Pin_1_1: Net-(IC1-SFB)
+L2 1u Inductor_SMD_Wurth:L_Wurth_WE-PMFI-252012
+  2 2_2: Net-(IC1-SFB)
+  1 1_1: Net-(IC1-SW_1)
+R28 10k Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VD
+  2 : /Microcontroller/~{TEC_FAULT}
+A1 RaspberryPi Pico 2 Module:RaspberryPi_Pico_Common_SMD
+  39 VSYS_39: +5V
+  2 GPIO1_2: /Laser Driver/LD_DAC_SCL
+  1 GPIO0_1: /Laser Driver/LD_DAC_SDA
+  6 GPIO4_6: /Laser Driver/LD_SWITCH
+  31 GPIO26_ADC0_31: /Laser Driver/V_I_LD_SENSE
+  21 GPIO16_21: /Laser Driver/~{LD_ERROR}
+  34 GPIO28_ADC2_34: /Microcontroller/BIAS_SENSE
+  5 GPIO3_5: /Microcontroller/EXT_SCL
+  4 GPIO2_4: /Microcontroller/EXT_SDA
+  10 GPIO7_10: /Microcontroller/FRAME_SYNC
+  16 GPIO12_16: /Microcontroller/GPIO12
+  17 GPIO13_17: /Microcontroller/GPIO13
+  19 GPIO14_19: /Microcontroller/GPIO14
+  20 GPIO15_20: /Microcontroller/GPIO15
+  9 GPIO6_9: /Microcontroller/PRN_SYNC
+  12 GPIO9_12: /Microcontroller/SPI_CSn
+  11 GPIO8_11: /Microcontroller/SPI_MISO
+  15 GPIO11_15: /Microcontroller/SPI_MOSI
+  14 GPIO10_14: /Microcontroller/SPI_SCK
+  32 GPIO27_ADC1_32: /Microcontroller/TEC_SENSE
+  24 GPIO18_24: /Microcontroller/~{BIAS_SHDN}
+  22 GPIO17_22: /Microcontroller/~{TEC_FAULT}
+  13 GND_13: GND
+  18 GND_18: GND
+  23 GND_23: GND
+  28 GND_28: GND
+  3 GND_3: GND
+  33 AGND_33: GND
+  38 GND_38: GND
+  8 GND_8: GND
+  35 ADC_VREF_35: Net-(A1-ADC_VREF)
+  7 GPIO5_7: Net-(A1-GPIO5)
+  25 GPIO19_25: Net-(A1-GPIO19)
+  36 3V3_36: unconnected-(A1-3V3-Pad36)
+  37 3V3_EN_37: unconnected-(A1-3V3_EN-Pad37)
+  26 GPIO20_26: unconnected-(A1-GPIO20-Pad26)
+  27 GPIO21_27: unconnected-(A1-GPIO21-Pad27)
+  29 GPIO22_29: unconnected-(A1-GPIO22-Pad29)
+  30 RUN_30: unconnected-(A1-RUN-Pad30)
+  40 VBUS_40: unconnected-(A1-VBUS-Pad40)
+C41 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VD
+  2 : GND
+C42 1u Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(A1-ADC_VREF)
+J3 Conn_02x06_Odd_Even Connector_PinHeader_2.54mm:PinHeader_2x06_P2.54mm_Vertical
+  3 Pin_3_3: /Microcontroller/FRAME_SYNC
+  5 Pin_5_5: /Microcontroller/GPIO12
+  7 Pin_7_7: /Microcontroller/GPIO13
+  9 Pin_9_9: /Microcontroller/GPIO14
+  11 Pin_11_11: /Microcontroller/GPIO15
+  1 Pin_1_1: /Microcontroller/PRN_SYNC
+  10 Pin_10_10: GND
+  12 Pin_12_12: GND
+  2 Pin_2_2: GND
+  4 Pin_4_4: GND
+  6 Pin_6_6: GND
+  8 Pin_8_8: GND
+R36 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VD
+  2 : Net-(A1-GPIO19)
+U10 SN65LVDT2DBV Package_TO_SOT_SMD:SOT-23-5
+  1 V_{CC}_1: +3.3VD
+  3 A_3: /Microcontroller/PULSE+
+  4 B_4: /Microcontroller/PULSE-
+  2 GND_2: GND
+  5 R_5: Net-(A1-GPIO5)
+U11 REF3030 Package_TO_SOT_SMD:SOT-23
+  1 IN_1: +3.3VA
+  3 GND_3: GND
+  2 OUT_2: Net-(A1-ADC_VREF)
+U18 DS18B20 Connector_PinHeader_2.54mm:PinHeader_1x03_P2.54mm_Vertical
+  3 V_{DD}_3: +3.3VD
+  1 GND_1: GND
+  2 DQ_2: Net-(A1-GPIO19)
+C43 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +5V2
+  2 : GND
+C44 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VA2
+  2 : GND
+C45 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +5V2
+  2 : GND
+C46 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +1.8VA
+  2 : GND
+C47 220n Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(C47-Pad1)
+C48 220n Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(C47-Pad1)
+C49 220n Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(C47-Pad1)
+C50 220n Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(C50-Pad1)
+C51 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(C50-Pad1)
+C52 100p Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(C50-Pad1)
+C53 100p Capacitor_SMD:C_0402_1005Metric
+  2 : +1.8VA
+  1 : GND
+C54 8.2n Capacitor_SMD:C_0402_1005Metric
+  2 : +1.8VA
+  1 : GND
+C55 47u Capacitor_SMD:C_0805_2012Metric
+  2 : GND
+  1 : Net-(C55-Pad1)
+C56 1u Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(C55-Pad1)
+C57 1u Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(C55-Pad1)
+C58 1u Capacitor_SMD:C_0402_1005Metric
+  2 : GND
+  1 : Net-(C55-Pad1)
+C59 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(C55-Pad1)
+C60 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VA2
+  2 : GND
+C61 100p Capacitor_SMD:C_0201_0603Metric
+  1 : Net-(C61-Pad1)
+  2 : Net-(U15-+)
+C62 100p Capacitor_SMD:C_0201_0603Metric
+  1 : Net-(C62-Pad1)
+  2 : Net-(C62-Pad2)
+C63 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VA2
+  2 : GND
+C64 8.2n Capacitor_SMD:C_0402_1005Metric
+  1 : GND
+  2 : Net-(U16-VREF)
+C65 8.2n Capacitor_SMD:C_0402_1005Metric
+  2 : /Receiver/V_TRSH
+  1 : GND
+C66 1u Capacitor_SMD:C_0402_1005Metric
+  1 : +3.3VA2
+  2 : GND
+D2 AFBR-S4P11P012R SiPM_usr:Broadcom_AFBR-S4P11P012R
+  1 K_1: Net-(C50-Pad1)
+  2 K_2: Net-(C50-Pad1)
+  3 A_3: Net-(C62-Pad1)
+  4 A_4: Net-(C62-Pad1)
+FB1 1.8k Inductor_SMD:L_0402_1005Metric
+  1 : Net-(C55-Pad1)
+  2 : Net-(FB1-Pad2)
+FB2 1.8k Inductor_SMD:L_0402_1005Metric
+  2 : Net-(C61-Pad1)
+  1 : Net-(FB1-Pad2)
+J4 USB_C_Receptacle Connector_USB:USB_C_Receptacle_Amphenol_12401610E4-2A
+  A4 VBUS_A4: +5V
+  A9 VBUS_A9: +5V
+  B4 VBUS_B4: +5V
+  B9 VBUS_B9: +5V
+  B3 TX2-_B3: /Microcontroller/EXT_SCL
+  B2 TX2+_B2: /Microcontroller/EXT_SDA
+  B11 RX1+_B11: /Microcontroller/PULSE+
+  B10 RX1-_B10: /Microcontroller/PULSE-
+  A6 D+_A6: /Power Supply/SIPM_BIAS
+  A1 GND_A1: GND
+  A12 GND_A12: GND
+  B1 GND_B1: GND
+  B12 GND_B12: GND
+  SH SHIELD_SH: GND
+  A5 CC1_A5: unconnected-(J4-CC1-PadA5)
+  B5 CC2_B5: unconnected-(J4-CC2-PadB5)
+  B6 D+_B6: unconnected-(J4-D+-PadB6)
+  A7 D-_A7: unconnected-(J4-D--PadA7)
+  B7 D-_B7: unconnected-(J4-D--PadB7)
+  A11 RX2+_A11: unconnected-(J4-RX2+-PadA11)
+  A10 RX2-_A10: unconnected-(J4-RX2--PadA10)
+  A8 SBU1_A8: unconnected-(J4-SBU1-PadA8)
+  B8 SBU2_B8: unconnected-(J4-SBU2-PadB8)
+  A2 TX1+_A2: unconnected-(J4-TX1+-PadA2)
+  A3 TX1-_A3: unconnected-(J4-TX1--PadA3)
+J5 USB_C_Receptacle Connector_USB:USB_C_Receptacle_Amphenol_12401610E4-2A
+  A4 VBUS_A4: +5V2
+  A9 VBUS_A9: +5V2
+  B4 VBUS_B4: +5V2
+  B9 VBUS_B9: +5V2
+  A10 RX2-_A10: /Receiver/EXT_SCL2
+  A11 RX2+_A11: /Receiver/EXT_SDA2
+  A2 TX1+_A2: /Receiver/PULSE2+
+  A3 TX1-_A3: /Receiver/PULSE2-
+  A6 D+_A6: /Receiver/SIPM_BIAS2
+  A1 GND_A1: GND
+  A12 GND_A12: GND
+  B1 GND_B1: GND
+  B12 GND_B12: GND
+  SH SHIELD_SH: GND
+  A5 CC1_A5: unconnected-(J5-CC1-PadA5)
+  B5 CC2_B5: unconnected-(J5-CC2-PadB5)
+  B6 D+_B6: unconnected-(J5-D+-PadB6)
+  A7 D-_A7: unconnected-(J5-D--PadA7)
+  B7 D-_B7: unconnected-(J5-D--PadB7)
+  B11 RX1+_B11: unconnected-(J5-RX1+-PadB11)
+  B10 RX1-_B10: unconnected-(J5-RX1--PadB10)
+  A8 SBU1_A8: unconnected-(J5-SBU1-PadA8)
+  B8 SBU2_B8: unconnected-(J5-SBU2-PadB8)
+  B2 TX2+_B2: unconnected-(J5-TX2+-PadB2)
+  B3 TX2-_B3: unconnected-(J5-TX2--PadB3)
+L3 15u Industor_usr:PFL4514
+  1 : +5V2
+  2 : Net-(C55-Pad1)
+R29 50 Resistor_SMD:R_0402_1005Metric
+  1 : /Receiver/SIPM_BIAS2
+  2 : Net-(C47-Pad1)
+R30 50 Resistor_SMD:R_0402_1005Metric
+  1 : Net-(C47-Pad1)
+  2 : Net-(C50-Pad1)
+R31 50 Resistor_SMD:R_0201_0603Metric
+  1 : +1.8VA
+  2 : Net-(U15-+)
+R32 50 Resistor_SMD:R_0201_0603Metric
+  2 : GND
+  1 : Net-(C62-Pad1)
+R33 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VA2
+  2 : Net-(U16-~{RESET})
+R34 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VA2
+  2 : /Receiver/EXT_SDA2
+R35 4k7 Resistor_SMD:R_0402_1005Metric
+  1 : +3.3VA2
+  2 : /Receiver/EXT_SCL2
+U12 NCV8161AMX330 Package_SON_usr:Texas_XDFN-4_1x1mm_P0.65mm
+  1 OUT_1: +3.3VA2
+  3 EN_3: +5V2
+  4 IN_4: +5V2
+  2 GND_2: GND
+  5 EPAD_5: GND
+U13 NCV8161AMX180 Package_SON_usr:Texas_XDFN-4_1x1mm_P0.65mm
+  1 OUT_1: +1.8VA
+  3 EN_3: +5V2
+  4 IN_4: +5V2
+  2 GND_2: GND
+  5 EPAD_5: GND
+U14 QPL7442 Package_DFN_QFN:DFN-8-1EP_2x2mm_P0.5mm_EP0.8x1.6mm
+  1 GND_1: GND
+  3 GND_3: GND
+  4 GND_4: GND
+  6 GND_6: GND
+  8 GND_8: GND
+  9 GND_9: GND
+  7 : Net-(C61-Pad1)
+  2 : Net-(C62-Pad2)
+  5 VG2_5: unconnected-(U14-VG2-Pad5)
+U15 TLV3801 Comparator_usr:TLV3801DSGR
+  6 VCC_6: +3.3VA2
+  7 VCC_7: +3.3VA2
+  8 Q_8: /Receiver/PULSE2+
+  1 ~{Q}_1: /Receiver/PULSE2-
+  4 -_4: /Receiver/V_TRSH
+  13 VEE_13: GND
+  2 GND_2: GND
+  3 VEE_3: GND
+  9 VEE_9: GND
+  5 +_5: Net-(U15-+)
+  5 NC_5: unconnected-(U15-NC-Pad5)
+  11 NC_11: unconnected-(U15-NC-Pad11)
+U16 AD5693R Package_SO:MSOP-10_3x3mm_P0.5mm
+  1 VDD_1: +3.3VA2
+  2 VLOGIC_2: +3.3VA2
+  6 A0_6: +3.3VA2
+  7 SCL_7: /Receiver/EXT_SCL2
+  8 SDA_8: /Receiver/EXT_SDA2
+  10 VOUT_10: /Receiver/V_TRSH
+  4 ~{LDAC}_4: GND
+  5 GND_5: GND
+  9 VREF_9: Net-(U16-VREF)
+  3 ~{RESET}_3: Net-(U16-~{RESET})
+U17 MCP9800A Package_TO_SOT_SMD:SOT-23-5
+  1 V_{DD}_1: +3.3VA2
+  4 SCLK_4: /Receiver/EXT_SCL2
+  5 SDA_5: /Receiver/EXT_SDA2
+  2 GND_2: GND
+  3 ALERT_3: unconnected-(U17-ALERT-Pad3)

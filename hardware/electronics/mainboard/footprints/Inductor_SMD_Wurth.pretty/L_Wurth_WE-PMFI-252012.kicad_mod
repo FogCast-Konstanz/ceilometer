@@ -1,0 +1,136 @@
+(footprint "L_Wurth_WE-PMFI-252012"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(descr "Shielded Power Inductors, body 2.5x2x1.2mm, https://www.we-online.com/en/components/products/WE-PMFI#/articles/WE-PMFI-252012")
+	(tags "SMT")
+	(property "Reference" "REF**"
+		(at 0 -2.35 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "c70d77cb-c321-4e8c-98ac-7c6b6ad6e370")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "L_Wurth_WE-PMFI-252012"
+		(at 0 2.35 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "d8e19e39-0f3f-4731-b162-64ee9dd15237")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "dc2887ab-5f89-4ca6-af11-86902508d935")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "5140d2ef-2ff1-46a3-b7cb-55cdfbfd2326")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_line
+		(start -1.25 -1.36)
+		(end 1.25 -1.36)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ee6c967e-2ffb-4754-94fb-0557f67b84dc")
+	)
+	(fp_line
+		(start -1.25 1.36)
+		(end 1.25 1.36)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "db73bfdd-f087-44e8-9f92-c3f362c20487")
+	)
+	(fp_rect
+		(start -1.85 -1.35)
+		(end 1.85 1.35)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "b876fae6-8313-4390-b185-dea245ea1797")
+	)
+	(fp_rect
+		(start -1.25 -1)
+		(end 1.25 1)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "e5250d0a-33b1-4b6b-a962-f37ee1c37894")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "2a43844c-2e62-4181-acbf-db7e845d4aac")
+		(effects
+			(font
+				(size 0.5 0.5)
+				(thickness 0.075)
+			)
+		)
+	)
+	(pad "1" smd rect
+		(at -1 0)
+		(size 1.2 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "6e5eaa36-0e16-4652-a55a-f9a395293dc3")
+	)
+	(pad "2" smd rect
+		(at 1 0)
+		(size 1.2 2.2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "87994fea-4dda-4e11-9e25-09dfb72b622a")
+	)
+	(embedded_fonts no)
+	(model "${KIPRJMOD}/Inductor_SMD_Wurth.pretty/3D/L_Wurth_WE-PMFI-252012.wrl"
+		(offset
+			(xyz 0 0 0)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz 0 0 0)
+		)
+	)
+)

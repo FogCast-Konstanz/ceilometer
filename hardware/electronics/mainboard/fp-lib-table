@@ -1,0 +1,11 @@
+(fp_lib_table
+	(version 7)
+	(lib (name "Driver_Laser") (type "KiCad") (uri "${KIPRJMOD}/footprints/Driver_Laser.pretty") (options "") (descr ""))
+	(lib (name "Comparator_usr") (type "KiCad") (uri "${KIPRJMOD}/footprints/Comparator_usr.pretty") (options "") (descr ""))
+	(lib (name "LT3571") (type "KiCad") (uri "${KIPRJMOD}/footprints/LT3571.pretty") (options "") (descr "Analog Devices LT3571 UD package"))
+	(lib (name "Industor_usr") (type "KiCad") (uri "${KIPRJMOD}/footprints/Industor_usr.pretty") (options "") (descr ""))
+	(lib (name "SiPM_usr") (type "KiCad") (uri "${KIPRJMOD}/footprints/SiPM_usr.pretty") (options "") (descr ""))
+	(lib (name "Analog_Devices_usr") (type "KiCad") (uri "${KIPRJMOD}/footprints/Analog_Devices_usr.pretty") (options "") (descr ""))
+	(lib (name "Inductor_SMD_Wurth") (type "KiCad") (uri "${KIPRJMOD}/footprints/Inductor_SMD_Wurth.pretty") (options "") (descr ""))
+	(lib (name "Analog_Devices_usr") (type "KiCad") (uri "${KIPRJMOD}/footprints/Analog_Devices_usr.pretty") (options "") (descr ""))
+)
