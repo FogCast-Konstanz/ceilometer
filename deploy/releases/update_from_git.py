@@ -9,6 +9,14 @@ import tempfile
 from pathlib import Path
 from install_release import CURRENT,deploy,health
 
+def release_available(repository,ref):
+    result=subprocess.run(['git','ls-remote','--exit-code','--heads',repository,ref],
+                          capture_output=True,text=True,timeout=90)
+    if result.returncode==2:
+        print('WAITING: no published deployment branch yet');return False
+    result.check_returncode()
+    return True
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repository',default=os.environ.get('CEILOMETER_GIT_URL'))
@@ -22,6 +30,7 @@ def main():
     status=health()
     if status['enabled'] or not status['connected'] or not status['stop_confirmed']:
         print('DEFERRED: instrument is active or shutdown is unconfirmed');return
+    if not release_available(args.repository,args.ref): return
     repo=Path('/var/lib/ceilometer-cd/repo');repo.mkdir(parents=True,exist_ok=True)
     def git(*parts,**kwargs): return subprocess.run(['git','-C',str(repo),*parts],check=True,**kwargs)
     if not (repo/'.git').exists(): git('init')

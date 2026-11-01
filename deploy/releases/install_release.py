@@ -96,7 +96,7 @@ def deploy(archive,serial,initial=False):
         shutil.rmtree(stage)
         print('ALREADY_CURRENT '+manifest['release_id']);return True
     # Exercise the actual Linux/Pi host runtime before stopping the old service.
-    for test in ('deploy/releases/tests/test_release.py','software/instrument/tests/test_stream_client.py','software/instrument/tests/test_dashboard.py'):
+    for test in ('deploy/releases/tests/test_release.py','deploy/releases/tests/test_updater.py','software/instrument/tests/test_stream_client.py','software/instrument/tests/test_dashboard.py'):
         run('/usr/bin/python3',str(stage/test),cwd=stage,env={**os.environ,'PYTHONDONTWRITEBYTECODE':'1'},timeout=120)
     if target.exists(): verify(target);shutil.rmtree(stage)
     else: stage.rename(target)
