@@ -54,6 +54,8 @@ if(CEIL_HOST_TESTS)
   endif()
   find_package(Python3 COMPONENTS Interpreter QUIET)
   if(Python3_Interpreter_FOUND)
+    add_test(NAME updater_tests COMMAND "${Python3_EXECUTABLE}"
+      "${CEIL_REPO_ROOT}/deploy/releases/tests/test_updater.py")
     add_test(NAME release_tests COMMAND "${Python3_EXECUTABLE}"
       "${CEIL_REPO_ROOT}/deploy/releases/tests/test_release.py")
     add_test(NAME dashboard_tests COMMAND "${Python3_EXECUTABLE}"

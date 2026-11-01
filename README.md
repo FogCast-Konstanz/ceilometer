@@ -174,3 +174,44 @@ Automated updates require an explicitly configured Git repository and target
 Pico serial number. Updates are applied only while outputs are confirmed off,
 and the service restarts disabled. Hardware-only commits do not trigger the
 firmware deployment workflow.
+
+### Pi-initiated continuous deployment
+
+GitHub Actions builds and tests a release, then publishes it to the repository's
+`deploy` branch. **GitHub never connects to the Raspberry Pi.** A systemd timer
+on the Pi initiates an outbound Git fetch every five minutes (with up to 30 s
+jitter), starting about two minutes after boot. No inbound port, webhook,
+public Pi address or university firewall exception is needed. The Pi needs
+outbound HTTPS access to the Git server; configure its proxy if required.
+
+After provisioning the instrument release under `/opt/ceilometer-firmware`,
+install and configure the poller on the Pi:
+
+```sh
+sudo install -d -m 0750 /etc/ceilometer
+sudo install -m 0600 /opt/ceilometer-firmware/deploy/raspberry-pi/cd.env.example /etc/ceilometer/cd.env
+sudoedit /etc/ceilometer/cd.env
+# Set the HTTPS repository URL, refs/heads/deploy and the target Pico USB serial.
+sudo install -m 0644 /opt/ceilometer-firmware/deploy/raspberry-pi/ceilometer-update.service /etc/systemd/system/
+sudo install -m 0644 /opt/ceilometer-firmware/deploy/raspberry-pi/ceilometer-update.timer /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now ceilometer-update.timer
+```
+
+For a private repository, configure read-only Git credentials on the Pi for the
+root-run updater. Do not embed credentials in the URL or commit them. GitHub
+Actions needs permission to publish the deployment branch, but no Pi credentials.
+
+```sh
+systemctl list-timers ceilometer-update.timer
+journalctl -u ceilometer-update.service -n 50
+# Trigger an immediate check:
+sudo systemctl start ceilometer-update.service
+```
+
+While measuring, or when shutdown cannot be confirmed, the updater defers the
+update until a later poll. Network outages leave the installed release running;
+the next scheduled poll retries. The installer verifies release hashes, targets
+the configured Pico, checks the restarted service and attempts rollback on failure.
+Neither polling nor an update automatically enables measurements. An initial
+local installation is required before polling can update the Pi itself.
